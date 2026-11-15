@@ -7,6 +7,7 @@ import {
   lathe, glassMaterial, metalMaterial, shadows,
   buildFlask, buildThermometer, buildBurner, buildBurette, buildManometer,
   buildBeaker, buildStirrer, buildTestTubeRack,
+  buildGraduatedCylinder, buildFunnel, buildWashBottle,
   liquidLevelOf, flaskInnerRadius,
 } from "./glassware.js";
 import { buildFlaskGhost } from "./bench-ghost.js";
@@ -90,6 +91,12 @@ export function buildBenchView(host, ctx) {
   scene.add(stirrer.group);
   const rack = buildTestTubeRack(THREE);
   scene.add(rack.group);
+  const cylinder = buildGraduatedCylinder(THREE);
+  scene.add(cylinder.group);
+  const funnel = buildFunnel(THREE);
+  scene.add(funnel.group);
+  const washBottle = buildWashBottle(THREE);
+  scene.add(washBottle.group);
 
   const bottles = buildBottles(THREE, scene, ctx.config.substances, ctx.config.controls || []);
   const ghost = buildFlaskGhost(THREE, { toScreen, reduced: REDUCED });
@@ -161,6 +168,9 @@ export function buildBenchView(host, ctx) {
     beaker.group.visible = visible("beaker");
     stirrer.group.visible = visible("stirrer");
     rack.group.visible = visible("rack");
+    cylinder.group.visible = visible("cylinder");
+    funnel.group.visible = visible("funnel");
+    washBottle.group.visible = visible("wash-bottle");
   }
   syncInstruments();
   wirePicking(canvas, camera, hits, ctx, ghost, (id) => { hoverId = id; });

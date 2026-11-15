@@ -1,4 +1,4 @@
-// Chemistry glassware factories (Three.js via the global THREE).
+﻿// Chemistry glassware factories (Three.js via the global THREE).
 // Pure geometry builders: no scene, no animation loop, no DOM.
 // Every builder returns the meshes the bench view needs to animate.
 
@@ -248,7 +248,7 @@ export function buildBeaker(THREE) {
   const water = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.28, 0.42, 32), waterMat));
   water.position.y = 0.21;
   group.add(body, rim, bottom, water);
-  group.position.set(-1.7, -1.2, 0.35);
+  group.position.set(-1.15, -1.2, 0.95);
   return { group };
 }
 
@@ -263,7 +263,7 @@ export function buildStirrer(THREE) {
   const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.5, 28, 1, true), glassMaterial(THREE));
   cup.position.y = 0.35;
   group.add(plate, dial, cup);
-  group.position.set(1.45, -1.2, 0.3);
+  group.position.set(0.55, -1.2, -1.15);
   return { group };
 }
 
@@ -281,5 +281,66 @@ export function buildTestTubeRack(THREE) {
     group.add(tube);
   }
   group.position.set(-1.15, -1.2, -1.35);
+  return { group };
+}
+
+// Graduated cylinder with its scale and a little solution, front-right.
+export function buildGraduatedCylinder(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const tube = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 1.1, 32, 1, true), glass));
+  tube.position.y = 0.55;
+  const foot = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.06, 32), glass));
+  foot.position.y = 0.03;
+  const marks = new THREE.MeshBasicMaterial({ color: 0x334155 });
+  for (let i = 1; i <= 6; i++) {
+    const mark = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.008, 0.01), marks);
+    mark.position.set(0.09, 0.18 + i * 0.14, 0.12);
+    group.add(mark);
+  }
+  const solution = shadows(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.11, 0.11, 0.42, 28),
+    new THREE.MeshStandardMaterial({ color: 0x93c5fd, roughness: 0.15, transparent: true, opacity: 0.75 }),
+  ));
+  solution.position.y = 0.24;
+  group.add(tube, foot, solution);
+  group.position.set(0.9, -1.2, 1.2);
+  return { group };
+}
+
+// Glass funnel resting on its stem, front-left of the flask.
+export function buildFunnel(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const cone = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.05, 0.44, 32, 1, true), glass));
+  cone.position.y = 0.48;
+  const stem = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.42, 20), glass));
+  stem.position.y = 0.14;
+  const rim = shadows(new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.022, 10, 40), glass));
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = 0.7;
+  group.add(cone, stem, rim);
+  group.position.set(-0.4, -1.2, 1.15);
+  return { group };
+}
+
+// Wash bottle (pissette) with its bent spout, front-right of the bench.
+export function buildWashBottle(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const body = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.52, 28, 1, true), glass));
+  body.position.y = 0.26;
+  const water = shadows(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.17, 0.19, 0.3, 24),
+    new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.15, transparent: true, opacity: 0.7 }),
+  ));
+  water.position.y = 0.16;
+  const cap = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.1, 20), metalMaterial(THREE, 0x334155, 0.5)));
+  cap.position.y = 0.56;
+  const spout = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 12), glass));
+  spout.position.set(0.12, 0.62, 0);
+  spout.rotation.z = -0.5;
+  group.add(body, water, cap, spout);
+  group.position.set(2.75, -1.2, -0.6);
   return { group };
 }

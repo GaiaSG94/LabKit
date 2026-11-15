@@ -55,7 +55,6 @@ export async function startGame(source) {
     },
     setInstrument(instrument, active) {
       setActive(instrument.material ? "material" : "instruments", instrument.material || instrument.id, active);
-      if (instrument.id === "burner") setActive("material", "bruleur", active);
       if (instrument.id === "burner") {
         const b = state.material.bruleur;
         if (!active && b) b.strength = 0;
@@ -110,13 +109,13 @@ export async function startGame(source) {
       ctx.touch();
     },
     setBurner(on) {
-      setActive("instruments", "burner", on);
+      setActive("material", "bruleur", on);
       const b = state.material.bruleur;
       if (on && b && !(b.strength > 0)) b.strength = 60;
       if (view.syncInstruments) view.syncInstruments();
       ctx.touch();
     },
-    toggleBurner() { ctx.setBurner(!ctx.instrumentActive({ id: "burner" })); },
+    toggleBurner() { ctx.setBurner(!isActive("material", "bruleur")); },
     getControl(path) { return getPath(state, path); },
     setControl(path, v) {
       if (setPath(state, path, v)) ctx.touch();

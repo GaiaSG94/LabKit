@@ -1,4 +1,4 @@
-// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
+﻿// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
 // Open body with a scalloped, swaying hem; eyes that follow the pointer, the
 // falling drop or the flask; moods that rotate, look at the viewer or fly.
 // Pure scene object: the bench view owns the camera and the render loop.
@@ -30,32 +30,33 @@ export function buildFlaskGhost(THREE, opts) {
   const cheekMat = new THREE.MeshStandardMaterial({ color: 0xff9a62, roughness: 0.6 });
   const sockets = new Map();
   for (const sx of [-1, 1]) {
-    // White sclera first, then the pupil on top of it: both protrude from the
-    // head so the eyes read as eyes instead of sinking into the body shell.
-    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 14), scleraMat);
-    sclera.scale.set(1, 1.2, 0.5);
-    sclera.position.set(sx * 0.23, EYE_Y, 0.66);
+    // White sclera first, then the pupil on top of it: both sit ON the head
+    // surface (see aim()), so the eyes read as eyes instead of sinking into
+    // the body shell.
+    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 14), scleraMat);
+    sclera.scale.set(1, 1.2, 0.62);
+    sclera.position.set(sx * 0.23, EYE_Y, 0.68);
     group.add(sclera);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 14), ink);
-    eye.scale.set(1, 1.3, 0.8);
-    eye.position.set(sx * 0.225, EYE_Y, 0.74);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 14), ink);
+    eye.scale.set(1, 1.3, 0.95);
+    eye.position.set(sx * 0.225, EYE_Y, 0.78);
     eye.userData.sx = sx;
     group.add(eye);
     eyes.push(eye);
     sockets.set(eye, sclera);
-    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 10), cheekMat);
+    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10), cheekMat);
     cheek.scale.set(1.2, 0.55, 0.3);
     cheek.position.set(sx * 0.46, 0.4, 0.62);
     group.add(cheek);
   }
-  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.017, 8, 16, Math.PI), ink);
+  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.02, 8, 16, Math.PI), ink);
   smile.rotation.z = Math.PI;
   smile.position.set(0, 0.45, 0.77);
   group.add(smile);
-  group.scale.setScalar(0.85);
+  group.scale.setScalar(1.05);
 
   const state = {
-    home: { x: 2.25, y: -1.2 + LOBE * 0.85 + 0.06 },
+    home: { x: 2.05, y: -1.2 + LOBE * 0.85 + 0.06 },
     mood: { kind: "watch", start: 0, until: 4, dir: 1, yaw: null, wave: 0 },
     look: { x: 0, y: 0 },
     blinkAt: 2.5,
@@ -63,7 +64,7 @@ export function buildFlaskGhost(THREE, opts) {
     hop: 0,
     pointer: { x: 0, y: 0, at: -1e9 },
   };
-  group.position.set(state.home.x, state.home.y, -0.1);
+  group.position.set(state.home.x, state.home.y, 0.55);
 
   waveHem(THREE, bodyGeo, hemBase, 0);
 
