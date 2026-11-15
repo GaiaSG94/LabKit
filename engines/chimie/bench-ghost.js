@@ -1,14 +1,14 @@
-﻿// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
-// Open body with a scalloped, swaying hem; big cartoon eyes that follow the
-// pointer, the falling drop or the flask; moods that watch, face the viewer or
-// hop. The face always stays turned to the camera, so the eyes never vanish.
+// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
+// Open body with a scalloped, swaying hem; glossy eyes like the LabKit logo
+// (dark pupil, iris crescent, catch-lights); moods that watch, face the viewer
+// or hop. The face always stays turned to the camera, so the eyes never vanish.
 import { lathe, shadows } from "./glassware.js";
 
 const HEM = 0.42;
 const LOBES = 7;
 const LOBE = 0.17;
 const EYE_Y = 0.62;
-const EYE_X = 0.25;
+const EYE_X = 0.2;
 const PROFILE = [
   [0.8, 0], [0.795, 0.07], [0.79, 0.14], [0.785, 0.21], [0.78, 0.28],
   [0.78, 0.35], [0.78, HEM], [0.745, 0.716], [0.641, 0.94], [0.468, 1.116],
@@ -23,33 +23,35 @@ export function buildFlaskGhost(THREE, opts) {
   const bodyGeo = lathe(THREE, PROFILE, 96);
   const hemBase = Float32Array.from(bodyGeo.attributes.position.array);
   const ink = new THREE.MeshStandardMaterial({ color: 0x17141f, roughness: 0.3 });
-  const scleraMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 });
+  const irisMat = new THREE.MeshStandardMaterial({ color: 0x4a3f66, roughness: 0.5 });
+  const hlMat = new THREE.MeshBasicMaterial({ color: 0xfbf8ff });
   const bodyMat = new THREE.MeshPhysicalMaterial({
     color: 0xfbf8ff, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.2, side: THREE.DoubleSide,
   });
   group.add(shadows(new THREE.Mesh(bodyGeo, bodyMat)));
-  const cheekMat = new THREE.MeshStandardMaterial({ color: 0xff9a62, roughness: 0.6 });
-  const sockets = new Map();
+  const cheekMat = new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.6 });
   for (const sx of [-1, 1]) {
-    // White sclera first, then the pupil on top of it: both sit ON the head
-    // surface (see aim()), so the eyes read as eyes instead of sinking into
-    // the body shell.
-    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 14), scleraMat);
-    sclera.scale.set(1, 1.15, 0.6);
-    sclera.position.set(sx * EYE_X, EYE_Y, 0.68);
-    group.add(sclera);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), ink);
-    eye.scale.set(1, 1.25, 0.95);
-    eye.position.set(sx * EYE_X, EYE_Y, 0.79);
-    eye.userData.sx = sx;
-    group.add(eye);
-    eyes.push(eye);
-    sockets.set(eye, sclera);
-    // Eyebrow: a dark stroke that makes the face read even at small size.
-    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.035, 0.05), ink);
-    brow.position.set(sx * EYE_X, EYE_Y + 0.21, 0.76);
-    brow.rotation.z = sx * 0.16;
-    group.add(brow);
+    // Glossy eye, same design as the SVG logo: dark pupil, a lighter crescent
+    // at the bottom for depth, two white catch-lights. The whole eye is one
+    // group so aim() can move and blink it as a unit.
+    const eyeG = new THREE.Group();
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), ink);
+    pupil.scale.set(1, 1.3, 0.8);
+    eyeG.add(pupil);
+    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 12), irisMat);
+    iris.scale.set(1, 0.45, 0.4);
+    iris.position.set(0, -0.045, 0.09);
+    eyeG.add(iris);
+    const hl1 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), hlMat);
+    hl1.position.set(-0.05, 0.06, 0.11);
+    eyeG.add(hl1);
+    const hl2 = new THREE.Mesh(new THREE.SphereGeometry(0.024, 10, 8), hlMat);
+    hl2.position.set(0.055, -0.03, 0.12);
+    eyeG.add(hl2);
+    eyeG.position.set(sx * EYE_X, EYE_Y, 0.72);
+    eyeG.userData.sx = sx;
+    group.add(eyeG);
+    eyes.push(eyeG);
     const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10), cheekMat);
     cheek.scale.set(1.2, 0.55, 0.3);
     cheek.position.set(sx * 0.46, 0.4, 0.62);
@@ -62,7 +64,7 @@ export function buildFlaskGhost(THREE, opts) {
   group.scale.setScalar(1.05);
 
   const state = {
-    home: { x: 2.05, y: -1.2 + LOBE * 0.85 + 0.06 },
+    home: { x: 2.6, y: -1.2 + LOBE * 0.85 + 0.06 },
     mood: { kind: "watch", start: 0, until: 4, dir: 1, yaw: null, wave: 0 },
     look: { x: 0, y: 0 },
     blinkAt: 2.5,
@@ -93,6 +95,7 @@ export function buildFlaskGhost(THREE, opts) {
 
   function aim(dt, target) {
     const head = toScreen(group.position.x, group.position.y + EYE_Y * 0.85, group.position.z);
+    if (!Number.isFinite(head.x) || !Number.isFinite(head.y)) return;
     let dx = target.x - head.x;
     let dy = target.y - head.y;
     const len = Math.hypot(dx, dy);
@@ -110,19 +113,12 @@ export function buildFlaskGhost(THREE, opts) {
       const x = sx * EYE_X + state.look.x * 0.05;
       const y = EYE_Y - state.look.y * 0.045;
       const r = bodyRadiusAt(y);
-      // Centre the pupil ON the body surface, not inside it: the sphere then
-      // reads as an eye protruding from the head instead of a hidden blob.
-      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.03;
+      // Centre the eye ON the body surface, not inside it: it then reads as a
+      // glossy eye protruding from the head instead of a hidden blob.
+      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.02;
       eye.position.set(x, y, z);
       eye.rotation.y = Math.asin(Math.max(-1, Math.min(1, x / r)));
-      eye.scale.y = blinking ? 0.15 : 1.25;
-      // The white socket rides with its pupil so the eye never slides off it.
-      const socket = sockets.get(eye);
-      if (socket) {
-        socket.position.set(sx * EYE_X + state.look.x * 0.02, y, z - 0.05);
-        socket.rotation.y = eye.rotation.y;
-        socket.scale.y = blinking ? 0.15 : 1.15;
-      }
+      eye.scale.y = blinking ? 0.15 : 1;
     }
   }
 

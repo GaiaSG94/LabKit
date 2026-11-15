@@ -124,7 +124,7 @@ export function buildBenchView(host, ctx) {
   ground.receiveShadow = true;
   scene.add(ground);
 
-  const box = { x0: -4.95, x1: 3.0, y0: -1.72, y1: 4.2 };
+  const box = { x0: -5.6, x1: 3.6, y0: -1.72, y1: 4.2 };
   const center = V((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2, 0);
   const tanH = Math.tan(((FOV / 2) * Math.PI) / 180);
 

@@ -1,4 +1,4 @@
-﻿// Chemistry glassware factories (Three.js via the global THREE).
+// Chemistry glassware factories (Three.js via the global THREE).
 // Pure geometry builders: no scene, no animation loop, no DOM.
 // Every builder returns the meshes the bench view needs to animate.
 
@@ -248,7 +248,7 @@ export function buildBeaker(THREE) {
   const water = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.28, 0.42, 32), waterMat));
   water.position.y = 0.21;
   group.add(body, rim, bottom, water);
-  group.position.set(-1.15, -1.2, 0.95);
+  group.position.set(-1.1, -1.2, 1.1);
   return { group };
 }
 
@@ -263,7 +263,7 @@ export function buildStirrer(THREE) {
   const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.2, 0.5, 28, 1, true), glassMaterial(THREE));
   cup.position.y = 0.35;
   group.add(plate, dial, cup);
-  group.position.set(0.55, -1.2, -1.15);
+  group.position.set(0.3, -1.2, -1.25);
   return { group };
 }
 
@@ -280,7 +280,7 @@ export function buildTestTubeRack(THREE) {
     tube.position.set(i * 0.22, 0.36, 0);
     group.add(tube);
   }
-  group.position.set(-1.15, -1.2, -1.35);
+  group.position.set(-1.15, -1.2, -1.4);
   return { group };
 }
 
@@ -304,7 +304,7 @@ export function buildGraduatedCylinder(THREE) {
   ));
   solution.position.y = 0.24;
   group.add(tube, foot, solution);
-  group.position.set(0.9, -1.2, 1.2);
+  group.position.set(1.15, -1.2, 1.7);
   return { group };
 }
 
@@ -320,7 +320,7 @@ export function buildFunnel(THREE) {
   rim.rotation.x = Math.PI / 2;
   rim.position.y = 0.7;
   group.add(cone, stem, rim);
-  group.position.set(-0.4, -1.2, 1.15);
+  group.position.set(-0.75, -1.2, 1.75);
   return { group };
 }
 
@@ -341,7 +341,7 @@ export function buildWashBottle(THREE) {
   spout.position.set(0.12, 0.62, 0);
   spout.rotation.z = -0.5;
   group.add(body, water, cap, spout);
-  group.position.set(2.75, -1.2, -0.6);
+  group.position.set(3.0, -1.2, -0.5);
   return { group };
 }
 
@@ -356,7 +356,7 @@ export function buildHotPlate(THREE) {
   knob.rotation.x = Math.PI / 2;
   knob.position.set(0.28, 0.12, 0.36);
   group.add(body, ceramic, knob);
-  group.position.set(1.45, -1.2, -1.35);
+  group.position.set(1.4, -1.2, -1.4);
   return { group };
 }
 
@@ -371,7 +371,7 @@ export function buildWatchGlass(THREE) {
   ));
   solution.position.y = 0.03;
   group.add(dish, solution);
-  group.position.set(-1.75, -1.2, 1.35);
+  group.position.set(-2.75, -1.2, 1.55);
   return { group };
 }
 
@@ -389,7 +389,7 @@ export function buildPasteurPipette(THREE) {
   ));
   drop.position.y = -0.63;
   group.add(bulb, tube, drop);
-  group.position.set(-1.05, -1.2, 1.5);
+  group.position.set(-1.7, -1.2, 1.7);
   group.rotation.z = Math.PI / 2 - 0.15;
   group.rotation.y = 0.4;
   return { group };
@@ -404,7 +404,7 @@ export function buildMortar(THREE) {
   pestle.position.set(0.16, 0.26, 0.05);
   pestle.rotation.z = 0.5;
   group.add(bowl, pestle);
-  group.position.set(1.95, -1.2, 1.35);
+  group.position.set(2.15, -1.2, 1.6);
   return { group };
 }
 
@@ -423,7 +423,7 @@ export function buildVolumetricFlask(THREE) {
   const stopper = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.09, 18), metalMaterial(THREE, 0x334155, 0.5)));
   stopper.position.y = 0.95;
   group.add(bulb, neck, ring, stopper);
-  group.position.set(2.35, -1.2, -1.35);
+  group.position.set(2.5, -1.2, -1.4);
   return { group };
 }
 
@@ -438,7 +438,7 @@ export function buildStopwatch(THREE) {
   crown.position.set(0.19, 0.1, 0);
   crown.rotation.z = Math.PI / 2;
   group.add(body, face, crown);
-  group.position.set(0.1, -1.2, 1.55);
+  group.position.set(0.25, -1.2, 1.8);
   group.rotation.y = -0.25;
   return { group };
 }
