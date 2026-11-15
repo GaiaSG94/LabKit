@@ -6,11 +6,16 @@ import { chEsc, CH_INSTRUMENTS, CH_MATERIAL } from "./hud-shared.js";
 
 export function buildLeftColumn({ add, config, ctx }) {
   const col = add('<aside class="ch-left ch-gx"></aside>');
+  const benchCol = document.createElement("div");
+  benchCol.className = "ch-col";
+  const rulesCol = document.createElement("div");
+  rulesCol.className = "ch-col";
+  col.append(benchCol, rulesCol);
   const sections = [
-    buildInstruments(col, config, ctx),
-    buildMaterial(col, config, ctx),
-    buildKnobs(col, config, ctx),
-    buildLaws(col, config, ctx),
+    buildInstruments(benchCol, config, ctx),
+    buildMaterial(benchCol, config, ctx),
+    buildKnobs(rulesCol, config, ctx),
+    buildLaws(rulesCol, config, ctx),
   ];
   return {
     element: col,

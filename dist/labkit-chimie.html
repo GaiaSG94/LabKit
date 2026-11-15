@@ -3014,7 +3014,7 @@ const CH_CSS = `
 .ch-stat span{overflow:hidden;text-overflow:ellipsis}
 .ch-measure{height:42px;border-radius:999px;padding:0 18px 0 14px;display:flex;align-items:center;gap:7px;font-weight:700;font-size:13.5px;white-space:nowrap;background:#0b2a17;color:#fff;flex:none}
 .ch-measure i{width:8px;height:8px;border-radius:50%;background:#ff5a3d}
-@media (max-width:1100px){.ch-left{width:220px;left:14px;top:78px}}
+@media (max-width:1100px){.ch-left{width:224px;left:14px;top:78px;flex-direction:column;overflow:auto}}
 @media (max-width:900px){
   .ch-tabs{top:70px}
   .ch-side{left:16px;right:16px;top:auto;bottom:88px;width:auto;height:150px}
@@ -3042,7 +3042,11 @@ const CH_CSS = `
 .ch-bur button.ink{background:#0b2a17;color:#fff}
 .ch-bur small{font:600 11px "JetBrains Mono",ui-monospace,monospace;color:rgba(11,42,23,.6);flex:1;text-align:right}
 .ch-eq{align-items:center;gap:5px;font-weight:800;font-size:11px;background:#16a34a;color:#fff;border-radius:999px;padding:3px 9px}
-.ch-left{position:absolute;left:24px;top:84px;bottom:96px;width:268px;padding:14px 16px;display:flex;flex-direction:column;gap:14px;overflow:auto;overscroll-behavior:contain}
+ .ch-left{position:absolute;left:24px;top:84px;bottom:96px;display:flex;flex-direction:row;gap:14px;padding:14px;overflow:hidden}
+ .ch-left>*{flex-shrink:0}
+ .ch-col{width:216px;max-width:240px;display:flex;flex-direction:column;gap:12px;min-height:0;min-width:0}
+ .ch-col>*{flex-shrink:0}
+ .ch-bar .ch-btn.notebook{justify-content:center;text-align:center;padding:0 16px}
 .ch-left>*{flex-shrink:0}
 .ch-lsec{display:flex;flex-direction:column;gap:7px}
 .ch-lsec h3{margin:0;font:700 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(11,42,23,.6);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
@@ -3068,7 +3072,7 @@ const CH_CSS = `
 .ch-ins .tag.solid{background:#0ea5e9;color:#fff}
 .ch-ins .tag.gas{background:#f97316;color:#fff}
  .ch-ins .tag.hot{background:#b91c1c;color:#fff}
- .ch-instrument{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:7px;min-height:30px}
+ .ch-instrument{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:7px;min-height:26px}
  .ch-instrument .nm{min-width:0;font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .ch-instrument .readout{font:700 10px "JetBrains Mono",ui-monospace,monospace;color:rgba(11,42,23,.7);white-space:nowrap}
  .ch-check{position:relative;width:36px;height:22px;display:block}
@@ -3084,7 +3088,7 @@ const CH_CSS = `
  .ch-instrument-quick button.ink{background:#0b2a17;color:#fff}
  .ch-instrument-quick button:disabled{opacity:.3;cursor:default}
  .ch-instrument.off{opacity:.55}
- .ch-law{display:flex;align-items:center;gap:8px;min-height:28px}
+ .ch-law{display:flex;align-items:center;gap:8px;min-height:24px}
  .ch-law .nm{flex:1;min-width:0;font-weight:600;font-size:12px}
  `;
 
@@ -3135,11 +3139,16 @@ const chEsc = (s) =>
 
 function buildLeftColumn({ add, config, ctx }) {
   const col = add('<aside class="ch-left ch-gx"></aside>');
+  const benchCol = document.createElement("div");
+  benchCol.className = "ch-col";
+  const rulesCol = document.createElement("div");
+  rulesCol.className = "ch-col";
+  col.append(benchCol, rulesCol);
   const sections = [
-    buildInstruments(col, config, ctx),
-    buildMaterial(col, config, ctx),
-    buildKnobs(col, config, ctx),
-    buildLaws(col, config, ctx),
+    buildInstruments(benchCol, config, ctx),
+    buildMaterial(benchCol, config, ctx),
+    buildKnobs(rulesCol, config, ctx),
+    buildLaws(rulesCol, config, ctx),
   ];
   return {
     element: col,
