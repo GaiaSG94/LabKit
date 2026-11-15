@@ -28,32 +28,21 @@ export function buildFlaskGhost(THREE, opts) {
   });
   group.add(shadows(new THREE.Mesh(bodyGeo, bodyMat)));
   const cheekMat = new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.6 });
+  const eyeTexture = new THREE.CanvasTexture(eyeCanvas());
+  eyeTexture.colorSpace = THREE.SRGBColorSpace;
   for (const sx of [-1, 1]) {
-    // Glossy eye, same design as the SVG logo: dark pupil, a lighter crescent
-    // at the bottom for depth, two white catch-lights. The whole eye is one
-    // group so aim() can move and blink it as a unit.
-    const eyeG = new THREE.Group();
-    const eyeInk = new THREE.MeshBasicMaterial({ color: 0x17141f, depthTest: false, depthWrite: false });
-    const eyeIris = new THREE.MeshBasicMaterial({ color: 0x4a3f66, depthTest: false, depthWrite: false });
-    const eyeHighlight = new THREE.MeshBasicMaterial({ color: 0xfbf8ff, depthTest: false, depthWrite: false });
-    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 14), eyeInk);
-    pupil.scale.set(1, 1.3, 0.8);
-    eyeG.add(pupil);
-    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), eyeIris);
-    iris.scale.set(1, 0.45, 0.4);
-    iris.position.set(0, -0.045, 0.09);
-    eyeG.add(iris);
-    const hl1 = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), eyeHighlight);
-    hl1.position.set(-0.05, 0.06, 0.11);
-    eyeG.add(hl1);
-    const hl2 = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), eyeHighlight);
-    hl2.position.set(0.055, -0.03, 0.12);
-    eyeG.add(hl2);
-    eyeG.position.set(sx * EYE_X, EYE_Y, 0.82);
-    eyeG.renderOrder = 20;
-    eyeG.userData.sx = sx;
-    group.add(eyeG);
-    eyes.push(eyeG);
+    const eye = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: eyeTexture,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }));
+    eye.scale.set(0.42, 0.56, 1);
+    eye.position.set(sx * EYE_X, EYE_Y, 1.08);
+    eye.renderOrder = 100;
+    eye.userData.sx = sx;
+    group.add(eye);
+    eyes.push(eye);
     const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10), cheekMat);
     cheek.scale.set(1.2, 0.55, 0.3);
     cheek.position.set(sx * 0.46, 0.4, 0.62);
@@ -114,14 +103,9 @@ export function buildFlaskGhost(THREE, opts) {
       const sx = eye.userData.sx;
       const x = sx * EYE_X + state.look.x * 0.05;
       const y = EYE_Y - state.look.y * 0.045;
-      const r = bodyRadiusAt(y);
-      // Centre the eye ON the body surface, not inside it: it then reads as a
-      // glossy eye protruding from the head instead of a hidden blob.
-      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.02;
-      eye.position.set(x, y, Math.max(z, 0.82));
-      eye.rotation.y = Math.asin(Math.max(-1, Math.min(1, x / r)));
-      eye.scale.y = blinking ? 0.15 : 1;
-      eye.renderOrder = 20;
+      eye.position.set(x, y, 1.08);
+      eye.scale.y = (blinking ? 0.1 : 0.56);
+      eye.material.opacity = 1;
     }
   }
 
@@ -147,7 +131,7 @@ export function buildFlaskGhost(THREE, opts) {
     const bob = reduced ? 0 : Math.abs(Math.sin(state.t * 2.2)) * 0.05;
     group.position.y = state.home.y + bob + lift + Math.sin(state.hop * Math.PI) * 0.35;
     group.position.x = state.home.x;
-    group.rotation.y = m.yaw;
+    group.rotation.y = m.yaw * 0.3;
     group.rotation.z = m.kind === "hop" ? Math.sin(k * Math.PI * 3) * 0.05 : 0;
     if (!reduced) {
       m.wave += dt * (m.kind === "fly" ? 5.5 : 2.4);
@@ -167,6 +151,37 @@ export function buildFlaskGhost(THREE, opts) {
 
 function bodyRadiusAt(y) {
   return 0.78 - ((y - HEM) / (0.716 - HEM)) * (0.78 - 0.745);
+}
+
+// One glossy eye as a 64x84 canvas, drawn exactly like the SVG logo: dark
+// pupil, lighter iris crescent at the bottom, two catch-lights. Sprites are
+// always camera-facing, so the eyes can never be hidden by the 3D body.
+function eyeCanvas() {
+  const c = document.createElement("canvas");
+  c.width = 64;
+  c.height = 84;
+  const g = c.getContext("2d");
+  const eye = g.createRadialGradient(30, 34, 4, 32, 38, 34);
+  eye.addColorStop(0, "#2a2438");
+  eye.addColorStop(1, "#17141f");
+  g.fillStyle = eye;
+  g.beginPath();
+  g.ellipse(32, 40, 20, 26, 0, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = "#4a3f66";
+  g.beginPath();
+  g.moveTo(18, 47);
+  g.quadraticCurveTo(32, 58, 46, 47);
+  g.quadraticCurveTo(32, 52, 18, 47);
+  g.fill();
+  g.fillStyle = "#fbf8ff";
+  g.beginPath();
+  g.arc(25, 28, 5.5, 0, Math.PI * 2);
+  g.fill();
+  g.beginPath();
+  g.arc(40, 46, 2.5, 0, Math.PI * 2);
+  g.fill();
+  return c;
 }
 
 // Push the vertices below HEM into scallops that sway with `phase`.
