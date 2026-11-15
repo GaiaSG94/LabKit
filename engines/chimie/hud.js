@@ -297,7 +297,7 @@ export function buildChemHud(host, ctx, view) {
     // Measures follow the instruments selected on the left: a deselected
     // instrument loses its card (and its 3D object via ctx.setInstrument).
     for (const c of cards) {
-      const def = CH_INSTRUMENTS.find((i) => i.metric === c.m.source);
+      const def = CH_INSTRUMENTS.find((i) => i.metric === c.m.id);
       c.card.hidden = !!(def && !ctx.instrumentActive(def));
     }
     const vals = ctx.metricValues();

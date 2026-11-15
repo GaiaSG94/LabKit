@@ -43,7 +43,8 @@
     { "id": "ph", "label": "pH", "unit": "", "source": "ph", "color": "#7c3aed" },
     { "id": "volume", "label": "Volume", "unit": "mL", "source": "volume", "color": "#2563eb" },
     { "id": "precipite", "label": "Precipitate", "unit": "g", "source": "precipite", "color": "#0ea5e9" },
-    { "id": "pression", "label": "Pressure", "unit": "kPa", "source": "pression", "color": "#f97316" }
+    { "id": "pression", "label": "Pressure", "unit": "kPa", "source": "pression", "color": "#f97316" },
+    { "id": "time", "label": "Elapsed time", "unit": "s", "source": "time", "color": "#0f766e" }
   ],
   "instruments": [
     { "type": "chips", "metrics": ["temperature", "ph", "volume", "precipite", "pression"] },

@@ -84,6 +84,7 @@ export function createWorld({ substances, material, laws }) {
     },
     measures() {
       const out = {
+        time: Math.round(this.t * 10) / 10,
         temp: Math.round(this.temp * 10) / 10,
         ph: this.ph,
         volume: Math.round(this.volume),

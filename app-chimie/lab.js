@@ -4,6 +4,7 @@ import { createWorld } from "../engines/chimie/world.js";
 
 export const labManifest = {
   measures: [
+    { id: "time" },
     { id: "temp" },
     { id: "ph" },
     { id: "volume" },

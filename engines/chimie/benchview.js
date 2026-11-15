@@ -8,6 +8,8 @@ import {
   buildFlask, buildThermometer, buildBurner, buildBurette, buildManometer,
   buildBeaker, buildStirrer, buildTestTubeRack,
   buildGraduatedCylinder, buildFunnel, buildWashBottle,
+  buildHotPlate, buildWatchGlass, buildPasteurPipette,
+  buildMortar, buildVolumetricFlask, buildStopwatch,
   liquidLevelOf, flaskInnerRadius,
 } from "./glassware.js";
 import { buildFlaskGhost } from "./bench-ghost.js";
@@ -97,6 +99,18 @@ export function buildBenchView(host, ctx) {
   scene.add(funnel.group);
   const washBottle = buildWashBottle(THREE);
   scene.add(washBottle.group);
+  const hotPlate = buildHotPlate(THREE);
+  scene.add(hotPlate.group);
+  const watchGlass = buildWatchGlass(THREE);
+  scene.add(watchGlass.group);
+  const pipette = buildPasteurPipette(THREE);
+  scene.add(pipette.group);
+  const mortar = buildMortar(THREE);
+  scene.add(mortar.group);
+  const volumetric = buildVolumetricFlask(THREE);
+  scene.add(volumetric.group);
+  const stopwatch = buildStopwatch(THREE);
+  scene.add(stopwatch.group);
 
   const bottles = buildBottles(THREE, scene, ctx.config.substances, ctx.config.controls || []);
   const ghost = buildFlaskGhost(THREE, { toScreen, reduced: REDUCED });
@@ -171,6 +185,12 @@ export function buildBenchView(host, ctx) {
     cylinder.group.visible = visible("cylinder");
     funnel.group.visible = visible("funnel");
     washBottle.group.visible = visible("wash-bottle");
+    hotPlate.group.visible = visible("hot-plate");
+    watchGlass.group.visible = visible("watch-glass");
+    pipette.group.visible = visible("pipette");
+    mortar.group.visible = visible("mortar");
+    volumetric.group.visible = visible("volumetric-flask");
+    stopwatch.group.visible = visible("stopwatch");
   }
   syncInstruments();
   wirePicking(canvas, camera, hits, ctx, ghost, (id) => { hoverId = id; });

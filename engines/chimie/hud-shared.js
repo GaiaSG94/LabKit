@@ -8,6 +8,7 @@ export const CH_INSTRUMENTS = [
   { id: "graduated-cylinder", label: "Graduated cylinder", metric: "volume", material: "cylinder" },
   { id: "balance", label: "Balance", metric: "precipite" },
   { id: "manometer", label: "Manometer", metric: "pression", material: "manometer" },
+  { id: "stopwatch", label: "Stopwatch", metric: "time", material: "stopwatch" },
 ];
 
 export const CH_MATERIAL = [
@@ -18,6 +19,11 @@ export const CH_MATERIAL = [
   { id: "rack", label: "Test tube rack", material: "rack" },
   { id: "funnel", label: "Funnel", material: "funnel" },
   { id: "wash-bottle", label: "Wash bottle", material: "wash-bottle" },
+  { id: "hot-plate", label: "Hot plate", material: "hot-plate" },
+  { id: "watch-glass", label: "Watch glass", material: "watch-glass" },
+  { id: "pipette", label: "Pasteur pipette", material: "pipette" },
+  { id: "mortar", label: "Mortar and pestle", material: "mortar" },
+  { id: "volumetric-flask", label: "Volumetric flask", material: "volumetric-flask" },
 ];
 
 const CH_ICONS = {

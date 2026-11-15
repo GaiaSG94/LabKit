@@ -53,6 +53,7 @@ export const chimiePack = {
     },
   },
   measures: [
+    { id: "time", label: "Elapsed time", unit: "s" },
     { id: "temp", label: "Temperature", unit: "°C" },
     { id: "ph", label: "pH", unit: "" },
     { id: "volume", label: "Volume", unit: "mL" },

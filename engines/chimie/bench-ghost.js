@@ -1,19 +1,20 @@
 ﻿// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
-// Open body with a scalloped, swaying hem; eyes that follow the pointer, the
-// falling drop or the flask; moods that rotate, look at the viewer or fly.
-// Pure scene object: the bench view owns the camera and the render loop.
+// Open body with a scalloped, swaying hem; big cartoon eyes that follow the
+// pointer, the falling drop or the flask; moods that watch, face the viewer or
+// hop. The face always stays turned to the camera, so the eyes never vanish.
 import { lathe, shadows } from "./glassware.js";
 
 const HEM = 0.42;
 const LOBES = 7;
 const LOBE = 0.17;
 const EYE_Y = 0.62;
+const EYE_X = 0.25;
 const PROFILE = [
   [0.8, 0], [0.795, 0.07], [0.79, 0.14], [0.785, 0.21], [0.78, 0.28],
   [0.78, 0.35], [0.78, HEM], [0.745, 0.716], [0.641, 0.94], [0.468, 1.116],
   [0.225, 1.25], [0.225, 1.6], [0.35, 1.6], [0.35, 1.75], [0, 1.75],
 ];
-const MOODS = { watch: 0.4, audience: 0.25, spin: 0.18, fly: 0.17 };
+const MOODS = { watch: 0.45, audience: 0.4, hop: 0.15 };
 
 export function buildFlaskGhost(THREE, opts) {
   const { toScreen, reduced } = opts;
@@ -33,17 +34,22 @@ export function buildFlaskGhost(THREE, opts) {
     // White sclera first, then the pupil on top of it: both sit ON the head
     // surface (see aim()), so the eyes read as eyes instead of sinking into
     // the body shell.
-    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 14), scleraMat);
-    sclera.scale.set(1, 1.2, 0.62);
-    sclera.position.set(sx * 0.23, EYE_Y, 0.68);
+    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 14), scleraMat);
+    sclera.scale.set(1, 1.15, 0.6);
+    sclera.position.set(sx * EYE_X, EYE_Y, 0.68);
     group.add(sclera);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 14), ink);
-    eye.scale.set(1, 1.3, 0.95);
-    eye.position.set(sx * 0.225, EYE_Y, 0.78);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), ink);
+    eye.scale.set(1, 1.25, 0.95);
+    eye.position.set(sx * EYE_X, EYE_Y, 0.79);
     eye.userData.sx = sx;
     group.add(eye);
     eyes.push(eye);
     sockets.set(eye, sclera);
+    // Eyebrow: a dark stroke that makes the face read even at small size.
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.035, 0.05), ink);
+    brow.position.set(sx * EYE_X, EYE_Y + 0.21, 0.76);
+    brow.rotation.z = sx * 0.16;
+    group.add(brow);
     const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10), cheekMat);
     cheek.scale.set(1.2, 0.55, 0.3);
     cheek.position.set(sx * 0.46, 0.4, 0.62);
@@ -78,7 +84,7 @@ export function buildFlaskGhost(THREE, opts) {
       if (roll < acc) { kind = name; break; }
     }
     if (kind === m.kind && kind !== "watch") kind = "watch";
-    const len = { watch: 3.5 + rnd() * 3, audience: 2.5 + rnd() * 2, spin: 1.8, fly: 3.4 }[kind];
+    const len = { watch: 3.5 + rnd() * 3, audience: 2.5 + rnd() * 2, hop: 2.2 }[kind];
     m.kind = kind;
     m.start = t;
     m.until = t + len;
@@ -101,21 +107,21 @@ export function buildFlaskGhost(THREE, opts) {
     if (t > state.blinkAt + 0.13) state.blinkAt = t + 2.4 + Math.random() * 3.2;
     for (const eye of eyes) {
       const sx = eye.userData.sx;
-      const x = sx * 0.225 + state.look.x * 0.05;
+      const x = sx * EYE_X + state.look.x * 0.05;
       const y = EYE_Y - state.look.y * 0.045;
       const r = bodyRadiusAt(y);
       // Centre the pupil ON the body surface, not inside it: the sphere then
       // reads as an eye protruding from the head instead of a hidden blob.
-      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.02;
+      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.03;
       eye.position.set(x, y, z);
       eye.rotation.y = Math.asin(Math.max(-1, Math.min(1, x / r)));
-      eye.scale.y = blinking ? 0.15 : 1.3;
+      eye.scale.y = blinking ? 0.15 : 1.25;
       // The white socket rides with its pupil so the eye never slides off it.
       const socket = sockets.get(eye);
       if (socket) {
-        socket.position.set(sx * 0.23 + state.look.x * 0.02, y, z - 0.05);
+        socket.position.set(sx * EYE_X + state.look.x * 0.02, y, z - 0.05);
         socket.rotation.y = eye.rotation.y;
-        socket.scale.y = blinking ? 0.15 : 1.2;
+        socket.scale.y = blinking ? 0.15 : 1.15;
       }
     }
   }
@@ -130,19 +136,20 @@ export function buildFlaskGhost(THREE, opts) {
     const m = state.mood;
     const k = Math.min(1, (state.t - m.start) / Math.max(0.01, m.until - m.start));
     const smooth = (x) => x * x * (3 - 2 * x);
-    const lift = m.kind === "fly" ? Math.sin(Math.PI * smooth(k)) * 0.9 : 0;
-    const spin = m.kind === "spin" ? m.dir * Math.PI * 2 * smooth(k) : 0;
+    const lift = m.kind === "hop" ? Math.sin(Math.PI * smooth(k)) * 0.45 : 0;
     const camYaw = state.camera
       ? Math.atan2(state.camera.position.x - group.position.x, state.camera.position.z - group.position.z)
       : 0;
-    const yawGoal = camYaw - (m.kind === "audience" ? 0.05 : m.kind === "fly" ? 0.2 : 0.38);
+    // The face always stays turned to the camera: only a slight glance away
+    // while watching the flask, so the eyes never vanish from the bench.
+    const yawGoal = camYaw - (m.kind === "watch" ? 0.14 : 0.02);
     if (m.yaw === null) m.yaw = yawGoal;
     m.yaw += (yawGoal - m.yaw) * Math.min(1, (reduced ? 1 : dt) * 3);
     const bob = reduced ? 0 : Math.abs(Math.sin(state.t * 2.2)) * 0.05;
     group.position.y = state.home.y + bob + lift + Math.sin(state.hop * Math.PI) * 0.35;
-    group.position.x = state.home.x + (m.kind === "fly" ? Math.sin(k * Math.PI * 2) * 0.12 : 0);
-    group.rotation.y = m.yaw + spin;
-    group.rotation.z = m.kind === "fly" ? Math.sin(k * Math.PI * 3) * 0.08 : 0;
+    group.position.x = state.home.x;
+    group.rotation.y = m.yaw;
+    group.rotation.z = m.kind === "hop" ? Math.sin(k * Math.PI * 3) * 0.05 : 0;
     if (!reduced) {
       m.wave += dt * (m.kind === "fly" ? 5.5 : 2.4);
       waveHem(THREE, bodyGeo, hemBase, m.wave);

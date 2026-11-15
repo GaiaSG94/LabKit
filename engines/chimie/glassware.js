@@ -344,3 +344,101 @@ export function buildWashBottle(THREE) {
   group.position.set(2.75, -1.2, -0.6);
   return { group };
 }
+
+// Hot plate: the heating surface every real bench uses to warm a flask.
+export function buildHotPlate(THREE) {
+  const group = new THREE.Group();
+  const body = shadows(new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.7), metalMaterial(THREE, 0x475569, 0.35)));
+  body.position.y = 0.09;
+  const ceramic = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 32), metalMaterial(THREE, 0xf1f5f9, 0.55)));
+  ceramic.position.y = 0.2;
+  const knob = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 20), metalMaterial(THREE, 0xb91c1c, 0.4)));
+  knob.rotation.x = Math.PI / 2;
+  knob.position.set(0.28, 0.12, 0.36);
+  group.add(body, ceramic, knob);
+  group.position.set(1.45, -1.2, -1.35);
+  return { group };
+}
+
+// Watch glass: a shallow dish used to evaporate a solution.
+export function buildWatchGlass(THREE) {
+  const group = new THREE.Group();
+  const dish = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.22, 0.035, 36), glassMaterial(THREE)));
+  dish.position.y = 0.02;
+  const solution = shadows(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.19, 0.16, 0.02, 32),
+    new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.2, transparent: true, opacity: 0.8 }),
+  ));
+  solution.position.y = 0.03;
+  group.add(dish, solution);
+  group.position.set(-1.75, -1.2, 1.35);
+  return { group };
+}
+
+// Pasteur pipette lying on the bench.
+export function buildPasteurPipette(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const bulb = shadows(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), glass));
+  bulb.position.y = 0.09;
+  const tube = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.012, 0.62, 14), glass));
+  tube.position.y = -0.31;
+  const drop = shadows(new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 12, 10),
+    new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.1, transparent: true, opacity: 0.8 }),
+  ));
+  drop.position.y = -0.63;
+  group.add(bulb, tube, drop);
+  group.position.set(-1.05, -1.2, 1.5);
+  group.rotation.z = Math.PI / 2 - 0.15;
+  group.rotation.y = 0.4;
+  return { group };
+}
+
+// Mortar and pestle, for crushing a solid.
+export function buildMortar(THREE) {
+  const group = new THREE.Group();
+  const bowl = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 0.28, 32, 1, true), metalMaterial(THREE, 0xb0b7bd, 0.4)));
+  bowl.position.y = 0.14;
+  const pestle = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.09, 0.42, 20), metalMaterial(THREE, 0xc7ced4, 0.35)));
+  pestle.position.set(0.16, 0.26, 0.05);
+  pestle.rotation.z = 0.5;
+  group.add(bowl, pestle);
+  group.position.set(1.95, -1.2, 1.35);
+  return { group };
+}
+
+// Volumetric flask: the calibrated flask used to prepare a solution.
+export function buildVolumetricFlask(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const bulb = shadows(new THREE.Mesh(new THREE.SphereGeometry(0.26, 28, 20), glass));
+  bulb.position.y = 0.26;
+  bulb.scale.set(1, 0.95, 1);
+  const neck = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.5, 20), glass));
+  neck.position.y = 0.68;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.058, 0.008, 6, 20), new THREE.MeshBasicMaterial({ color: 0x64748b }));
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.82;
+  const stopper = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.09, 18), metalMaterial(THREE, 0x334155, 0.5)));
+  stopper.position.y = 0.95;
+  group.add(bulb, neck, ring, stopper);
+  group.position.set(2.35, -1.2, -1.35);
+  return { group };
+}
+
+// Digital stopwatch, to time a reaction.
+export function buildStopwatch(THREE) {
+  const group = new THREE.Group();
+  const body = shadows(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.14), metalMaterial(THREE, 0x1f2937, 0.4)));
+  body.position.y = 0.1;
+  const face = shadows(new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.12), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4, emissive: 0x14532d, emissiveIntensity: 0.6 })));
+  face.position.set(0, 0.11, 0.071);
+  const crown = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.05, 16), metalMaterial(THREE, 0x9ca3af, 0.3)));
+  crown.position.set(0.19, 0.1, 0);
+  crown.rotation.z = Math.PI / 2;
+  group.add(body, face, crown);
+  group.position.set(0.1, -1.2, 1.55);
+  group.rotation.y = -0.25;
+  return { group };
+}

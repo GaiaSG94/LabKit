@@ -29,7 +29,7 @@ export function buildLeftColumn({ add, config, ctx }) {
 
 function buildInstruments(col, config, ctx) {
   const card = section(col, "Instruments", "select your measuring devices");
-  const metrics = new Map(config.metrics.map((m) => [m.source, m]));
+  const metrics = new Map(config.metrics.map((m) => [m.id, m]));
   const rows = CH_INSTRUMENTS.map((item) => {
     const metric = metrics.get(item.metric);
     const row = switchRow(card, item, ctx);

@@ -9,7 +9,7 @@ import { buildChemHud } from "../engines/chimie/hud.js";
 import { describeState } from "../engines/chimie/narration.js";
 
 export const gameManifest = {
-  measures: [{ id: "temp" }, { id: "ph" }, { id: "volume" }, { id: "precipite" }, { id: "pression" }],
+  measures: [{ id: "time" }, { id: "temp" }, { id: "ph" }, { id: "volume" }, { id: "precipite" }, { id: "pression" }],
 };
 
 const BURETTE_MAX = 50;

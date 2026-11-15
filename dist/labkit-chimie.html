@@ -2267,6 +2267,7 @@ function createWorld({ substances, material, laws }) {
     },
     measures() {
       const out = {
+        time: Math.round(this.t * 10) / 10,
         temp: Math.round(this.temp * 10) / 10,
         ph: this.ph,
         volume: Math.round(this.volume),
@@ -2329,6 +2330,7 @@ const chimiePack = {
     },
   },
   measures: [
+    { id: "time", label: "Elapsed time", unit: "s" },
     { id: "temp", label: "Temperature", unit: "°C" },
     { id: "ph", label: "pH", unit: "" },
     { id: "volume", label: "Volume", unit: "mL" },
@@ -2721,22 +2723,121 @@ function buildWashBottle(THREE) {
   return { group };
 }
 
+// Hot plate: the heating surface every real bench uses to warm a flask.
+function buildHotPlate(THREE) {
+  const group = new THREE.Group();
+  const body = shadows(new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.7), metalMaterial(THREE, 0x475569, 0.35)));
+  body.position.y = 0.09;
+  const ceramic = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 32), metalMaterial(THREE, 0xf1f5f9, 0.55)));
+  ceramic.position.y = 0.2;
+  const knob = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 20), metalMaterial(THREE, 0xb91c1c, 0.4)));
+  knob.rotation.x = Math.PI / 2;
+  knob.position.set(0.28, 0.12, 0.36);
+  group.add(body, ceramic, knob);
+  group.position.set(1.45, -1.2, -1.35);
+  return { group };
+}
+
+// Watch glass: a shallow dish used to evaporate a solution.
+function buildWatchGlass(THREE) {
+  const group = new THREE.Group();
+  const dish = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.22, 0.035, 36), glassMaterial(THREE)));
+  dish.position.y = 0.02;
+  const solution = shadows(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.19, 0.16, 0.02, 32),
+    new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.2, transparent: true, opacity: 0.8 }),
+  ));
+  solution.position.y = 0.03;
+  group.add(dish, solution);
+  group.position.set(-1.75, -1.2, 1.35);
+  return { group };
+}
+
+// Pasteur pipette lying on the bench.
+function buildPasteurPipette(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const bulb = shadows(new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 12), glass));
+  bulb.position.y = 0.09;
+  const tube = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.012, 0.62, 14), glass));
+  tube.position.y = -0.31;
+  const drop = shadows(new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 12, 10),
+    new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.1, transparent: true, opacity: 0.8 }),
+  ));
+  drop.position.y = -0.63;
+  group.add(bulb, tube, drop);
+  group.position.set(-1.05, -1.2, 1.5);
+  group.rotation.z = Math.PI / 2 - 0.15;
+  group.rotation.y = 0.4;
+  return { group };
+}
+
+// Mortar and pestle, for crushing a solid.
+function buildMortar(THREE) {
+  const group = new THREE.Group();
+  const bowl = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 0.28, 32, 1, true), metalMaterial(THREE, 0xb0b7bd, 0.4)));
+  bowl.position.y = 0.14;
+  const pestle = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.09, 0.42, 20), metalMaterial(THREE, 0xc7ced4, 0.35)));
+  pestle.position.set(0.16, 0.26, 0.05);
+  pestle.rotation.z = 0.5;
+  group.add(bowl, pestle);
+  group.position.set(1.95, -1.2, 1.35);
+  return { group };
+}
+
+// Volumetric flask: the calibrated flask used to prepare a solution.
+function buildVolumetricFlask(THREE) {
+  const group = new THREE.Group();
+  const glass = glassMaterial(THREE);
+  const bulb = shadows(new THREE.Mesh(new THREE.SphereGeometry(0.26, 28, 20), glass));
+  bulb.position.y = 0.26;
+  bulb.scale.set(1, 0.95, 1);
+  const neck = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.5, 20), glass));
+  neck.position.y = 0.68;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.058, 0.008, 6, 20), new THREE.MeshBasicMaterial({ color: 0x64748b }));
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.82;
+  const stopper = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.09, 18), metalMaterial(THREE, 0x334155, 0.5)));
+  stopper.position.y = 0.95;
+  group.add(bulb, neck, ring, stopper);
+  group.position.set(2.35, -1.2, -1.35);
+  return { group };
+}
+
+// Digital stopwatch, to time a reaction.
+function buildStopwatch(THREE) {
+  const group = new THREE.Group();
+  const body = shadows(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.2, 0.14), metalMaterial(THREE, 0x1f2937, 0.4)));
+  body.position.y = 0.1;
+  const face = shadows(new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.12), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4, emissive: 0x14532d, emissiveIntensity: 0.6 })));
+  face.position.set(0, 0.11, 0.071);
+  const crown = shadows(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.05, 16), metalMaterial(THREE, 0x9ca3af, 0.3)));
+  crown.position.set(0.19, 0.1, 0);
+  crown.rotation.z = Math.PI / 2;
+  group.add(body, face, crown);
+  group.position.set(0.1, -1.2, 1.55);
+  group.rotation.y = -0.25;
+  return { group };
+}
+
 // ---- engines/chimie/bench-ghost.js (inlined) ----
 ﻿// The flask ghost mascot for the Chemistry bench (Three.js via the global THREE).
-// Open body with a scalloped, swaying hem; eyes that follow the pointer, the
-// falling drop or the flask; moods that rotate, look at the viewer or fly.
-// Pure scene object: the bench view owns the camera and the render loop.
+// Open body with a scalloped, swaying hem; big cartoon eyes that follow the
+// pointer, the falling drop or the flask; moods that watch, face the viewer or
+// hop. The face always stays turned to the camera, so the eyes never vanish.
 
 const HEM = 0.42;
 const LOBES = 7;
 const LOBE = 0.17;
 const EYE_Y = 0.62;
+const EYE_X = 0.25;
 const PROFILE = [
   [0.8, 0], [0.795, 0.07], [0.79, 0.14], [0.785, 0.21], [0.78, 0.28],
   [0.78, 0.35], [0.78, HEM], [0.745, 0.716], [0.641, 0.94], [0.468, 1.116],
   [0.225, 1.25], [0.225, 1.6], [0.35, 1.6], [0.35, 1.75], [0, 1.75],
 ];
-const MOODS = { watch: 0.4, audience: 0.25, spin: 0.18, fly: 0.17 };
+const MOODS = { watch: 0.45, audience: 0.4, hop: 0.15 };
 
 function buildFlaskGhost(THREE, opts) {
   const { toScreen, reduced } = opts;
@@ -2756,17 +2857,22 @@ function buildFlaskGhost(THREE, opts) {
     // White sclera first, then the pupil on top of it: both sit ON the head
     // surface (see aim()), so the eyes read as eyes instead of sinking into
     // the body shell.
-    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 14), scleraMat);
-    sclera.scale.set(1, 1.2, 0.62);
-    sclera.position.set(sx * 0.23, EYE_Y, 0.68);
+    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 14), scleraMat);
+    sclera.scale.set(1, 1.15, 0.6);
+    sclera.position.set(sx * EYE_X, EYE_Y, 0.68);
     group.add(sclera);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 14), ink);
-    eye.scale.set(1, 1.3, 0.95);
-    eye.position.set(sx * 0.225, EYE_Y, 0.78);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), ink);
+    eye.scale.set(1, 1.25, 0.95);
+    eye.position.set(sx * EYE_X, EYE_Y, 0.79);
     eye.userData.sx = sx;
     group.add(eye);
     eyes.push(eye);
     sockets.set(eye, sclera);
+    // Eyebrow: a dark stroke that makes the face read even at small size.
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.035, 0.05), ink);
+    brow.position.set(sx * EYE_X, EYE_Y + 0.21, 0.76);
+    brow.rotation.z = sx * 0.16;
+    group.add(brow);
     const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10), cheekMat);
     cheek.scale.set(1.2, 0.55, 0.3);
     cheek.position.set(sx * 0.46, 0.4, 0.62);
@@ -2801,7 +2907,7 @@ function buildFlaskGhost(THREE, opts) {
       if (roll < acc) { kind = name; break; }
     }
     if (kind === m.kind && kind !== "watch") kind = "watch";
-    const len = { watch: 3.5 + rnd() * 3, audience: 2.5 + rnd() * 2, spin: 1.8, fly: 3.4 }[kind];
+    const len = { watch: 3.5 + rnd() * 3, audience: 2.5 + rnd() * 2, hop: 2.2 }[kind];
     m.kind = kind;
     m.start = t;
     m.until = t + len;
@@ -2824,21 +2930,21 @@ function buildFlaskGhost(THREE, opts) {
     if (t > state.blinkAt + 0.13) state.blinkAt = t + 2.4 + Math.random() * 3.2;
     for (const eye of eyes) {
       const sx = eye.userData.sx;
-      const x = sx * 0.225 + state.look.x * 0.05;
+      const x = sx * EYE_X + state.look.x * 0.05;
       const y = EYE_Y - state.look.y * 0.045;
       const r = bodyRadiusAt(y);
       // Centre the pupil ON the body surface, not inside it: the sphere then
       // reads as an eye protruding from the head instead of a hidden blob.
-      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.02;
+      const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.03;
       eye.position.set(x, y, z);
       eye.rotation.y = Math.asin(Math.max(-1, Math.min(1, x / r)));
-      eye.scale.y = blinking ? 0.15 : 1.3;
+      eye.scale.y = blinking ? 0.15 : 1.25;
       // The white socket rides with its pupil so the eye never slides off it.
       const socket = sockets.get(eye);
       if (socket) {
-        socket.position.set(sx * 0.23 + state.look.x * 0.02, y, z - 0.05);
+        socket.position.set(sx * EYE_X + state.look.x * 0.02, y, z - 0.05);
         socket.rotation.y = eye.rotation.y;
-        socket.scale.y = blinking ? 0.15 : 1.2;
+        socket.scale.y = blinking ? 0.15 : 1.15;
       }
     }
   }
@@ -2853,19 +2959,20 @@ function buildFlaskGhost(THREE, opts) {
     const m = state.mood;
     const k = Math.min(1, (state.t - m.start) / Math.max(0.01, m.until - m.start));
     const smooth = (x) => x * x * (3 - 2 * x);
-    const lift = m.kind === "fly" ? Math.sin(Math.PI * smooth(k)) * 0.9 : 0;
-    const spin = m.kind === "spin" ? m.dir * Math.PI * 2 * smooth(k) : 0;
+    const lift = m.kind === "hop" ? Math.sin(Math.PI * smooth(k)) * 0.45 : 0;
     const camYaw = state.camera
       ? Math.atan2(state.camera.position.x - group.position.x, state.camera.position.z - group.position.z)
       : 0;
-    const yawGoal = camYaw - (m.kind === "audience" ? 0.05 : m.kind === "fly" ? 0.2 : 0.38);
+    // The face always stays turned to the camera: only a slight glance away
+    // while watching the flask, so the eyes never vanish from the bench.
+    const yawGoal = camYaw - (m.kind === "watch" ? 0.14 : 0.02);
     if (m.yaw === null) m.yaw = yawGoal;
     m.yaw += (yawGoal - m.yaw) * Math.min(1, (reduced ? 1 : dt) * 3);
     const bob = reduced ? 0 : Math.abs(Math.sin(state.t * 2.2)) * 0.05;
     group.position.y = state.home.y + bob + lift + Math.sin(state.hop * Math.PI) * 0.35;
-    group.position.x = state.home.x + (m.kind === "fly" ? Math.sin(k * Math.PI * 2) * 0.12 : 0);
-    group.rotation.y = m.yaw + spin;
-    group.rotation.z = m.kind === "fly" ? Math.sin(k * Math.PI * 3) * 0.08 : 0;
+    group.position.x = state.home.x;
+    group.rotation.y = m.yaw;
+    group.rotation.z = m.kind === "hop" ? Math.sin(k * Math.PI * 3) * 0.05 : 0;
     if (!reduced) {
       m.wave += dt * (m.kind === "fly" ? 5.5 : 2.4);
       waveHem(THREE, bodyGeo, hemBase, m.wave);
@@ -3103,6 +3210,7 @@ const CH_INSTRUMENTS = [
   { id: "graduated-cylinder", label: "Graduated cylinder", metric: "volume", material: "cylinder" },
   { id: "balance", label: "Balance", metric: "precipite" },
   { id: "manometer", label: "Manometer", metric: "pression", material: "manometer" },
+  { id: "stopwatch", label: "Stopwatch", metric: "time", material: "stopwatch" },
 ];
 
 const CH_MATERIAL = [
@@ -3113,6 +3221,11 @@ const CH_MATERIAL = [
   { id: "rack", label: "Test tube rack", material: "rack" },
   { id: "funnel", label: "Funnel", material: "funnel" },
   { id: "wash-bottle", label: "Wash bottle", material: "wash-bottle" },
+  { id: "hot-plate", label: "Hot plate", material: "hot-plate" },
+  { id: "watch-glass", label: "Watch glass", material: "watch-glass" },
+  { id: "pipette", label: "Pasteur pipette", material: "pipette" },
+  { id: "mortar", label: "Mortar and pestle", material: "mortar" },
+  { id: "volumetric-flask", label: "Volumetric flask", material: "volumetric-flask" },
 ];
 
 const CH_ICONS = {
@@ -3162,7 +3275,7 @@ function buildLeftColumn({ add, config, ctx }) {
 
 function buildInstruments(col, config, ctx) {
   const card = section(col, "Instruments", "select your measuring devices");
-  const metrics = new Map(config.metrics.map((m) => [m.source, m]));
+  const metrics = new Map(config.metrics.map((m) => [m.id, m]));
   const rows = CH_INSTRUMENTS.map((item) => {
     const metric = metrics.get(item.metric);
     const row = switchRow(card, item, ctx);
@@ -3425,6 +3538,18 @@ function buildBenchView(host, ctx) {
   scene.add(funnel.group);
   const washBottle = buildWashBottle(THREE);
   scene.add(washBottle.group);
+  const hotPlate = buildHotPlate(THREE);
+  scene.add(hotPlate.group);
+  const watchGlass = buildWatchGlass(THREE);
+  scene.add(watchGlass.group);
+  const pipette = buildPasteurPipette(THREE);
+  scene.add(pipette.group);
+  const mortar = buildMortar(THREE);
+  scene.add(mortar.group);
+  const volumetric = buildVolumetricFlask(THREE);
+  scene.add(volumetric.group);
+  const stopwatch = buildStopwatch(THREE);
+  scene.add(stopwatch.group);
 
   const bottles = buildBottles(THREE, scene, ctx.config.substances, ctx.config.controls || []);
   const ghost = buildFlaskGhost(THREE, { toScreen, reduced: REDUCED });
@@ -3499,6 +3624,12 @@ function buildBenchView(host, ctx) {
     cylinder.group.visible = visible("cylinder");
     funnel.group.visible = visible("funnel");
     washBottle.group.visible = visible("wash-bottle");
+    hotPlate.group.visible = visible("hot-plate");
+    watchGlass.group.visible = visible("watch-glass");
+    pipette.group.visible = visible("pipette");
+    mortar.group.visible = visible("mortar");
+    volumetric.group.visible = visible("volumetric-flask");
+    stopwatch.group.visible = visible("stopwatch");
   }
   syncInstruments();
   wirePicking(canvas, camera, hits, ctx, ghost, (id) => { hoverId = id; });
@@ -4172,7 +4303,7 @@ function buildChemHud(host, ctx, view) {
     // Measures follow the instruments selected on the left: a deselected
     // instrument loses its card (and its 3D object via ctx.setInstrument).
     for (const c of cards) {
-      const def = CH_INSTRUMENTS.find((i) => i.metric === c.m.source);
+      const def = CH_INSTRUMENTS.find((i) => i.metric === c.m.id);
       c.card.hidden = !!(def && !ctx.instrumentActive(def));
     }
     const vals = ctx.metricValues();
@@ -4256,7 +4387,7 @@ function buildChemHud(host, ctx, view) {
 // lab.js stays the shell wiring used by the validator / MCP server / tests; this is what the page runs.
 
 const gameManifest = {
-  measures: [{ id: "temp" }, { id: "ph" }, { id: "volume" }, { id: "precipite" }, { id: "pression" }],
+  measures: [{ id: "time" }, { id: "temp" }, { id: "ph" }, { id: "volume" }, { id: "precipite" }, { id: "pression" }],
 };
 
 const BURETTE_MAX = 50;
@@ -4554,7 +4685,8 @@ startGame({
     { "id": "ph", "label": "pH", "unit": "", "source": "ph", "color": "#7c3aed" },
     { "id": "volume", "label": "Volume", "unit": "mL", "source": "volume", "color": "#2563eb" },
     { "id": "precipite", "label": "Precipitate", "unit": "g", "source": "precipite", "color": "#0ea5e9" },
-    { "id": "pression", "label": "Pressure", "unit": "kPa", "source": "pression", "color": "#f97316" }
+    { "id": "pression", "label": "Pressure", "unit": "kPa", "source": "pression", "color": "#f97316" },
+    { "id": "time", "label": "Elapsed time", "unit": "s", "source": "time", "color": "#0f766e" }
   ],
   "instruments": [
     { "type": "chips", "metrics": ["temperature", "ph", "volume", "precipite", "pression"] },
