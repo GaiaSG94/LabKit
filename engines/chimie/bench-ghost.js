@@ -23,8 +23,6 @@ export function buildFlaskGhost(THREE, opts) {
   const bodyGeo = lathe(THREE, PROFILE, 96);
   const hemBase = Float32Array.from(bodyGeo.attributes.position.array);
   const ink = new THREE.MeshStandardMaterial({ color: 0x17141f, roughness: 0.3 });
-  const irisMat = new THREE.MeshStandardMaterial({ color: 0x4a3f66, roughness: 0.5 });
-  const hlMat = new THREE.MeshBasicMaterial({ color: 0xfbf8ff });
   const bodyMat = new THREE.MeshPhysicalMaterial({
     color: 0xfbf8ff, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.2, side: THREE.DoubleSide,
   });
@@ -35,20 +33,24 @@ export function buildFlaskGhost(THREE, opts) {
     // at the bottom for depth, two white catch-lights. The whole eye is one
     // group so aim() can move and blink it as a unit.
     const eyeG = new THREE.Group();
-    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), ink);
+    const eyeInk = new THREE.MeshBasicMaterial({ color: 0x17141f, depthTest: false, depthWrite: false });
+    const eyeIris = new THREE.MeshBasicMaterial({ color: 0x4a3f66, depthTest: false, depthWrite: false });
+    const eyeHighlight = new THREE.MeshBasicMaterial({ color: 0xfbf8ff, depthTest: false, depthWrite: false });
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 14), eyeInk);
     pupil.scale.set(1, 1.3, 0.8);
     eyeG.add(pupil);
-    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 12), irisMat);
+    const iris = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), eyeIris);
     iris.scale.set(1, 0.45, 0.4);
     iris.position.set(0, -0.045, 0.09);
     eyeG.add(iris);
-    const hl1 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), hlMat);
+    const hl1 = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), eyeHighlight);
     hl1.position.set(-0.05, 0.06, 0.11);
     eyeG.add(hl1);
-    const hl2 = new THREE.Mesh(new THREE.SphereGeometry(0.024, 10, 8), hlMat);
+    const hl2 = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), eyeHighlight);
     hl2.position.set(0.055, -0.03, 0.12);
     eyeG.add(hl2);
-    eyeG.position.set(sx * EYE_X, EYE_Y, 0.72);
+    eyeG.position.set(sx * EYE_X, EYE_Y, 0.82);
+    eyeG.renderOrder = 20;
     eyeG.userData.sx = sx;
     group.add(eyeG);
     eyes.push(eyeG);
@@ -64,7 +66,7 @@ export function buildFlaskGhost(THREE, opts) {
   group.scale.setScalar(1.05);
 
   const state = {
-    home: { x: 2.6, y: -1.2 + LOBE * 0.85 + 0.06 },
+    home: { x: 0.85, y: -1.2 + LOBE * 0.85 + 0.06 },
     mood: { kind: "watch", start: 0, until: 4, dir: 1, yaw: null, wave: 0 },
     look: { x: 0, y: 0 },
     blinkAt: 2.5,
@@ -116,9 +118,10 @@ export function buildFlaskGhost(THREE, opts) {
       // Centre the eye ON the body surface, not inside it: it then reads as a
       // glossy eye protruding from the head instead of a hidden blob.
       const z = Math.sqrt(Math.max(0, r * r - x * x)) + 0.02;
-      eye.position.set(x, y, z);
+      eye.position.set(x, y, Math.max(z, 0.82));
       eye.rotation.y = Math.asin(Math.max(-1, Math.min(1, x / r)));
       eye.scale.y = blinking ? 0.15 : 1;
+      eye.renderOrder = 20;
     }
   }
 
