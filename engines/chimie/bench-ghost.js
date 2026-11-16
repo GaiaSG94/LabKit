@@ -29,13 +29,18 @@ export function buildFlaskGhost(THREE, opts) {
   group.add(shadows(new THREE.Mesh(bodyGeo, bodyMat)));
   const cheekMat = new THREE.MeshStandardMaterial({ color: 0xff8a3d, roughness: 0.6 });
   const eyeTexture = new THREE.CanvasTexture(eyeCanvas());
-  eyeTexture.colorSpace = THREE.SRGBColorSpace;
+  // three r149 has no Texture.colorSpace yet: without sRGB encoding the ink
+  // pupil is read as linear and comes out washed-out grey.
+  if ("colorSpace" in eyeTexture) eyeTexture.colorSpace = THREE.SRGBColorSpace;
+  else eyeTexture.encoding = THREE.sRGBEncoding;
   for (const sx of [-1, 1]) {
     const eye = new THREE.Sprite(new THREE.SpriteMaterial({
       map: eyeTexture,
       transparent: true,
       depthTest: false,
       depthWrite: false,
+      toneMapped: false,
+      fog: false,
     }));
     eye.scale.set(0.42, 0.56, 1);
     eye.position.set(sx * EYE_X, EYE_Y, 1.08);
@@ -86,16 +91,7 @@ export function buildFlaskGhost(THREE, opts) {
 
   function aim(dt, target) {
     const head = toScreen(group.position.x, group.position.y + EYE_Y * 0.85, group.position.z);
-    if (!Number.isFinite(head.x) || !Number.isFinite(head.y)) return;
-    let dx = target.x - head.x;
-    let dy = target.y - head.y;
-    const len = Math.hypot(dx, dy);
-    const k = Math.min(1, len / 160) / (len || 1);
-    dx *= k;
-    dy *= k;
-    const ease = Math.min(1, dt * 9);
-    state.look.x += (dx - state.look.x) * ease;
-    state.look.y += (dy - state.look.y) * ease;
+    state.look = nextLook(state.look, head, target, dt);
     const t = state.t;
     const blinking = t > state.blinkAt && t < state.blinkAt + 0.13;
     if (t > state.blinkAt + 0.13) state.blinkAt = t + 2.4 + Math.random() * 3.2;
@@ -149,38 +145,50 @@ export function buildFlaskGhost(THREE, opts) {
   };
 }
 
-function bodyRadiusAt(y) {
-  return 0.78 - ((y - HEM) / (0.716 - HEM)) * (0.78 - 0.745);
+// One step of the gaze, in screen pixels (|look| <= 1 after scaling).
+// A point that does not project (camera not placed yet, point on the camera
+// plane) is ignored, and a non-finite gaze recovers to centre: one NaN would
+// otherwise stick forever and move both eyes to NaN, i.e. off the screen.
+export function nextLook(look, head, target, dt) {
+  const ok = (p) => p && Number.isFinite(p.x) && Number.isFinite(p.y);
+  const cur = ok(look) ? look : { x: 0, y: 0 };
+  if (!ok(head) || !ok(target) || !Number.isFinite(dt)) return { x: cur.x, y: cur.y };
+  let dx = target.x - head.x;
+  let dy = target.y - head.y;
+  const len = Math.hypot(dx, dy);
+  const k = Math.min(1, len / 160) / (len || 1);
+  dx *= k;
+  dy *= k;
+  const ease = Math.min(1, Math.max(0, dt) * 9);
+  return { x: cur.x + (dx - cur.x) * ease, y: cur.y + (dy - cur.y) * ease };
 }
 
-// One glossy eye as a 64x84 canvas, drawn exactly like the SVG logo: dark
-// pupil, lighter iris crescent at the bottom, two catch-lights. Sprites are
-// always camera-facing, so the eyes can never be hidden by the 3D body.
+// One glossy eye as a 64x84 canvas, the logo's eye (core/ghost.js eye())
+// scaled x3.57 around its centre (32, 40): flat ink pupil, iris crescent at
+// the bottom, two paper catch-lights, no white sclera. Colours = "white" theme.
 function eyeCanvas() {
   const c = document.createElement("canvas");
   c.width = 64;
   c.height = 84;
   const g = c.getContext("2d");
-  const eye = g.createRadialGradient(30, 34, 4, 32, 38, 34);
-  eye.addColorStop(0, "#2a2438");
-  eye.addColorStop(1, "#17141f");
-  g.fillStyle = eye;
+  const S = 3.57;
+  const P = (dx, dy) => [32 + dx * S, 40 + dy * S];
+  g.fillStyle = "#17141f";
   g.beginPath();
-  g.ellipse(32, 40, 20, 26, 0, 0, Math.PI * 2);
+  g.ellipse(32, 40, 5.6 * S, 7.3 * S, 0, 0, Math.PI * 2);
   g.fill();
   g.fillStyle = "#4a3f66";
   g.beginPath();
-  g.moveTo(18, 47);
-  g.quadraticCurveTo(32, 58, 46, 47);
-  g.quadraticCurveTo(32, 52, 18, 47);
+  g.moveTo(...P(-4, 3.2));
+  g.quadraticCurveTo(...P(0, 7.6), ...P(4, 3.2));
+  g.quadraticCurveTo(...P(0, 5.4), ...P(-4, 3.2));
   g.fill();
   g.fillStyle = "#fbf8ff";
-  g.beginPath();
-  g.arc(25, 28, 5.5, 0, Math.PI * 2);
-  g.fill();
-  g.beginPath();
-  g.arc(40, 46, 2.5, 0, Math.PI * 2);
-  g.fill();
+  for (const [dx, dy, r] of [[-1.8, -2.8, 1.9], [2, 3, 0.85]]) {
+    g.beginPath();
+    g.arc(...P(dx, dy), r * S, 0, Math.PI * 2);
+    g.fill();
+  }
   return c;
 }
 

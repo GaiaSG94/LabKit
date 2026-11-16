@@ -118,3 +118,7 @@ measurement contract.
   with a message naming the reason.
 - REQ-47: WHEN a member snaps THEN it SHALL stay visible as a broken stub and the
   test SHALL end as a collapse.
+- REQ-59: The chemistry lab's 3D flask ghost SHALL keep a finite gaze, so both
+  eyes stay drawn: WHEN a focus or head point does not project to the screen
+  (camera not placed yet, point on the camera plane) THEN it SHALL be ignored,
+  and a non-finite gaze SHALL recover to centre.

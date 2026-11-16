@@ -50,5 +50,13 @@ Agent-executable build plan. Each task ends with an observable check.
   - Check: `tests/properties-chemistry-scenarios.mjs` in `node tests/run-tests.mjs`
     (68/68 properties).
 
+- [x] 18. Chemistry flask ghost's eyes drawn again (REQ-59): the gaze ignored
+  points that do not project (the first frame runs before the camera is
+  placed) and recovers from NaN, instead of moving both eye sprites to NaN for
+  good; eyes drawn as the logo's eye (ink pupil, iris crescent, two
+  catch-lights), sRGB-encoded and not tone-mapped so the ink stays ink.
+  - Check: REQ-59 property in `tests/properties-chemistry.mjs` (69/69); screenshot
+    of `dist/labkit-chimie.html` shows two symmetric dark blobs on the face.
+
 > Tasks 10 and 14 are the only open work. Everything else is implemented,
 > tested and gated by CI.

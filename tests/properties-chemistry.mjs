@@ -3,6 +3,7 @@
 // balance shows up here, not in a screenshot.
 import { bootLab, runSteps } from "./labs.mjs";
 import { Suite } from "./harness.mjs";
+import { nextLook } from "../engines/chimie/bench-ghost.js";
 
 export const suite = new Suite("chemistry");
 
@@ -163,4 +164,31 @@ suite.property(
     }
   },
   { runs: 20 },
+);
+
+// The ghost's gaze is fed by screen projections that are NaN or infinite
+// before the camera is placed; one bad frame must never hide its eyes.
+const ODD = [NaN, Infinity, -Infinity, undefined];
+const coord = (rng) => (rng() < 0.3 ? ODD[Math.floor(rng() * ODD.length)] : (rng() - 0.5) * 4000);
+const point = (rng) => (rng() < 0.1 ? null : { x: coord(rng), y: coord(rng) });
+
+suite.property(
+  "REQ-59 the flask ghost's gaze stays finite whatever it is asked to look at",
+  (rng) => ({
+    start: rng() < 0.2 ? { x: NaN, y: 0 } : { x: (rng() - 0.5) * 2, y: (rng() - 0.5) * 2 },
+    frames: Array.from({ length: 1 + Math.floor(rng() * 12) }, () => ({
+      head: point(rng), target: point(rng), dt: rng() < 0.1 ? NaN : rng() * 0.2,
+    })),
+  }),
+  ({ start, frames }) => {
+    let look = start;
+    for (const f of frames) {
+      look = nextLook(look, f.head, f.target, f.dt);
+      if (!Number.isFinite(look.x) || !Number.isFinite(look.y)) {
+        throw new Error(`gaze became ${look.x}, ${look.y}`);
+      }
+      if (Math.hypot(look.x, look.y) > 1.5) throw new Error(`gaze ran away to ${look.x}, ${look.y}`);
+    }
+  },
+  { runs: 60 },
 );
