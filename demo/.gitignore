@@ -1,0 +1,8 @@
+*.mp4
+*.mov
+*.webm
+*.wav
+renders/
+audio-generated/
+node_modules/
+.env

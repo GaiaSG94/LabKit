@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planches labo chimie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* Planche : 3 nouvelles pistes pour le labo chimie (fond vert EcoLab), dans la lignée de C1, avec de la vraie verrerie 3D (three.js). */
+:root{--bg:#f3f2f7;--surface:#fff;--fg:#17141f;--muted:#5f5b70;--line:#dcd9e6;--accent:#2f8f3a;--f:"Archivo","Arial Narrow",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f0d16;--surface:#17141f;--fg:#efeaff;--muted:#a7a1c0;--line:#2b2639;--accent:#7fd069;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f0d16;--surface:#17141f;--fg:#efeaff;--muted:#a7a1c0;--line:#2b2639;--accent:#7fd069;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--f);padding:0 16px 80px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+.label{font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.intro{padding:48px 0 24px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:36px;align-items:end}
+.intro h1{font:900 clamp(34px,6vw,64px)/1 var(--f);font-stretch:72%;margin-top:10px}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted);max-width:60ch;margin-top:14px;font-size:17px}
+.keep{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px 20px;font-size:15px}
+.keep ul{margin:8px 0 0;padding-left:18px;display:grid;gap:3px}
+.board{display:grid;gap:18px;padding:30px 0;border-top:2px solid var(--fg)}
+.board-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.board-head .code{font:700 14px var(--mono);color:var(--accent)}
+.board-head h2{font:900 30px/1.1 var(--f);font-stretch:80%}
+.frame{border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 14px 36px -22px rgba(20,15,40,.45)}
+.viewport{position:relative;aspect-ratio:1000/620;overflow:hidden;background:#6cc95a}
+.notes{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:26px;font-size:15px}
+.notes .pitch{color:var(--muted)}
+.notes ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+.swatch{display:flex;gap:6px;margin-top:10px;align-items:center;font:12px var(--mono);color:var(--muted)}
+.swatch b{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:block}
+@media (max-width:760px){.intro,.notes{grid-template-columns:minmax(0,1fr)}}
+
+/* ================= Maquettes (1000 × 620, mises à l'échelle) ================= */
+.m{position:absolute;top:0;left:0;width:1000px;height:620px;transform-origin:0 0;transform:scale(var(--s,1));overflow:hidden;background:#6cc95a;color:#0b2a17;font:13px/1.35 "Archivo","Arial Narrow",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.m *{box-sizing:border-box}
+.m p{margin:0}
+.m .ab{position:absolute}
+.m svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
+.m .num{font-family:"Archivo","Arial Narrow",sans-serif;font-stretch:66%;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:.9}
+.m .num sup{font-size:.34em;font-stretch:100%;font-weight:700;vertical-align:top;margin-left:3px;position:relative;top:.3em;letter-spacing:0}
+.m .cap{font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(11,42,23,.6)}
+.m .gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.m .g{display:block;flex:none}
+.m .gls{background:rgba(255,255,255,.38);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.62);box-shadow:0 20px 40px -24px rgba(5,45,20,.6),inset 0 1px 0 rgba(255,255,255,.75);border-radius:22px}
+.m .pill{border-radius:999px!important}
+.m .brand{left:24px;top:16px;height:46px;display:flex;align-items:center;gap:10px}
+.m .brand .g{width:40px}
+.m .brand b{font:900 31px/1 "Archivo";font-stretch:70%;letter-spacing:-.01em}
+.m .back{right:24px;top:16px;height:46px;padding:0 18px 0 12px;display:flex;align-items:center;gap:6px;font:700 13px "Archivo";white-space:nowrap}
+.m .back .i{width:16px;height:16px}
+.m .ink{background:#0b2a17;color:#fff}
+.m .anchor{position:absolute;left:-300px;top:-300px}
+.m .noweb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:700 14px "Archivo";color:#fff;background:#0008;padding:8px 14px;border-radius:999px}
+
+/* ---------- C4 · verre soufflé ---------- */
+.c4 .seg{left:50%;top:16px;height:46px;transform:translateX(-50%);padding:5px;display:flex;gap:2px}
+.c4 .seg span{padding:0 18px;border-radius:999px;font:600 13.5px/36px "Archivo";white-space:nowrap}
+.c4 .seg .on{background:#0b2a17;color:#fff}
+.c4 .bl{transform:translate(-50%,0);display:flex;align-items:center;gap:7px;padding:5px 5px 5px 11px;white-space:nowrap;font:700 12.5px "Archivo"}
+.c4 .bl small{font:600 11px "JetBrains Mono";color:rgba(11,42,23,.6)}
+.c4 .bl em{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#0b2a17;color:#fff}
+.c4 .bl em .i{width:13px;height:13px;stroke-width:2.6}
+.c4 .tag{transform:translate(0,-50%);display:flex;align-items:center;font:700 12px "Archivo";white-space:nowrap}
+.c4 .tag i{width:22px;height:1.5px;background:#0b2a17;position:relative;flex:none}
+.c4 .tag i::before{content:"";position:absolute;left:-4px;top:-3px;width:7px;height:7px;border-radius:50%;background:#0b2a17}
+.c4 .tag span{padding:5px 11px}
+.c4 .tag.left{transform:translate(-100%,-50%);flex-direction:row-reverse}
+.c4 .tag.left i::before{left:auto;right:-4px}
+.c4-right{right:24px;top:84px;width:236px;height:452px;display:flex;flex-direction:column;gap:12px}
+.c4 .w{padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.c4 .w-t{flex:1;min-height:0}
+.c4 .wh{display:flex;justify-content:space-between;align-items:center}
+.c4 .chip{font:700 11px "Archivo";background:#ff5a3d;color:#fff;border-radius:999px;padding:3px 9px}
+.c4 .mut{font:600 12px "Archivo";color:rgba(11,42,23,.6)}
+.c4 .big{font-size:68px}
+.c4 .mid{font-size:44px}
+.c4 .spark{width:100%;flex:1;min-height:36px;display:block}
+.c4 .phb{height:10px;border-radius:5px;background:linear-gradient(90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#5e35b1);position:relative;margin-top:4px}
+.c4 .phb u{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;border:3px solid #0b2a17}
+.c4 .phl{display:flex;justify-content:space-between;font-size:10.5px;color:rgba(11,42,23,.55)}
+.c4 .vb{height:10px;border-radius:5px;background:rgba(11,42,23,.12);overflow:hidden;margin-top:4px}
+.c4 .vb i{display:block;height:100%;width:64%;background:#0b2a17;border-radius:5px}
+.c4-bar{left:50%;bottom:20px;transform:translateX(-50%);height:58px;padding:8px;display:flex;align-items:center;gap:6px}
+.c4 .ib{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62)}
+.c4 .ib .i{width:18px;height:18px}
+.c4 .ib.ink{background:#0b2a17;color:#fff}
+.c4 .sep{width:1px;height:24px;background:rgba(11,42,23,.18);margin:0 6px}
+.c4 .stat{display:flex;align-items:center;gap:7px;font:600 13.5px "Archivo";white-space:nowrap}
+.c4 .stat b{width:14px;height:14px;border-radius:50%;display:block;box-shadow:inset 0 -2px 3px rgba(0,0,0,.2)}
+.c4 .pl{height:42px;border-radius:999px;padding:0 18px 0 14px;display:flex;align-items:center;gap:7px;font:700 13.5px "Archivo";white-space:nowrap}
+.c4 .pl .i{width:12px;height:12px;color:#ff5a3d}
+
+/* ---------- C5 · nature morte ---------- */
+.c5 .title{left:50%;top:22px;transform:translateX(-50%);height:34px;padding:0 14px;display:flex;align-items:center;gap:8px;font:700 13.5px "Archivo";white-space:nowrap}
+.c5 .title .cap{color:rgba(11,42,23,.55)}
+.c5 .call{transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
+.c5 .call::after{content:"";width:1.5px;height:var(--h,26px);background:rgba(11,42,23,.75)}
+.c5 .call>i{position:absolute;bottom:-4px;left:50%;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:#0b2a17;box-shadow:0 0 0 3px rgba(255,255,255,.7)}
+.c5 .call.side{transform:translate(-100%,-50%);flex-direction:row}
+.c5 .call.side::after{width:var(--w,22px);height:1.5px}
+.c5 .call.side>i{bottom:auto;left:auto;right:-4px;top:50%;margin:-4px 0 0 0}
+.c5 .call.side.r{transform:translate(0,-50%);flex-direction:row-reverse}
+.c5 .call.side.r>i{right:auto;left:-4px}
+.c5 .card{padding:8px 12px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.c5 .card .num{font-size:30px}
+.c5 .card small{display:block;font:600 10.5px "JetBrains Mono";letter-spacing:.06em;text-transform:uppercase;color:rgba(11,42,23,.55)}
+.c5 .card b{font:700 13px "Archivo"}
+.c5 .dot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:inset 0 -2px 3px rgba(0,0,0,.2)}
+.c5 .stp{display:flex;align-items:center;gap:2px;background:#fff;border-radius:999px;padding:2px}
+.c5 .stp em{width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.c5 .stp em .i{width:12px;height:12px;stroke-width:2.6}
+.c5 .stp em:last-child{background:#0b2a17;color:#fff}
+.c5 .stp b{min-width:14px;text-align:center;font:700 11.5px "JetBrains Mono"}
+.c5 .knob{width:34px;height:34px;flex:none}
+.c5-dock{left:50%;bottom:18px;transform:translateX(-50%);height:66px;padding:8px;display:flex;align-items:center;gap:4px}
+.c5-dock span{height:50px;min-width:62px;padding:0 10px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 10.5px "Archivo"}
+.c5-dock span.on{background:#0b2a17;color:#fff}
+.c5-dock .sep{width:1px;min-width:1px;height:30px;padding:0;background:rgba(11,42,23,.18);margin:0 6px}
+.c5-dock .round{min-width:50px;width:50px;border-radius:50%}
+
+/* ---------- C6 · le fantôme guide ---------- */
+.c6 .nav{right:196px;top:16px;height:46px;display:flex;align-items:center;gap:22px;font:600 13.5px "Archivo"}
+.c6 .nav span{padding:6px 0;border-bottom:2px solid transparent}
+.c6 .nav .on{border-color:#0b2a17}
+.c6 .back{background:#0b2a17;color:#fff;border-radius:999px}
+.c6-left{left:40px;top:96px;width:420px;display:flex;flex-direction:column;gap:16px}
+.c6 .eyebrow{font:700 11px "JetBrains Mono";letter-spacing:.12em;text-transform:uppercase;color:rgba(11,42,23,.65);display:flex;align-items:center;gap:8px}
+.c6 .eyebrow i{width:8px;height:8px;border-radius:50%;background:#ff5a3d;box-shadow:0 0 0 3px rgba(255,90,61,.25)}
+.c6 h3{font:900 76px/.88 "Archivo";font-stretch:66%;letter-spacing:-.025em;margin:0}
+.c6 h3 em{font-style:normal;color:#fff;-webkit-text-stroke:0}
+.c6 .steps{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.c6 .st{display:flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 8px;border-radius:14px;font:600 14px "Archivo"}
+.c6 .st i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 11px "JetBrains Mono";font-style:normal;border:2px solid #0b2a17;flex:none}
+.c6 .st.done{color:rgba(11,42,23,.55)}
+.c6 .st.done i{background:#0b2a17;border-color:#0b2a17;color:#6cc95a}
+.c6 .st.done i .i{width:13px;height:13px;stroke-width:3;color:#d8f86a}
+.c6 .st.now{background:rgba(255,255,255,.45);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7)}
+.c6 .st.now b{margin-left:auto;font:700 12.5px "Archivo";background:#0b2a17;color:#fff;border-radius:999px;padding:7px 13px}
+.c6 .bubble{transform:translate(-50%,-100%);background:#fff;border-radius:18px;padding:11px 15px;font:700 14px/1.3 "Archivo";width:210px;box-shadow:0 16px 30px -18px rgba(5,45,20,.65)}
+.c6 .bubble::after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;width:14px;height:14px;background:#fff;transform:rotate(45deg);border-radius:2px}
+.c6 .bubble small{display:block;font:600 10.5px "JetBrains Mono";letter-spacing:.08em;text-transform:uppercase;color:rgba(11,42,23,.5);margin-bottom:3px}
+.c6-score{left:40px;right:40px;bottom:16px;height:84px;border-top:2px solid #0b2a17;display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:end;gap:0}
+.c6 .sc{padding:12px 18px 0 0;border-right:1px solid rgba(11,42,23,.22);margin-right:18px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+.c6 .sc:nth-child(4){border-right:0}
+.c6 .sc .num{font-size:48px}
+.c6 .sc small{font:700 10.5px "JetBrains Mono";letter-spacing:.1em;text-transform:uppercase;color:rgba(11,42,23,.6);display:flex;justify-content:space-between}
+.c6 .sc small b{color:#ff5a3d;font-weight:700}
+.c6 .ctl{display:flex;gap:6px;padding-bottom:4px}
+.c6 .ctl span{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.55)}
+.c6 .ctl span.ink{background:#0b2a17;color:#fff}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.2A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.7-2.8L14 9.5V3M7.6 15h8.8"/></symbol>
+  <symbol id="i-law" viewBox="0 0 24 24"><path d="M12 4v16M7 20h10M5 8h14M5 8l-2.5 6a2.5 2.5 0 0 0 5 0zM19 8l-2.5 6a2.5 2.5 0 0 0 5 0z"/></symbol>
+  <symbol id="i-knobs" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5.5v13M15 5.5v13" stroke-width="2.8"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></symbol>
+  <symbol id="i-step" viewBox="0 0 24 24"><path d="M6 5v14M10 12h9M15 8l4 4-4 4"/></symbol>
+  <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+</svg>
+
+<div class="wrap">
+
+<header class="intro">
+  <div>
+    <p class="label">auralab · planches · labo chimie · v3</p>
+    <h1>labo <span>chimie</span>, plus loin que C1</h1>
+    <p class="lede">La verrerie flottante (C1) te plaisait : ces trois pistes repartent d'elle. La verrerie est maintenant en vraie 3D : verre qui reflète la lumière, liquide, bulles, flamme. Les textes des maquettes sont en anglais, comme le labo depuis ton dernier commit. Dis-moi la piste que tu gardes (C4, C5 ou C6).</p>
+  </div>
+  <div class="keep">
+    <p class="label">Ce qui ne bouge pas</p>
+    <ul>
+      <li>Fond vert EcoLab <b>#6cc95a</b>, sans cadre sombre</li>
+      <li>Fantôme fiole et « chemistry lab » en minuscules</li>
+      <li>Flacons, paillasse, instruments, carnet</li>
+      <li>Rien ne se chevauche, tout tient sans défiler</li>
+    </ul>
+  </div>
+</header>
+
+<section class="board">
+  <div class="board-head"><span class="code">C4</span><h2>Verre soufflé</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c4" data-scene="c4">
+      <div class="ab brand"><span class="g" data-ghost="white"></span><b>chemistry lab</b></div>
+      <nav class="ab gls pill seg"><span class="on">Lab</span><span>Laws</span><span>Knobs</span><span>Notebook</span></nav>
+      <span class="ab gls pill back"><svg class="i"><use href="#i-back"/></svg>all labs</span>
+      <span class="ab anchor gls pill bl" data-p="-4.1,-1.2,0.3" data-dy="12">Blue<small>×1</small><em><svg class="i"><use href="#i-plus"/></svg></em></span>
+      <span class="ab anchor gls pill bl" data-p="-2.85,-1.2,0.5" data-dy="12">Yellow<small>×1</small><em><svg class="i"><use href="#i-plus"/></svg></em></span>
+      <span class="ab anchor gls pill bl" data-p="-1.6,-1.2,0.2" data-dy="12">Acid<small>×0</small><em><svg class="i"><use href="#i-plus"/></svg></em></span>
+      <span class="ab anchor tag left" data-p="-0.3,1.9,0"><i></i><span class="gls pill">Erlenmeyer · 500 mL</span></span>
+      <aside class="ab c4-right">
+        <div class="gls w w-t">
+          <div class="wh"><p class="cap">Temperature</p><span class="chip">↗ heating</span></div>
+          <p class="num big">41.2<sup>°C</sup></p>
+          <svg class="spark" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10V50H0Z" fill="#ff5a3d" fill-opacity=".16"/><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10" fill="none" stroke="#ff5a3d" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+        </div>
+        <div class="gls w">
+          <div class="wh"><p class="cap">pH</p><span class="mut">neutral</span></div>
+          <p class="num mid">6.8</p>
+          <div class="phb"><u style="left:48.6%"></u></div>
+          <div class="phl"><span>acid</span><span>basic</span></div>
+        </div>
+        <div class="gls w">
+          <div class="wh"><p class="cap">Volume</p><span class="mut">of 500 mL</span></div>
+          <p class="num mid">320<sup>mL</sup></p>
+          <div class="vb"><i></i></div>
+        </div>
+      </aside>
+      <div class="ab gls pill c4-bar">
+        <span class="ib ink"><svg class="i"><use href="#i-pause"/></svg></span>
+        <span class="ib"><svg class="i"><use href="#i-reset"/></svg></span>
+        <span class="ib"><svg class="i"><use href="#i-step"/></svg></span>
+        <span class="sep"></span>
+        <span class="stat"><b style="background:#2563eb"></b><b style="background:#facc15;margin-left:-11px"></b>Blue + yellow → green</span>
+        <span class="sep"></span>
+        <span class="pl ink"><svg class="i"><use href="#i-rec"/></svg>Measure</span>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">C'est C1, mais en vrai verre. L'erlenmeyer reflète la lumière, le liquide vert fait des bulles, la goutte tombe dans le col et le thermomètre trempe dedans. Les trois flacons sont de vrais objets posés à gauche : on clique dessus pour verser. Les mesures restent à droite, en très gros chiffres.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0b2a17"></b><b style="background:#2fd27a"></b><b style="background:#ff5a3d"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>Tout ce qui plaisait dans C1, en mieux</li><li>On comprend tout de suite que c'est de la vraie chimie</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Le labo passe en 3D comme le labo ponts : un peu plus lourd à charger</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">C5</span><h2>Nature morte</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c5" data-scene="c5">
+      <div class="ab brand"><span class="g" data-ghost="white"></span><b>chemistry lab</b></div>
+      <span class="ab gls pill title"><span class="cap">Experiment 1</span>Colors</span>
+      <span class="ab gls pill back"><svg class="i"><use href="#i-back"/></svg>all labs</span>
+      <div class="ab anchor call side r" data-p="0.33,2.82,0.12" style="--w:26px"><span class="gls card"><span class="num">41.2<sup>°C</sup></span><span><small>Temp</small><b style="color:#ff5a3d">↗ heating</b></span></span><i></i></div>
+      <div class="ab anchor call side" data-p="-0.66,0.62,0.4" style="--w:30px"><span class="gls card"><span class="dot" style="background:#2fd27a"></span><span><small>Volume</small><b>320 mL · green</b></span></span><i></i></div>
+      <div class="ab anchor call" data-p="2.75,-1.19,0.55" style="--h:30px"><span class="gls card"><span class="num">6.8</span><span><small>pH</small><b>neutral</b></span></span><i></i></div>
+      <div class="ab anchor call" data-p="-0.15,-1.12,1.25" style="--h:18px"><span class="gls card"><svg class="knob" viewBox="0 0 34 34"><circle cx="17" cy="17" r="13" fill="none" stroke="rgba(11,42,23,.15)" stroke-width="4" stroke-dasharray="61.3 81.7" stroke-linecap="round" transform="rotate(135 17 17)"/><circle cx="17" cy="17" r="13" fill="none" stroke="#ff8a3d" stroke-width="4" stroke-dasharray="36.8 81.7" stroke-linecap="round" transform="rotate(135 17 17)"/></svg><span><small>Burner</small><b>60 %</b></span></span><i></i></div>
+      <div class="ab anchor call side" data-p="-3.48,-0.62,1.55" style="--w:20px"><span class="gls card"><span class="dot" style="background:#2563eb"></span><b>Blue</b><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></span><i></i></div>
+      <div class="ab anchor call side" data-p="-3.78,-0.62,0.1" style="--w:20px"><span class="gls card"><span class="dot" style="background:#facc15"></span><b>Yellow</b><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></span><i></i></div>
+      <div class="ab anchor call side" data-p="-4.08,-0.62,-1.35" style="--w:20px"><span class="gls card"><span class="dot" style="background:#f97316"></span><b>Acid</b><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>0</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></span><i></i></div>
+      <div class="ab anchor call" data-p="3.05,-1.12,-1.3" style="--h:18px"><span class="gls card"><span><small>Notebook</small><b>2 notes · write</b></span></span><i></i></div>
+      <nav class="ab gls pill c5-dock">
+        <span class="on"><svg class="i"><use href="#i-flask"/></svg>Lab</span>
+        <span><svg class="i"><use href="#i-law"/></svg>Laws</span>
+        <span><svg class="i"><use href="#i-knobs"/></svg>Knobs</span>
+        <span><svg class="i"><use href="#i-book"/></svg>Notebook</span>
+        <span class="sep"></span>
+        <span class="round ink"><svg class="i"><use href="#i-pause"/></svg></span>
+        <span class="round"><svg class="i"><use href="#i-reset"/></svg></span>
+      </nav>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Plus de panneaux : la paillasse est vue d'en haut, comme une nature morte posée sur le vert. Chaque objet porte sa propre étiquette en verre : les doses sous les flacons, la température au bout du thermomètre, le pH sur le papier pH, la puissance sur le bec. Le carnet est un vrai cahier posé sur la table, et les quatre onglets sont dans un dock en bas.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0b2a17"></b><b style="background:#fbfaf5"></b><b style="background:#ff8a3d"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>Se comprend sans mode d'emploi : chaque chiffre est sur son objet</li><li>Le plus « labo réel » des trois</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Les étiquettes suivent les objets : il faut les placer avec soin</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">C6</span><h2>Le fantôme guide</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c6" data-scene="c6">
+      <div class="ab brand"><span class="g" data-ghost="white"></span><b>chemistry lab</b></div>
+      <nav class="ab nav"><span class="on">Lab</span><span>Laws</span><span>Knobs</span><span>Notebook</span></nav>
+      <span class="ab back"><svg class="i"><use href="#i-back"/></svg>all labs</span>
+      <div class="ab c6-left">
+        <p class="eyebrow"><i></i>Experiment 1 · step 3 of 4</p>
+        <h3>Blue + yellow <em>=</em> green.</h3>
+        <div class="steps">
+          <div class="st done"><i><svg class="i"><use href="#i-check"/></svg></i>Pour one dose of blue</div>
+          <div class="st done"><i><svg class="i"><use href="#i-check"/></svg></i>Pour one dose of yellow</div>
+          <div class="st now"><i>3</i>Heat it gently<b>Light the burner</b></div>
+          <div class="st"><i>4</i>Add the acid and watch</div>
+        </div>
+      </div>
+      <div class="ab anchor bubble" data-p="2.25,0.42,0.1" data-dy="-12"><small>Ghost</small>Green! Now heat it gently and watch the thermometer.</div>
+      <div class="ab c6-score">
+        <div class="sc"><small>Temperature <b>↗</b></small><span class="num">41.2<sup>°C</sup></span></div>
+        <div class="sc"><small>pH</small><span class="num">6.8</span></div>
+        <div class="sc"><small>Volume</small><span class="num">320<sup>mL</sup></span></div>
+        <div class="sc"><small>Time</small><span class="num">0:42</span></div>
+        <div class="ctl"><span class="ink"><svg class="i"><use href="#i-pause"/></svg></span><span><svg class="i"><use href="#i-reset"/></svg></span></div>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Une mise en page de magazine. À gauche, une énorme phrase dit ce qui se passe (« Blue + yellow = green. »), puis les étapes de l'expérience. À droite, l'erlenmeyer en 3D, avec le flacon jaune qui verse. Le fantôme fiole de la marque, en relief, regarde l'expérience et donne le conseil suivant dans une bulle. En bas, les mesures s'affichent comme un tableau de score.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0b2a17"></b><b style="background:#ffffff"></b><b style="background:#ff5a3d"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>Le plus fort visuellement, très « marque »</li><li>Le fantôme guide l'élève pas à pas</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Moins de place pour le mode libre (bac à sable)</li></ul></div>
+  </div>
+</section>
+
+</div>
+<script src="core/ghost.js"></script>
+<script src="app-ponts/vendor/three.min.js"></script>
+<script>
+// Ghost logos + scaling.
+(function () {
+  document.querySelectorAll(".m .g").forEach((h) => { if (window.AuraGhost) window.AuraGhost.mount(h, h.dataset.ghost || "white"); });
+  const fit = () => document.querySelectorAll(".viewport").forEach((v) => v.querySelector(".m").style.setProperty("--s", v.clientWidth / 1000));
+  addEventListener("resize", fit);
+  fit();
+})();
+
+// Real 3D glassware (three.js, same build as the bridge lab).
+(function () {
+  const T = window.THREE;
+  if (!T) return;
+  const still = /still/.test(location.search);
+  const reduce = still || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (T.ColorManagement && "legacyMode" in T.ColorManagement) T.ColorManagement.legacyMode = false;
+  const W = 1000, H = 620, GREEN = 0x6cc95a;
+  const V = (x, y, z) => new T.Vector3(x, y, z);
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  const lathe = (pts, seg) => new T.LatheGeometry(pts.map(([r, y]) => new T.Vector2(r, y)), seg || 72);
+  const shade = (m, cast, receive) => { m.castShadow = cast !== false; m.receiveShadow = !!receive; return m; };
+
+  function makeRenderer(host) {
+    const r = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: still });
+    r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    r.setSize(W, H, false);
+    r.outputEncoding = T.sRGBEncoding;
+    r.toneMapping = T.ACESFilmicToneMapping;
+    r.toneMappingExposure = 1.0;
+    r.shadowMap.enabled = true;
+    r.shadowMap.type = T.PCFSoftShadowMap;
+    r.setClearColor(GREEN, 1); // the page green, also what the glass refracts
+    r.domElement.className = "gl";
+    host.insertBefore(r.domElement, host.firstChild);
+    return r;
+  }
+  // Studio environment for reflections: soft gradient dome + three softboxes.
+  function studio(renderer) {
+    const pm = new T.PMREMGenerator(renderer);
+    const env = new T.Scene();
+    const R = 40, g = new T.SphereGeometry(R, 32, 16), p = g.attributes.position, col = new Float32Array(p.count * 3);
+    const top = new T.Color("#ffffff"), hor = new T.Color("#e3f6dd"), bot = new T.Color("#4f9a42"), c = new T.Color();
+    for (let i = 0; i < p.count; i++) {
+      const k = p.getY(i) / R;
+      if (k > 0) c.copy(hor).lerp(top, Math.min(1, k * 1.6)); else c.copy(hor).lerp(bot, Math.min(1, -k * 2));
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    }
+    g.setAttribute("color", new T.BufferAttribute(col, 3));
+    env.add(new T.Mesh(g, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide })));
+    const panel = (w, h, pos, k) => {
+      const m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ color: new T.Color(k, k, k), side: T.DoubleSide }));
+      m.position.copy(pos); m.lookAt(0, 0, 0); env.add(m);
+    };
+    panel(16, 5, V(0, 18, 8), 6);
+    panel(5, 14, V(-16, 6, 7), 3.5);
+    panel(5, 14, V(16, 5, -4), 2.4);
+    const tex = pm.fromScene(env, 0.02).texture;
+    pm.dispose();
+    return tex;
+  }
+  const glass = () => new T.MeshPhysicalMaterial({
+    color: 0xffffff, metalness: 0, roughness: 0, transmission: 1, thickness: 0.12, ior: 1.48,
+    clearcoat: 0.6, clearcoatRoughness: 0.03, envMapIntensity: 1.0, side: T.DoubleSide,
+  });
+  const metal = (c, rough) => new T.MeshStandardMaterial({ color: c, metalness: 0.75, roughness: rough || 0.32 });
+  const rubber = new T.MeshStandardMaterial({ color: 0x1f1d24, roughness: 0.6 });
+  const FLASK = [[0, 0], [0.9, 0], [0.98, 0.035], [1.0, 0.1], [0.97, 0.2], [0.36, 1.5], [0.3, 1.63], [0.29, 2.3], [0.34, 2.33], [0.36, 2.37], [0.33, 2.4], [0.28, 2.37]];
+  const rIn = (y) => (y < 0.2 ? 0.92 : 0.92 - (0.92 - 0.27) * Math.min(1, (y - 0.2) / 1.3));
+  const BOTTLE = [[0, 0], [0.4, 0], [0.45, 0.04], [0.46, 0.12], [0.46, 0.72], [0.42, 0.84], [0.3, 0.94], [0.17, 0.99], [0.15, 1.04], [0.15, 1.16], [0.12, 1.16]];
+
+  function labelTex(name, color) {
+    const cv = document.createElement("canvas"); cv.width = 512; cv.height = 96;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#fbfaf5"; c.fillRect(0, 0, 512, 96);
+    c.font = '800 28px Archivo, "Segoe UI", sans-serif'; c.textBaseline = "middle";
+    const tw = c.measureText(name).width, x0 = 256 - (tw + 30) / 2;
+    c.fillStyle = color; c.beginPath(); c.arc(x0 + 10, 48, 11, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#0b2a17"; c.fillText(name, x0 + 30, 50);
+    const t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding; t.anisotropy = 4;
+    return t;
+  }
+  function bottle(name, color, level) {
+    const g = new T.Group();
+    const liq = shade(new T.Mesh(lathe([[0, 0.04], [0.41, 0.04], [0.42, 0.1], [0.42, level], [0, level]], 48),
+      new T.MeshStandardMaterial({ color, roughness: 0.15, emissive: color, emissiveIntensity: 0.18 })));
+    const body = new T.Mesh(lathe(BOTTLE, 64), glass());
+    const band = new T.Mesh(new T.CylinderGeometry(0.465, 0.465, 0.26, 64, 1, true), new T.MeshStandardMaterial({ map: labelTex(name, color), roughness: 0.75, side: T.DoubleSide }));
+    band.position.y = 0.36; band.rotation.y = Math.PI;
+    const cap = shade(new T.Mesh(new T.CylinderGeometry(0.17, 0.17, 0.16, 32), rubber)); cap.position.y = 1.2;
+    const bulb = shade(new T.Mesh(new T.SphereGeometry(0.15, 32, 16), rubber)); bulb.position.y = 1.37; bulb.scale.y = 1.15;
+    g.add(liq, band, cap, bulb, body);
+    return g;
+  }
+  // Erlenmeyer on a tripod over a Bunsen burner, thermometer dipped in, green liquid with bubbles.
+  function bench(scene, o) {
+    const out = {};
+    const L = o.level || 0.95;
+    const flask = new T.Group(); scene.add(flask);
+    const liquidMat = new T.MeshStandardMaterial({ color: 0x0b8f47, roughness: 0.18, emissive: 0x078a40, emissiveIntensity: 0.55 });
+    flask.add(shade(new T.Mesh(lathe([[0, 0.05], [0.84, 0.05], [0.91, 0.12], [rIn(0.2), 0.2], [rIn(L), L], [0, L]]), liquidMat)));
+    const men = new T.Mesh(new T.CircleGeometry(rIn(L) - 0.01, 64), new T.MeshStandardMaterial({ color: 0x22c06b, roughness: 0.1, emissive: 0x0f9d50, emissiveIntensity: 0.45 }));
+    men.rotation.x = -Math.PI / 2; men.position.y = L + 0.002; flask.add(men);
+    flask.add(new T.Mesh(lathe(FLASK), glass()));
+    // Bubbles rising in the liquid.
+    const rnd = rng(7), N = 34;
+    const bub = new T.InstancedMesh(new T.SphereGeometry(1, 12, 8), new T.MeshStandardMaterial({ color: 0xeafff2, roughness: 0.05, emissive: 0x9ff5c4, emissiveIntensity: 0.25 }), N);
+    const bubs = [];
+    for (let i = 0; i < N; i++) bubs.push({ a: rnd() * 6.28, r: rnd(), y: 0.1 + rnd() * (L - 0.15), v: 0.18 + rnd() * 0.3, s: 0.022 + rnd() * 0.03 });
+    flask.add(bub);
+    const m4 = new T.Matrix4(), q = new T.Quaternion(), sc = new T.Vector3(), pv = new T.Vector3();
+    out.bubbles = (dt) => {
+      bubs.forEach((b, i) => {
+        b.y += b.v * dt; if (b.y > L - 0.03) b.y = 0.1;
+        const rr = rIn(b.y) * 0.78 * b.r;
+        bub.setMatrixAt(i, m4.compose(pv.set(Math.cos(b.a) * rr, b.y, Math.sin(b.a) * rr), q, sc.setScalar(b.s)));
+      });
+      bub.instanceMatrix.needsUpdate = true;
+    };
+    out.bubbles(0);
+    // Thermometer.
+    const th = new T.Group();
+    const red = new T.MeshStandardMaterial({ color: 0xff3b30, roughness: 0.2, emissive: 0xff3b30, emissiveIntensity: 0.25 });
+    const colH = o.thermo || 1.7;
+    const tcol = new T.Mesh(new T.CylinderGeometry(0.018, 0.018, colH, 10), red); tcol.position.y = colH / 2 + 0.08;
+    const tb = new T.Mesh(new T.SphereGeometry(0.058, 16, 12), red); tb.position.y = 0.06;
+    const TL = o.tube || 3.0;
+    const tube = new T.Mesh(new T.CylinderGeometry(0.047, 0.047, TL, 20), glass()); tube.position.y = TL / 2;
+    th.add(tcol, tb, tube);
+    th.position.set(0.12, 0.28, 0.05); th.rotation.z = -0.07;
+    scene.add(th);
+    // Tripod, gauze, burner and flame.
+    const dark = metal(0x2f3431, 0.4);
+    const ring = shade(new T.Mesh(new T.TorusGeometry(1.0, 0.032, 10, 64), dark)); ring.rotation.x = Math.PI / 2; ring.position.y = -0.035; scene.add(ring);
+    const gauze = shade(new T.Mesh(new T.BoxGeometry(1.35, 0.012, 1.35), new T.MeshStandardMaterial({ color: 0x4a504c, metalness: 0.35, roughness: 0.75 })), true, true);
+    gauze.position.y = -0.01; scene.add(gauze);
+    [Math.PI / 2, (Math.PI * 7) / 6, (Math.PI * 11) / 6].forEach((a) => {
+      const top = V(Math.cos(a) * 1.0, -0.035, Math.sin(a) * 1.0), bot = V(Math.cos(a) * 1.28, -1.2, Math.sin(a) * 1.28);
+      const d = new T.Vector3().subVectors(bot, top);
+      const leg = shade(new T.Mesh(new T.CylinderGeometry(0.028, 0.028, d.length(), 10), dark));
+      leg.position.copy(top).addScaledVector(d, 0.5); leg.quaternion.setFromUnitVectors(V(0, 1, 0), d.normalize());
+      scene.add(leg);
+    });
+    const steel = metal(0xa7b0ad, 0.28);
+    const base = shade(new T.Mesh(new T.CylinderGeometry(0.42, 0.46, 0.08, 48), dark)); base.position.y = -1.16; scene.add(base);
+    const pipe = shade(new T.Mesh(new T.CylinderGeometry(0.085, 0.085, 0.5, 32), steel)); pipe.position.y = -0.87; scene.add(pipe);
+    const collar = shade(new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.09, 32), steel)); collar.position.y = -0.98; scene.add(collar);
+    const valve = shade(new T.Mesh(new T.BoxGeometry(0.2, 0.06, 0.08), steel)); valve.position.set(0.24, -1.08, 0); scene.add(valve);
+    const flame = new T.Group();
+    const outer = new T.Mesh(new T.ConeGeometry(0.13, 0.56, 24, 1, true), new T.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.55, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide }));
+    outer.position.y = 0.28;
+    const inner = new T.Mesh(new T.ConeGeometry(0.065, 0.3, 20, 1, true), new T.MeshBasicMaterial({ color: 0xbfe6ff, transparent: true, opacity: 0.85, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide }));
+    inner.position.y = 0.15;
+    flame.add(outer, inner); flame.position.y = -0.62; scene.add(flame);
+    const glow = new T.PointLight(0x5aa9ff, 0.8, 3, 2); glow.position.set(0, -0.3, 0); scene.add(glow);
+    out.flame = (t) => { const k = 1 + Math.sin(t * 31) * 0.06 + Math.sin(t * 17) * 0.05; flame.scale.set(1 / Math.sqrt(k), k, 1 / Math.sqrt(k)); };
+    // Ground: only the shadows show on the page green.
+    const ground = new T.Mesh(new T.PlaneGeometry(40, 40), new T.ShadowMaterial({ opacity: 0.2 }));
+    ground.rotation.x = -Math.PI / 2; ground.position.y = -1.2; ground.receiveShadow = true; scene.add(ground);
+    out.L = L;
+    return out;
+  }
+  function lights(scene, renderer, sunPos) {
+    scene.environment = studio(renderer);
+    const key = new T.DirectionalLight(0xffffff, 1.1);
+    key.position.copy(sunPos || V(-4, 8, 5));
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    const c = key.shadow.camera; c.left = -7; c.right = 7; c.top = 7; c.bottom = -7; c.near = 1; c.far = 30;
+    key.shadow.radius = 6; key.shadow.bias = -0.0004;
+    scene.add(key);
+    scene.add(new T.HemisphereLight(0xffffff, 0x4f9a42, 0.35));
+  }
+  // The flask ghost of the logo, turned on a lathe.
+  function makeGhost() {
+    const prof = [[0, 0], [0.7, 0], [0.78, 0.08], [0.78, 0.45], [0.745, 0.716], [0.641, 0.94], [0.468, 1.116], [0.225, 1.25], [0.225, 1.6], [0.35, 1.6], [0.35, 1.75], [0, 1.75]];
+    const g = new T.Group();
+    const ink = new T.MeshStandardMaterial({ color: 0x17141f, roughness: 0.3 });
+    g.add(shade(new T.Mesh(lathe(prof, 64), new T.MeshPhysicalMaterial({ color: 0xfbf8ff, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.2 }))));
+    const eyeG = new T.SphereGeometry(0.085, 16, 12), chG = new T.SphereGeometry(0.1, 16, 10);
+    const cheek = new T.MeshStandardMaterial({ color: 0xff9a62, roughness: 0.6 });
+    [-1, 1].forEach((s) => {
+      const e = new T.Mesh(eyeG, ink); e.scale.set(1, 1.3, 0.55); e.position.set(s * 0.225, 0.62, 0.72); g.add(e);
+      const c = new T.Mesh(chG, cheek); c.scale.set(1.2, 0.55, 0.3); c.position.set(s * 0.46, 0.4, 0.62); g.add(c);
+    });
+    const sm = new T.Mesh(new T.TorusGeometry(0.065, 0.017, 8, 16, Math.PI), ink); sm.rotation.z = Math.PI; sm.position.set(0, 0.45, 0.77); g.add(sm);
+    return g;
+  }
+  function faceCamera(obj, cam) { obj.rotation.y = Math.atan2(cam.position.x - obj.position.x, cam.position.z - obj.position.z); }
+
+  // ---------- C4: blown glass (C1 in real 3D) ----------
+  function sceneC4(host) {
+    const renderer = makeRenderer(host);
+    const scene = new T.Scene();
+    const camera = new T.PerspectiveCamera(24, W / H, 0.1, 100);
+    camera.position.set(0.6, 1.9, 14.5);
+    camera.lookAt(-0.55, 0.55, 0);
+    lights(scene, renderer);
+    const b = bench(scene, { level: 0.95, thermo: 1.6, tube: 2.6 });
+    const bottles = [bottle("BLUE", "#1d4ed8", 0.62), bottle("YELLOW", "#eab308", 0.5), bottle("ACID", "#ea580c", 0.62)];
+    [[-4.1, 0.3], [-2.85, 0.5], [-1.6, 0.2]].forEach(([x, z], i) => { bottles[i].position.set(x, -1.2, z); faceCamera(bottles[i], camera); scene.add(bottles[i]); });
+    // A yellow drop falls into the neck, a ripple spreads on the liquid.
+    const drop = new T.Mesh(new T.SphereGeometry(0.075, 20, 14), new T.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, emissive: 0xfacc15, emissiveIntensity: 0.2 }));
+    drop.scale.y = 1.35; scene.add(drop);
+    const ripple = new T.Mesh(new T.TorusGeometry(0.1, 0.008, 6, 48), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 }));
+    ripple.rotation.x = Math.PI / 2; ripple.position.y = b.L + 0.01; scene.add(ripple);
+    return {
+      renderer, scene, camera,
+      update(t, dt) {
+        b.bubbles(dt); b.flame(t);
+        const k = ((t + 0.9) % 2.6) / 2.6;
+        const fall = Math.min(1, k / 0.55);
+        drop.visible = k < 0.55;
+        drop.position.set(0, 3.7 - (3.7 - b.L) * fall * fall, 0);
+        const rk = Math.max(0, (k - 0.55) / 0.45);
+        ripple.visible = k >= 0.55;
+        ripple.scale.setScalar(1 + rk * 3.5);
+        ripple.material.opacity = 0.8 * (1 - rk);
+      },
+    };
+  }
+
+  // ---------- C5: still life seen from above ----------
+  function paperTex() {
+    const cv = document.createElement("canvas"); cv.width = 512; cv.height = 660;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#fbfaf5"; c.fillRect(0, 0, 512, 660);
+    c.strokeStyle = "rgba(37,99,235,.25)"; c.lineWidth = 2;
+    for (let y = 120; y < 640; y += 44) { c.beginPath(); c.moveTo(30, y); c.lineTo(482, y); c.stroke(); }
+    c.strokeStyle = "rgba(239,68,68,.35)"; c.beginPath(); c.moveTo(72, 20); c.lineTo(72, 640); c.stroke();
+    c.fillStyle = "#0b2a17"; c.font = '800 40px Archivo, "Segoe UI", sans-serif'; c.fillText("Experiment 1", 90, 86);
+    c.font = '500 30px "Segoe Print", "Comic Sans MS", cursive'; c.fillStyle = "#1e3a8a";
+    ["blue + yellow → green ✓", "heat: bubbles at 41 °C", "acid next…"].forEach((s, i) => c.fillText(s, 90, 154 + i * 88));
+    const t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+    return t;
+  }
+  function phTex() {
+    const cv = document.createElement("canvas"); cv.width = 64; cv.height = 320;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#fbfaf5"; c.fillRect(0, 0, 64, 320);
+    ["#43a047", "#7cb342", "#fdd835", "#fb8c00"].forEach((col, i) => { c.fillStyle = col; c.fillRect(10, 20 + i * 52, 44, 40); });
+    const t = new T.CanvasTexture(cv); t.encoding = T.sRGBEncoding;
+    return t;
+  }
+  function sceneC5(host) {
+    const renderer = makeRenderer(host);
+    const scene = new T.Scene();
+    const camera = new T.PerspectiveCamera(30, W / H, 0.1, 100);
+    camera.position.set(0.2, 8.6, 9.6);
+    camera.lookAt(-0.25, -0.2, 0.05);
+    lights(scene, renderer, V(-5, 9, 4));
+    const b = bench(scene, { level: 0.95, thermo: 1.6, tube: 2.6 });
+    [["BLUE", "#1d4ed8", 0.62, -3.0, 1.55], ["YELLOW", "#eab308", 0.5, -3.3, 0.1], ["ACID", "#ea580c", 0.62, -3.6, -1.35]].forEach(([n, c, l, x, z]) => {
+      const bt = bottle(n, c, l); bt.position.set(x, -1.2, z); faceCamera(bt, camera); scene.add(bt);
+    });
+    const strip = shade(new T.Mesh(new T.BoxGeometry(0.32, 0.012, 1.5), [0, 0, new T.MeshStandardMaterial({ map: phTex(), roughness: 0.8 }), 0, 0, 0].map((m) => m || new T.MeshStandardMaterial({ color: 0xfbfaf5, roughness: 0.8 }))), true, true);
+    strip.position.set(2.75, -1.19, 0.55); strip.rotation.y = 0.5; scene.add(strip);
+    const book = shade(new T.Mesh(new T.BoxGeometry(1.75, 0.07, 2.25), [0, 0, new T.MeshStandardMaterial({ map: paperTex(), roughness: 0.85 }), 0, 0, 0].map((m) => m || new T.MeshStandardMaterial({ color: 0xe9e4d6, roughness: 0.85 }))), true, true);
+    book.position.set(3.05, -1.16, -1.3); book.rotation.y = -0.35; scene.add(book);
+    const pencil = new T.Group();
+    const wood = shade(new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 1.5, 6), new T.MeshStandardMaterial({ color: 0xffc94d, roughness: 0.6 })));
+    const tip = shade(new T.Mesh(new T.ConeGeometry(0.045, 0.16, 6), new T.MeshStandardMaterial({ color: 0xe9c79a, roughness: 0.7 }))); tip.position.y = 0.83;
+    pencil.add(wood, tip); pencil.rotation.set(0, 0.6, Math.PI / 2); pencil.position.set(2.05, -1.07, -0.35); scene.add(pencil);
+    return { renderer, scene, camera, update(t, dt) { b.bubbles(dt); b.flame(t); } };
+  }
+
+  // ---------- C6: editorial close-up with the ghost as guide ----------
+  function sceneC6(host) {
+    const renderer = makeRenderer(host);
+    const scene = new T.Scene();
+    const camera = new T.PerspectiveCamera(30, W / H, 0.1, 100);
+    camera.position.set(-1.1, 2.2, 13.2);
+    camera.lookAt(-1.61, 0.75, 0);
+    lights(scene, renderer, V(-3, 8, 6));
+    const b = bench(scene, { level: 0.95, thermo: 1.6, tube: 2.6 });
+    // The yellow bottle tilts over the neck and pours a thin stream.
+    const bt = bottle("YELLOW", "#eab308", 0.5);
+    bt.position.set(-1.2, 3.12, 0.1); bt.rotation.set(0, 0, -2.1); scene.add(bt);
+    const stream = new T.Mesh(new T.CylinderGeometry(0.03, 0.022, 1, 12), new T.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, emissive: 0xfacc15, emissiveIntensity: 0.25 }));
+    const a = V(-0.12, 2.47, 0.1), z = V(-0.05, b.L, 0.05), d = new T.Vector3().subVectors(z, a);
+    stream.position.copy(a).addScaledVector(d, 0.5); stream.scale.y = d.length(); stream.quaternion.setFromUnitVectors(V(0, 1, 0), d.normalize());
+    scene.add(stream);
+    const ghost = makeGhost(); ghost.scale.setScalar(0.88); ghost.position.set(2.25, -1.2, 0.1); scene.add(ghost);
+    return {
+      renderer, scene, camera,
+      update(t, dt) {
+        b.bubbles(dt); b.flame(t);
+        ghost.position.y = -1.2 + Math.abs(Math.sin(t * 2.2)) * 0.05;
+        faceCamera(ghost, camera); ghost.rotation.y -= 0.35;
+      },
+    };
+  }
+
+  const builders = { c4: sceneC4, c5: sceneC5, c6: sceneC6 };
+  const scenes = [];
+  document.querySelectorAll("[data-scene]").forEach((host) => {
+    try { const s = builders[host.dataset.scene](host); s.host = host; s.on = true; scenes.push(s); }
+    catch (e) { console.error(e); host.insertAdjacentHTML("afterbegin", '<p class="noweb">3D unavailable on this device</p>'); }
+  });
+  function place(s) {
+    s.host.querySelectorAll(".anchor").forEach((el) => {
+      const [x, y, z] = el.dataset.p.split(",").map(Number);
+      const p = V(x, y, z).project(s.camera);
+      el.style.left = (((p.x + 1) / 2) * W + Number(el.dataset.dx || 0)).toFixed(1) + "px";
+      el.style.top = (((1 - p.y) / 2) * H + Number(el.dataset.dy || 0)).toFixed(1) + "px";
+    });
+  }
+  let last = performance.now();
+  const draw = (t, dt) => scenes.forEach((s) => { if (!s.on) return; if (s.update) s.update(t, dt); s.renderer.render(s.scene, s.camera); });
+  scenes.forEach((s) => { s.camera.updateMatrixWorld(); place(s); });
+  draw(0.6, 0);
+  if (!reduce) {
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => { const s = scenes.find((x) => x.host === e.target); if (s) s.on = e.isIntersecting; }));
+      scenes.forEach((s) => io.observe(s.host));
+    }
+    const t0 = performance.now();
+    const loop = (now) => { const dt = Math.min(0.05, (now - last) / 1000); last = now; draw((now - t0) / 1000 + 0.6, dt); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>

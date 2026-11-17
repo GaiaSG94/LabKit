@@ -1,0 +1,465 @@
+<title>Planches visuelles AuraLab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&family=Big+Shoulders+Display:wght@800;900&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;600&family=Lexend:wght@400;600&family=Martian+Mono:wght@400;600&family=Shantell+Sans:wght@400;600;800&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: planche de présentation — intro, 5 maquettes plein cadre très illustrées (F à J) avec leurs notes, sélection fixée en bas. */
+:root{
+  --bg:#f3f2f7; --surface:#ffffff; --fg:#17151f; --muted:#5f5b70; --line:#dcd9e6; --accent:#e0681f; --accent-soft:#fdebdf;
+  --f-display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  --f-mono:"Martian Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--fg); font:16px/1.55 var(--f-body); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 120px}
+.wrap{max-width:1180px; margin:0 auto}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
+p{margin:0}
+.label{font:600 11px/1.4 var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+a{color:var(--accent)}
+.intro{padding-block:52px 28px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:40px; align-items:end}
+.intro h1{font:700 clamp(32px,5vw,58px)/1.05 var(--f-display); letter-spacing:-.02em; margin-top:12px}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted); max-width:58ch; margin-top:16px; font-size:17px}
+.keep{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:18px 20px; display:grid; gap:8px; font-size:15px}
+.board{display:grid; gap:20px; padding-block:36px; border-top:2px solid var(--fg)}
+.board-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap}
+.board-head h2{font:700 30px/1.1 var(--f-display)}
+.board-head .code{font:600 13px var(--f-mono); color:var(--accent); margin-right:10px}
+.frame{border-radius:12px; overflow:hidden; border:1px solid var(--line); box-shadow:0 14px 36px -22px rgba(20,15,40,.45)}
+.viewport{position:relative; aspect-ratio:1000/620; overflow:hidden; max-width:100%; background:#888}
+.mock{position:absolute; top:0; left:0; width:1000px; height:620px; transform-origin:0 0; transform:scale(var(--s,.6)); overflow:hidden}
+.notes{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:28px}
+.notes .pitch{color:var(--muted)}
+.swatches{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px}
+.swatches b{display:block; width:34px; height:34px; border-radius:8px; border:1px solid var(--line)}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:14px; margin:0; align-content:start}
+.kv dt{font:600 11px/1.9 var(--f-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.kv dd{margin:0}
+.pick{font:700 14px var(--f-body); border:1.5px solid var(--fg); background:transparent; color:var(--fg); border-radius:999px; padding:8px 16px; cursor:pointer}
+.pick:hover{background:var(--accent-soft)}
+.pick[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.pick:focus-visible, .copy:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.bar{position:fixed; left:0; right:0; bottom:0; background:var(--fg); color:var(--bg); padding:12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display:flex; justify-content:center}
+.bar .in{max-width:1180px; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between}
+.bar output{font:600 14px var(--f-mono)}
+.copy{font:700 14px var(--f-body); background:var(--bg); color:var(--fg); border:0; border-radius:999px; padding:8px 16px; cursor:pointer}
+@media (max-width:860px){ .intro, .notes{grid-template-columns:1fr} }
+.g{display:block}
+.g svg{display:block; width:100%; height:auto; overflow:visible}
+.mock canvas.fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+
+/* ============ F · Diorama isométrique ============ */
+.is{background:radial-gradient(700px 500px at 70% 60%, #2a2147, #15112a); color:#f4f0ff; font:15px/1.5 "Bricolage Grotesque", sans-serif}
+.is .scene{position:absolute; inset:0}
+.is .brand{position:absolute; left:40px; top:28px; display:flex; align-items:center; gap:10px; font:800 22px "Bricolage Grotesque", sans-serif}
+.is .brand .g{width:30px}
+.is .txt{position:absolute; left:40px; top:120px; width:330px}
+.is .eyebrow{font:600 11px "Martian Mono", monospace; letter-spacing:.12em; text-transform:uppercase; color:#ff8a3d}
+.is h3{font:800 46px/1 "Bricolage Grotesque", sans-serif; letter-spacing:-.02em; margin-top:12px; font-variation-settings:"opsz" 96}
+.is h3 span{color:#ff8a3d}
+.is .lede{margin-top:14px; color:#c8bfe6}
+.is .cta{display:inline-block; margin-top:20px; background:#f4f0ff; color:#15112a; font-weight:800; padding:10px 18px; border-radius:999px}
+.is .ghost{position:absolute; width:78px}
+.is .tag{position:absolute; transform:translate(-50%,-100%); background:#f4f0ff; color:#15112a; font:600 11px "Martian Mono", monospace; padding:4px 8px; border-radius:6px; white-space:nowrap}
+.is .tag::after{content:""; position:absolute; left:50%; bottom:-5px; margin-left:-5px; border:5px solid transparent; border-bottom:0; border-top-color:#f4f0ff}
+.is .tag.hot{background:#ff8a3d; color:#15112a}
+.is .tag.hot::after{border-top-color:#ff8a3d}
+.is .say{position:absolute; background:#fff; color:#15112a; font-weight:700; font-size:13px; padding:8px 12px; border-radius:14px 14px 14px 3px; width:170px}
+
+/* ============ G · Aquarelle ============ */
+.aq{background:#fcfbf8; color:#2b2350; font:15px/1.5 "Shantell Sans", cursive}
+.aq .wash{position:absolute; inset:0; width:100%; height:100%}
+.aq .brand{position:absolute; left:40px; top:26px; display:flex; align-items:center; gap:10px; font:800 24px "Shantell Sans", cursive}
+.aq .brand .g{width:36px}
+.aq .nav{position:absolute; right:40px; top:34px; display:flex; gap:20px; font-weight:600}
+.aq .txt{position:absolute; left:40px; top:110px; width:440px}
+.aq h3{font:800 50px/1.05 "Shantell Sans", cursive}
+.aq h3 span{color:#d9621f}
+.aq .lede{margin-top:14px; font-size:16px; color:#4a4170; max-width:40ch}
+.aq .ghost{position:absolute; left:600px; top:80px; width:230px}
+.aq .hand{position:absolute; font:600 16px "Shantell Sans", cursive; color:#2b2350}
+.aq .arrows{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+.aq .blob{position:absolute; background:rgba(255,255,255,.75); border:2px solid rgba(43,35,80,.55); padding:14px 16px}
+.aq .b1{left:40px; top:360px; width:250px; border-radius:46% 54% 52% 48% / 44% 46% 54% 56%}
+.aq .b2{left:330px; top:330px; width:330px; height:250px; border-radius:52% 48% 45% 55% / 50% 56% 44% 50%; padding:0; overflow:hidden; background:rgba(185,166,255,.18)}
+.aq .b3{right:40px; top:380px; width:270px; border-radius:50% 50% 46% 54% / 56% 44% 56% 44%}
+.aq .blob h4{font:800 17px "Shantell Sans", cursive; margin-bottom:6px}
+.aq .blob p{font-size:14px}
+.aq .b2 canvas{position:absolute; inset:0; width:100%; height:100%}
+
+/* ============ H · Risographie ============ */
+.ri{background:#efece6; color:#0078bf; font:13px/1.5 "IBM Plex Mono", monospace}
+.ri .grain{position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:.5; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.3 0 0 0 0 0.3 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.ri .dots{position:absolute; right:40px; top:40px; width:420px; height:420px; border-radius:50%; background-image:radial-gradient(#ff48b0 3.2px, transparent 3.6px); background-size:11px 11px; mix-blend-mode:multiply; opacity:.75}
+.ri .top{position:absolute; left:36px; right:36px; top:24px; display:flex; justify-content:space-between; font:600 12px "IBM Plex Mono", monospace; letter-spacing:.1em; text-transform:uppercase}
+.ri .top .brand{display:flex; align-items:center; gap:8px; font:900 26px "Big Shoulders Display", sans-serif; letter-spacing:.02em; text-transform:none}
+.ri .top .brand .g{width:28px}
+.ri h3{position:absolute; left:32px; top:70px; width:660px; font:900 128px/.82 "Big Shoulders Display", sans-serif; text-transform:uppercase; mix-blend-mode:multiply}
+.ri h3 .a{color:#0078bf; display:block}
+.ri h3 .b{color:#ff48b0; display:block; margin-left:24px}
+.ri .ghost{position:absolute; right:90px; top:66px; width:300px; mix-blend-mode:multiply}
+.ri .lede{position:absolute; left:36px; top:356px; width:400px; color:#0078bf; font-size:14px}
+.ri .strip{position:absolute; left:36px; right:36px; bottom:28px; height:170px; display:grid; grid-template-columns:220px 1fr 250px; gap:14px}
+.ri .cell{border:3px solid #0078bf; padding:10px 12px; position:relative; mix-blend-mode:multiply}
+.ri .cell h4{font:900 22px "Big Shoulders Display", sans-serif; color:#ff48b0; text-transform:uppercase; letter-spacing:.04em}
+.ri .cell ul{list-style:none; margin:4px 0 0; padding:0}
+.ri .cell li.on::before{content:"■ "; color:#ff48b0}
+.ri .cell li::before{content:"□ "}
+.ri .cell canvas{position:absolute; inset:0; width:100%; height:100%}
+
+/* ============ I · Dans la fiole ============ */
+.fi{background:#14111d; color:#14111d; font:15px/1.5 "Lexend", sans-serif}
+.fi .body{position:absolute; inset:0; width:100%; height:100%}
+.fi .navl, .fi .navr{position:absolute; top:22px; display:flex; gap:20px; color:#d9d1f5; font-weight:600; font-size:14px}
+.fi .navl{left:34px} .fi .navr{right:34px}
+.fi .navr span{background:#ff8a3d; color:#14111d; padding:5px 14px; border-radius:999px}
+.fi .rim{position:absolute; left:430px; top:0; width:140px; height:44px; display:grid; place-items:center; font:700 18px "Unbounded", sans-serif; color:#14111d}
+.fi .eyesbig{position:absolute; left:330px; top:96px; width:340px}
+.fi .txt{position:absolute; left:200px; right:200px; top:290px; text-align:center}
+.fi h3{font:700 40px/1.08 "Unbounded", sans-serif; letter-spacing:-.01em}
+.fi h3 span{color:#e0681f}
+.fi .lede{margin:12px auto 0; max-width:52ch; color:#4b4466}
+.fi .cards{position:absolute; left:150px; right:150px; top:420px; display:grid; grid-template-columns:1fr 1.3fr 1fr; gap:14px}
+.fi .card{background:rgba(255,255,255,.7); border:1.5px solid rgba(20,17,29,.12); border-radius:18px; padding:12px 14px; backdrop-filter:blur(4px); font-size:13px}
+.fi .card h4{font:700 12px "Unbounded", sans-serif; margin-bottom:6px}
+.fi .card .chips{display:flex; flex-wrap:wrap; gap:4px}
+.fi .card .chips span{background:#ece6ff; border-radius:8px; padding:2px 8px; font-weight:600}
+.fi .card .chips span.on{background:#14111d; color:#f3efff}
+.fi .hintc{position:absolute; left:0; right:0; top:262px; text-align:center; font:400 11px "Martian Mono", monospace; color:#8a80aa}
+
+/* ============ J · Pâte à modeler ============ */
+.cl{background:radial-gradient(900px 600px at 30% 20%, #ffe6d8, #ffc9ae); color:#3a2550; font:15px/1.5 "Lexend", sans-serif}
+.cl .clay{box-shadow:inset -6px -8px 14px rgba(58,37,80,.16), inset 6px 8px 12px rgba(255,255,255,.65), 8px 14px 22px rgba(150,70,40,.25)}
+.cl .nav{position:absolute; left:36px; right:36px; top:22px; display:flex; justify-content:space-between; align-items:center}
+.cl .brand{display:flex; align-items:center; gap:10px; font:800 28px "Baloo 2", sans-serif}
+.cl .brand .g{width:40px}
+.cl .pills{display:flex; gap:10px}
+.cl .pills span{background:#fff3ec; padding:6px 16px; border-radius:999px; font-weight:600; font-size:14px}
+.cl .pills span.go{background:#ff8a3d; color:#fff}
+.cl .txt{position:absolute; left:40px; top:104px; width:470px}
+.cl h3{font:800 56px/1 "Baloo 2", sans-serif; text-shadow:0 3px 0 rgba(255,255,255,.6)}
+.cl h3 span{color:#e0681f}
+.cl .lede{margin-top:12px; color:#5b4670; max-width:42ch}
+.cl .plinth{position:absolute; left:640px; top:250px; width:250px; height:56px; border-radius:50%; background:#b9a6ff}
+.cl .ghost{position:absolute; left:668px; top:52px; width:200px}
+.cl .tray{position:absolute; left:36px; right:36px; bottom:26px; height:220px; border-radius:40px; background:#8fe3c4; display:grid; grid-template-columns:250px 1fr 250px; gap:18px; padding:20px}
+.cl .tok{display:flex; flex-wrap:wrap; gap:8px; align-content:start}
+.cl .tok span{border-radius:999px; padding:7px 14px; font-weight:600; font-size:13px; background:#fff7f2}
+.cl .tok span.on{background:#b9a6ff; color:#fff}
+.cl .bowl{position:relative; border-radius:28px; background:#fff7f2; overflow:hidden}
+.cl .bowl canvas{position:absolute; inset:0; width:100%; height:100%}
+.cl .book{border-radius:24px; background:#fffdf8; padding:14px 16px; font-size:13px}
+.cl .book h4{font:800 18px "Baloo 2", sans-serif}
+.cl .tray h4.t{font:800 18px "Baloo 2", sans-serif; width:100%}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div>
+      <p class="label">AuraLab · planches visuelles · 8 nov. 2026</p>
+      <h1>Cinq planches où <span>l'image</span> porte le message.</h1>
+      <p class="lede">Ici, l'illustration fait le travail : une pièce de labo en 3D, de l'aquarelle, une affiche imprimée, une page qui est elle-même le fantôme, de la pâte à modeler. Tout est dessiné en code, sans image externe. Bouge la souris : les yeux suivent partout, et dans la planche I tu peux remuer les bulles.</p>
+    </div>
+    <aside class="keep">
+      <p class="label">Toujours pareil</p>
+      <p>La fiole-fantôme et son regard, le contenu, et les zones du labo : étagère, paillasse, carnet, fantôme guide.</p>
+      <p class="label" style="margin-top:6px">Avant : <a href="https://claude.ai/artifact/83mZjKZXE18658j87uk43t">planches A à E</a> · <a href="https://claude.ai/artifact/3LqmAy9K178sYpdrm4FB7u">version Nuit</a></p>
+    </aside>
+  </header>
+
+  <!-- F -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">F</span>Diorama isométrique</h2><button class="pick" type="button" id="pick-f" data-id="F · Diorama" aria-pressed="false">Retenir F</button></div>
+    <div class="frame"><div class="viewport"><div class="mock is" id="mf">
+      <svg class="scene" id="isoScene" viewBox="0 0 1000 620" aria-hidden="true"></svg>
+      <canvas class="fx" id="isoFx"></canvas>
+      <span class="brand"><span class="g" data-g="std"></span>auralab</span>
+      <div class="txt"><p class="eyebrow">Laboratoires virtuels</p><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Entre dans la pièce. Le matériel est sur l'étagère, la fiole chauffe dans le bain, le carnet attend tes mesures.</p><span class="cta">Entrer dans le labo</span></div>
+      <span class="g ghost" id="isoGhost" data-g="std"></span>
+      <p class="say" id="isoSay">Psst… le manomètre est sur l'étagère.</p>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Le labo devient une petite pièce en 3D isométrique, comme un jeu de construction ou une maison de poupée. Chaque objet de la pièce est une zone du labo, avec son étiquette. La fiole-fantôme chauffe dans le bain et des bulles s'en échappent.</p>
+        <div class="swatches"><b style="background:#15112a"></b><b style="background:#8b78d8"></b><b style="background:#3a6f74"></b><b style="background:#ff8a3d"></b><b style="background:#f6f1ff"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Bricolage Grotesque</dd><dt>Visuel</dt><dd>Pièce isométrique en SVG, générée en code</dd><dt>Public</dt><dd>Tous, et très fort en démo</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>On comprend « un labo est un lieu » sans lire une ligne</dd><dt>Contre</dt><dd>Chaque nouveau labo demande sa propre pièce dessinée</dd></dl>
+    </div>
+  </section>
+
+  <!-- G -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">G</span>Aquarelle</h2><button class="pick" type="button" id="pick-g" data-id="G · Aquarelle" aria-pressed="false">Retenir G</button></div>
+    <div class="frame"><div class="viewport"><div class="mock aq">
+      <svg class="wash" viewBox="0 0 1000 620" aria-hidden="true">
+        <defs><filter id="wc" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="55"/><feGaussianBlur stdDeviation="2.5"/></filter></defs>
+        <g filter="url(#wc)" style="mix-blend-mode:multiply">
+          <circle cx="720" cy="230" r="190" fill="#b9a6ff" opacity=".42"/>
+          <circle cx="850" cy="330" r="120" fill="#ffb27a" opacity=".45"/>
+          <circle cx="150" cy="520" r="170" fill="#8fd1bf" opacity=".38"/>
+          <circle cx="470" cy="90" r="90" fill="#ffb3c7" opacity=".35"/>
+          <circle cx="560" cy="470" r="150" fill="#b9a6ff" opacity=".22"/>
+        </g>
+      </svg>
+      <span class="brand"><span class="g" data-g="aq"></span>auralab</span>
+      <div class="nav"><span>le labo</span><span>pour les profs</span><span>entrer →</span></div>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p></div>
+      <span class="g ghost" data-g="aq"></span>
+      <svg class="arrows" viewBox="0 0 1000 620" aria-hidden="true" fill="none" stroke="#2b2350" stroke-width="2" stroke-linecap="round"><path d="M880 120 Q860 160 820 170"/><path d="M820 170 l10 -12 M820 170 l14 4"/></svg>
+      <p class="hand" style="left:850px; top:84px">psst… touche à tout !</p>
+      <div class="blob b1"><h4>L'étagère</h4><p>thermomètre ✓ · bain ✓<br>manomètre · piston · pompe<br>hélium · CO₂</p></div>
+      <div class="blob b2"><canvas data-p="aq"></canvas></div>
+      <div class="blob b3"><h4>Le carnet</h4><p>#1 — 293 K — ?<br>#2 — 420 K — ?<br><i>le fantôme :</i> sans manomètre, pas de pression…</p></div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Un album jeunesse : des taches d'aquarelle qui se mélangent, une écriture à la main et des cadres qui ressemblent à des flaques de couleur. Le fantôme est peint, avec un contour qui bave un peu. Chaleureux et poétique.</p>
+        <div class="swatches"><b style="background:#fcfbf8"></b><b style="background:#b9a6ff"></b><b style="background:#ffb27a"></b><b style="background:#8fd1bf"></b><b style="background:#2b2350"></b></div></div>
+      <dl class="kv"><dt>Titres et texte</dt><dd>Shantell Sans</dd><dt>Visuel</dt><dd>Taches SVG avec filtre de turbulence</dd><dt>Public</dt><dd>Primaire, collège, familles</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Unique et doux, on ne confond avec aucun autre outil</dd><dt>Contre</dt><dd>Filtres plus lourds sur les vieux PC de collège</dd></dl>
+    </div>
+  </section>
+
+  <!-- H -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">H</span>Risographie</h2><button class="pick" type="button" id="pick-h" data-id="H · Risographie" aria-pressed="false">Retenir H</button></div>
+    <div class="frame"><div class="viewport"><div class="mock ri">
+      <span class="dots"></span>
+      <div class="top"><span class="brand"><span class="g" data-g="ri"></span>auralab</span><span>labo · profs · entrer</span></div>
+      <h3><span class="a">Pas une expérience.</span><span class="b">Un labo entier.</span></h3>
+      <span class="g ghost" data-g="ri"></span>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Imprimé en deux encres, rose fluo et bleu, avec le léger décalage de l'impression.</p>
+      <div class="strip">
+        <div class="cell"><h4>Étagère</h4><ul><li class="on">thermomètre</li><li class="on">bain</li><li>manomètre</li><li>piston · pompe</li></ul></div>
+        <div class="cell"><canvas data-p="ri"></canvas></div>
+        <div class="cell"><h4>Carnet</h4><p>#1 293 K · ?<br>#2 420 K · ?<br>Il manque le manomètre.</p></div>
+      </div>
+      <span class="grain"></span>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Une affiche imprimée en risographie : deux encres qui se superposent, une trame de points, du grain et un fantôme imprimé avec un léger décalage. Une typo énorme et condensée qui occupe toute la page. C'est la planche la plus graphique.</p>
+        <div class="swatches"><b style="background:#efece6"></b><b style="background:#ff48b0"></b><b style="background:#0078bf"></b><b style="background:#7a3d9a"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Big Shoulders Display</dd><dt>Texte</dt><dd>IBM Plex Mono</dd><dt>Public</dt><dd>Lycée, jury, réseaux sociaux</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Très marquant, s'imprime aussi en vraie affiche pour la classe</dd><dt>Contre</dt><dd>Les deux encres limitent les couleurs dans les labos</dd></dl>
+    </div>
+  </section>
+
+  <!-- I -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">I</span>Dans la fiole</h2><button class="pick" type="button" id="pick-i" data-id="I · Dans la fiole" aria-pressed="false">Retenir I</button></div>
+    <div class="frame"><div class="viewport"><div class="mock fi" id="mi">
+      <svg class="body" id="fiBody" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <canvas class="fx" id="fiFx"></canvas>
+      <div class="navl"><span>Le labo</span><span>Qu'est-ce qu'un labo</span></div>
+      <div class="navr"><span>Entrer</span></div>
+      <div class="rim">auralab</div>
+      <span class="g eyesbig" data-g="eyes"></span>
+      <p class="hintc">bouge la souris : les bulles s'écartent</p>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Tu es dans la fiole. Une paillasse, une étagère de matériel, des substances et un carnet, et un fantôme qui te regarde travailler.</p></div>
+      <div class="cards">
+        <div class="card"><h4>Étagère</h4><div class="chips"><span class="on">thermomètre</span><span class="on">bain</span><span>manomètre</span><span>piston</span><span>CO₂</span></div></div>
+        <div class="card"><h4>Paillasse</h4><p>Enceinte · N₂ 50 · 293 K · soupape 5 atm. La fiole chauffe dans le bain.</p></div>
+        <div class="card"><h4>Carnet</h4><p>#1 293 K · ?<br>#2 420 K · ?</p></div>
+      </div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">La page entière est le fantôme. Le haut de l'écran est le col de la fiole, le bas ondule comme son drap, et deux grands yeux te suivent. Des bulles flottent dans tout l'écran et s'écartent au passage du curseur. Spectaculaire et très simple à la fois.</p>
+        <div class="swatches"><b style="background:#14111d"></b><b style="background:#f3efff"></b><b style="background:#d9cffd"></b><b style="background:#ff8a3d"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Unbounded</dd><dt>Texte</dt><dd>Lexend</dd><dt>Public</dt><dd>Tous ; idéal en page d'accueil</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>L'idée la plus mémorable, le logo devient l'interface</dd><dt>Contre</dt><dd>Fonctionne surtout pour l'accueil ; les labos auront besoin d'une version plus calme</dd></dl>
+    </div>
+  </section>
+
+  <!-- J -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">J</span>Pâte à modeler</h2><button class="pick" type="button" id="pick-j" data-id="J · Pâte à modeler" aria-pressed="false">Retenir J</button></div>
+    <div class="frame"><div class="viewport"><div class="mock cl">
+      <div class="nav"><span class="brand"><span class="g" data-g="cl"></span>auralab</span><span class="pills"><span class="clay">Le labo</span><span class="clay">Pour les profs</span><span class="clay go">Entrer</span></span></div>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p></div>
+      <span class="plinth clay"></span>
+      <span class="g ghost" data-g="cl"></span>
+      <div class="tray clay">
+        <div class="tok"><h4 class="t">Étagère</h4><span class="clay on">Thermomètre</span><span class="clay on">Bain</span><span class="clay">Manomètre</span><span class="clay">Piston</span><span class="clay">Pompe</span><span class="clay">CO₂</span></div>
+        <div class="bowl clay"><canvas data-p="cl"></canvas></div>
+        <div class="book clay"><h4>Carnet</h4><p>#1 · 293 K · ?<br>#2 · 420 K · ?<br><b>Fantôme :</b> il te manque le manomètre !</p></div>
+      </div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Tout semble modelé à la main : des volumes doux avec ombres et reflets, des boutons comme des boudins de pâte, un fantôme brillant posé sur son socle. Les particules deviennent de petites billes. Ludique et chaleureux, très « jouet ».</p>
+        <div class="swatches"><b style="background:#ffc9ae"></b><b style="background:#b9a6ff"></b><b style="background:#8fe3c4"></b><b style="background:#ff8a3d"></b><b style="background:#3a2550"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Baloo 2</dd><dt>Texte</dt><dd>Lexend, pensée pour la lisibilité</dd><dt>Public</dt><dd>Primaire, collège</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Donne envie de toucher, se fait en CSS pur</dd><dt>Contre</dt><dd>Peut sembler enfantin pour le lycée</dd></dl>
+    </div>
+  </section>
+</div>
+
+<div class="bar" id="bar" hidden><div class="in"><output id="sel" for="pick-f">Sélection</output><button class="copy" type="button" id="copy">Copier la sélection</button></div></div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BODY = 'M41 22 H59 V36 Q81 45 81 68 V86 Q75.8 80 70.7 86 Q65.5 92 60.3 86 Q55.2 80 50 86 Q44.8 92 39.7 86 Q34.5 80 29.3 86 Q24.2 92 19 86 V68 Q19 45 41 36 Z';
+  var uid = 0;
+  function eyes(fill, extra){ return '<g class="eyes"><ellipse cx="41" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/><ellipse cx="59" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/>' + (extra || '') + '</g>'; }
+  var G = {
+    std:function(){ return '<svg viewBox="0 0 100 100" class="gh"><circle cx="67" cy="13" r="3.6" fill="#ff8a3d"/><circle cx="74" cy="4.5" r="2.2" fill="#ff8a3d" opacity=".75"/><rect x="36" y="18" width="28" height="6" rx="3" fill="#efeaff"/><path d="' + BODY + '" fill="#efeaff"/>' + eyes('#15112a') + '</svg>'; },
+    aq:function(){ var id = 'aq' + (++uid); return '<svg viewBox="0 0 100 100" class="gh"><defs><filter id="' + id + '" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="5" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="4"/></filter></defs><g filter="url(#' + id + ')"><circle cx="67" cy="13" r="4" fill="#ffb27a"/><circle cx="74" cy="4.5" r="2.4" fill="#ffb27a" opacity=".8"/><rect x="36" y="18" width="28" height="6" rx="3" fill="#d8cdfb"/><path d="' + BODY + '" fill="#f1ecff" stroke="#7d68d6" stroke-width="2" opacity=".95"/><path d="M27 72 Q28 52 44 43" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/></g>' + eyes('#2b2350') + '</svg>'; },
+    ri:function(){ return '<svg viewBox="0 0 100 100" class="gh"><g style="mix-blend-mode:multiply"><circle cx="67" cy="13" r="3.6" fill="#ff48b0"/><circle cx="74" cy="4.5" r="2.2" fill="#ff48b0"/><rect x="36" y="18" width="28" height="6" rx="3" fill="#ff48b0"/><path d="' + BODY + '" fill="#ff48b0" opacity=".9"/></g><g transform="translate(2 1.5)" style="mix-blend-mode:multiply"><rect x="36" y="18" width="28" height="6" rx="3" fill="none" stroke="#0078bf" stroke-width="1.6"/><path d="' + BODY + '" fill="none" stroke="#0078bf" stroke-width="1.8"/>' + eyes('#0078bf') + '</g></svg>'; },
+    cl:function(){ var id = 'cl' + (++uid); return '<svg viewBox="0 0 100 100" class="gh"><defs><radialGradient id="' + id + '" cx="35%" cy="35%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e7defd"/><stop offset="1" stop-color="#a996e8"/></radialGradient><radialGradient id="' + id + 'o" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#ffd2b0"/><stop offset="1" stop-color="#e0681f"/></radialGradient></defs><circle cx="67" cy="13" r="4.4" fill="url(#' + id + 'o)"/><circle cx="75" cy="4" r="2.8" fill="url(#' + id + 'o)"/><rect x="36" y="17" width="28" height="7" rx="3.5" fill="url(#' + id + ')"/><path d="' + BODY + '" fill="url(#' + id + ')"/><ellipse cx="31" cy="54" rx="5" ry="9" fill="#fff" opacity=".55" transform="rotate(25 31 54)"/>' + eyes('#2a1a3e', '<circle cx="39.5" cy="59.5" r="1.4" fill="#fff"/><circle cx="57.5" cy="59.5" r="1.4" fill="#fff"/>') + '</svg>'; },
+    eyes:function(){ return '<svg viewBox="0 0 100 44" class="gh" data-max="5"><g class="eyes"><ellipse cx="26" cy="22" rx="13" ry="18" fill="#14111d"/><ellipse cx="74" cy="22" rx="13" ry="18" fill="#14111d"/><circle cx="22" cy="14" r="3" fill="#fff" opacity=".85"/><circle cx="70" cy="14" r="3" fill="#fff" opacity=".85"/></g></svg>'; }
+  };
+  document.querySelectorAll('[data-g]').forEach(function(el){ el.innerHTML = G[el.dataset.g](); });
+
+  // ----- F : scène isométrique -----
+  var s = 34, ox = 690, oy = 190;
+  function P(x, y, z){ return [ox + (x - y) * s * .866, oy + (x + y) * s * .5 - z * s]; }
+  function poly(pts, fill, extra){ return '<polygon points="' + pts.map(function(p){ var q = P(p[0], p[1], p[2]); return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' ') + '" fill="' + fill + '"' + (extra || '') + '/>'; }
+  function box(x, y, z, dx, dy, dz, top, right, left){
+    return poly([[x,y,z+dz],[x+dx,y,z+dz],[x+dx,y+dy,z+dz],[x,y+dy,z+dz]], top) +
+           poly([[x+dx,y,z],[x+dx,y+dy,z],[x+dx,y+dy,z+dz],[x+dx,y,z+dz]], right) +
+           poly([[x,y+dy,z],[x+dx,y+dy,z],[x+dx,y+dy,z+dz],[x,y+dy,z+dz]], left);
+  }
+  var h = '';
+  h += poly([[0,0,0],[10,0,0],[10,10,0],[0,10,0]], '#3a6f74');
+  for (var i = 1; i < 10; i++){ var a = P(i,0,0), b = P(i,10,0), c = P(0,i,0), d = P(10,i,0); h += '<path d="M' + a + 'L' + b + 'M' + c + 'L' + d + '" stroke="rgba(255,255,255,.07)" stroke-width="1"/>'; }
+  h += poly([[0,0,0],[0,10,0],[0,10,4.5],[0,0,4.5]], '#7d6ac9');
+  h += poly([[0,0,0],[10,0,0],[10,0,4.5],[0,0,4.5]], '#9b8ae6');
+  h += poly([[5.5,0,1.8],[8.5,0,1.8],[8.5,0,3.8],[5.5,0,3.8]], '#100c20');
+  [[6.1,3.4],[6.8,2.4],[7.4,3.1],[6.4,2.1],[8.0,2.6]].forEach(function(st){ var q = P(st[0],0,st[1]); h += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="1.4" fill="#f4f0ff"/>'; });
+  var m = P(7.9,0,3.35); h += '<circle cx="' + m[0] + '" cy="' + m[1] + '" r="9" fill="#ffb27a"/>';
+  // étagère
+  var SH = ['#3b2f5c','#2e2448','#251c3c'];
+  h += box(0,1,0,1.2,.2,4, SH[0],SH[1],SH[2]);
+  [[0.2,[['#efeaff',.8],['#8fe3c4',.6],['#ff8a3d',.9]]],[1.5,[['#6ec3f4',.7],['#efeaff',.9],['#ffb3c7',.6]]],[2.8,[['#ff8a3d',.6],['#8fe3c4',.8]]]].forEach(function(lv){
+    h += box(0,1,lv[0],1.2,4,.18, '#4a3c73','#3b2f5c','#2e2448');
+    lv[1].forEach(function(bt, j){ var y = 1.5 + j * 1.15; h += box(.35, y, lv[0] + .18, .5, .5, bt[1], bt[0], shade(bt[0], .8), shade(bt[0], .65)); });
+  });
+  h += box(0,4.8,0,1.2,.2,4, SH[0],SH[1],SH[2]);
+  // paillasse
+  h += box(3,5,0,6,3,2.6,'#f6f1ff','#e06a1f','#ff8a3d');
+  h += box(4,5.6,2.6,1.6,1.4,.5,'#9fd8f7','#3d9fd6','#5bb4e6');
+  h += box(6.6,6,2.6,1.8,1.5,.12,'#fffaf0','#d9d0c0','#e8e0d0');
+  [6.4,6.8,7.2].forEach(function(yy){ var a2 = P(6.85,yy,2.73), b2 = P(8.15,yy,2.73); h += '<path d="M' + a2 + 'L' + b2 + '" stroke="#b8acd6" stroke-width="1"/>'; });
+  h += box(8.6,9.1,0,.9,.9,1.4,'#b9a6ff','#8b78d8','#9d8ae2');
+  document.getElementById('isoScene').innerHTML = h;
+  function shade(hex, k){ var n = parseInt(hex.slice(1), 16), r = (n >> 16) * k, g = (n >> 8 & 255) * k, b = (n & 255) * k; return 'rgb(' + (r|0) + ',' + (g|0) + ',' + (b|0) + ')'; }
+  var mf = document.getElementById('mf');
+  var base = P(4.8, 6.3, 3.1), gw = 78;
+  var ig = document.getElementById('isoGhost'); ig.style.left = (base[0] - gw / 2) + 'px'; ig.style.top = (base[1] - gw * .86) + 'px';
+  var say = document.getElementById('isoSay'); say.style.left = (base[0] + 30) + 'px'; say.style.top = (base[1] - 150) + 'px';
+  [['étagère',.6,3,4.5,''],['bain',4.8,7.2,3.1,''],['carnet',7.5,6.8,2.9,''],['paillasse',9,8,1.8,''],['manomètre ?',.6,3.4,2.4,' hot']].forEach(function(t){
+    var q = P(t[1],t[2],t[3]), el = document.createElement('span'); el.className = 'tag' + t[4]; el.textContent = t[0]; el.style.left = q[0] + 'px'; el.style.top = q[1] + 'px'; mf.appendChild(el);
+  });
+
+  // ----- I : corps du fantôme plein écran -----
+  (function(){
+    var d = 'M430 0 H570 V44 Q990 70 990 320 V585', n = 12, x0 = 990, x1 = 10, w = (x0 - x1) / n;
+    for (var k = 0; k < n; k++){ var xa = x0 - w * (k + 1), cx = x0 - w * (k + .5), cy = k % 2 ? 618 : 556; d += ' Q' + cx.toFixed(1) + ' ' + cy + ' ' + xa.toFixed(1) + ' 585'; }
+    d += ' V320 Q10 70 430 44 Z';
+    document.getElementById('fiBody').innerHTML = '<defs><radialGradient id="fiG" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f1ecff"/><stop offset="1" stop-color="#d9cffd"/></radialGradient></defs><rect x="415" y="0" width="170" height="44" rx="10" fill="#d9cffd"/><path d="' + d + '" fill="url(#fiG)"/>';
+  })();
+
+  // ----- Yeux qui suivent -----
+  var ghosts = [].slice.call(document.querySelectorAll('svg.gh'));
+  window.addEventListener('pointermove', function(ev){
+    if (reduce) return;
+    ghosts.forEach(function(sv){
+      var r = sv.getBoundingClientRect(); if (!r.width) return;
+      var max = +(sv.dataset.max || 3.2), cx = r.left + r.width / 2, cy = r.top + r.height * (sv.dataset.max ? .5 : .6);
+      var dx = ev.clientX - cx, dy = ev.clientY - cy, dd = Math.hypot(dx, dy) || 1, k = Math.min(1, dd / 260);
+      sv.querySelector('.eyes').setAttribute('transform', 'translate(' + (dx / dd * max * k).toFixed(2) + ' ' + (dy / dd * max * .8 * k).toFixed(2) + ')');
+    });
+  });
+
+  // ----- Mise à l'échelle -----
+  var vps = document.querySelectorAll('.viewport');
+  function fit(vp){ vp.firstElementChild.style.setProperty('--s', vp.clientWidth / 1000); }
+  vps.forEach(fit);
+  if ('ResizeObserver' in window){ var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target); }); }); vps.forEach(function(v){ ro.observe(v); }); }
+  else window.addEventListener('resize', function(){ vps.forEach(fit); });
+
+  // ----- Particules des enceintes -----
+  var seed = 13; function rnd(){ seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  var CFG = {
+    aq:{n:40, draw:function(c,p){ c.fillStyle = ['rgba(125,104,214,.55)','rgba(255,150,90,.55)','rgba(90,170,150,.5)'][p.i % 3]; c.beginPath(); c.arc(p.x, p.y, 7, 0, 6.283); c.fill(); }},
+    ri:{n:46, draw:function(c,p){ c.globalCompositeOperation = 'multiply'; c.fillStyle = p.i % 2 ? '#ff48b0' : '#0078bf'; c.beginPath(); c.arc(p.x, p.y, 5, 0, 6.283); c.fill(); c.globalCompositeOperation = 'source-over'; }},
+    cl:{n:30, draw:function(c,p){ var col = ['#b9a6ff','#ff8a3d','#8fe3c4'][p.i % 3], g = c.createRadialGradient(p.x - 2.5, p.y - 2.5, 1, p.x, p.y, 8); g.addColorStop(0, '#ffffff'); g.addColorStop(.35, col); g.addColorStop(1, shade2(col)); c.fillStyle = 'rgba(58,37,80,.18)'; c.beginPath(); c.arc(p.x + 2, p.y + 3, 8, 0, 6.283); c.fill(); c.fillStyle = g; c.beginPath(); c.arc(p.x, p.y, 8, 0, 6.283); c.fill(); }}
+  };
+  function shade2(hex){ return shade(hex, .7); }
+  var sims = [];
+  document.querySelectorAll('canvas[data-p]').forEach(function(cv){
+    var cfg = CFG[cv.dataset.p], w = cv.offsetWidth || 300, hh = cv.offsetHeight || 180;
+    cv.width = w * 2; cv.height = hh * 2; var c = cv.getContext('2d'); c.scale(2, 2);
+    var ps = []; for (var i = 0; i < cfg.n; i++){ var a = rnd() * 6.283, sp = .4 + rnd() * .8; ps.push({i:i, x:10 + rnd() * (w - 20), y:10 + rnd() * (hh - 20), vx:Math.cos(a) * sp, vy:Math.sin(a) * sp}); }
+    sims.push({c:c, w:w, h:hh, ps:ps, cfg:cfg});
+  });
+
+  // Bulles F (montent de la fiole) et I (remuées par le curseur)
+  function fxCanvas(id){ var cv = document.getElementById(id), c = cv.getContext('2d'); cv.width = 2000; cv.height = 1240; c.scale(2, 2); return c; }
+  var cF = fxCanvas('isoFx'), cI = fxCanvas('fiFx');
+  var neck = [base[0] + 6, base[1] - gw * .7], bubF = [];
+  for (var bI = 0; bI < 14; bI++) bubF.push({t: rnd(), x: rnd() * 20 - 10, r: 2 + rnd() * 4});
+  var bubI = [];
+  for (var q = 0; q < 70; q++){ bubI.push({x: 60 + rnd() * 880, y: 80 + rnd() * 480, vx: 0, vy: -(.15 + rnd() * .35), r: 3 + rnd() * 9, o: .35 + rnd() * .55}); }
+  var mi = document.getElementById('mi'), mouse = {x:-999, y:-999};
+  mi.addEventListener('pointermove', function(e){ var r = mi.getBoundingClientRect(), k = 1000 / r.width; mouse.x = (e.clientX - r.left) * k; mouse.y = (e.clientY - r.top) * k; });
+  mi.addEventListener('pointerleave', function(){ mouse.x = mouse.y = -999; });
+  function insideGhost(x, y){ return y > 60 && y < 585 && x > 20 && x < 980; }
+
+  function frame(){
+    sims.forEach(function(sm){
+      sm.c.clearRect(0, 0, sm.w, sm.h);
+      sm.ps.forEach(function(p){
+        if (!reduce){ p.x += p.vx; p.y += p.vy; }
+        if (p.x < 9 || p.x > sm.w - 9){ p.vx *= -1; p.x = Math.max(9, Math.min(sm.w - 9, p.x)); }
+        if (p.y < 9 || p.y > sm.h - 9){ p.vy *= -1; p.y = Math.max(9, Math.min(sm.h - 9, p.y)); }
+        sm.cfg.draw(sm.c, p);
+      });
+    });
+    cF.clearRect(0, 0, 1000, 620);
+    bubF.forEach(function(b){
+      if (!reduce){ b.t += .004; if (b.t > 1) b.t -= 1; }
+      var y = neck[1] - b.t * 170, x = neck[0] + b.x + Math.sin(b.t * 9 + b.r) * 8;
+      cF.globalAlpha = Math.max(0, 1 - b.t) * .9; cF.fillStyle = '#ff8a3d'; cF.beginPath(); cF.arc(x, y, b.r, 0, 6.283); cF.fill();
+    });
+    cF.globalAlpha = 1;
+    cI.clearRect(0, 0, 1000, 620);
+    bubI.forEach(function(b){
+      if (!reduce){
+        var dx = b.x - mouse.x, dy = b.y - mouse.y, d2 = dx * dx + dy * dy;
+        if (d2 < 14000){ var d = Math.sqrt(d2) || 1, f = (1 - d / 118) * 1.6; b.vx += dx / d * f; b.vy += dy / d * f; }
+        b.vx *= .92; b.vy = b.vy * .92 - .03;
+        b.x += b.vx; b.y += b.vy;
+        if (b.y < 70){ b.y = 570; b.x = 80 + Math.random() * 840; }
+        if (b.x < 30) b.x = 30; if (b.x > 970) b.x = 970; if (b.y > 575) b.y = 575;
+      }
+      if (!insideGhost(b.x, b.y)) return;
+      cI.globalAlpha = b.o; cI.fillStyle = '#ff8a3d'; cI.beginPath(); cI.arc(b.x, b.y, b.r, 0, 6.283); cI.fill();
+    });
+    cI.globalAlpha = 1;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  frame();
+
+  // ----- Sélection -----
+  var picks = document.querySelectorAll('.pick'), bar = document.getElementById('bar'), out = document.getElementById('sel'), saved = [];
+  try { saved = JSON.parse(localStorage.getItem('auralab-planches-v') || '[]'); } catch(e){}
+  function render(){
+    var ids = []; picks.forEach(function(b){ if (b.getAttribute('aria-pressed') === 'true') ids.push(b.dataset.id); });
+    bar.hidden = !ids.length; out.textContent = 'Planches AuraLab retenues : ' + ids.join(' + ');
+    try { localStorage.setItem('auralab-planches-v', JSON.stringify(ids)); } catch(e){}
+  }
+  picks.forEach(function(b){
+    if (saved.indexOf(b.dataset.id) > -1) b.setAttribute('aria-pressed', 'true');
+    b.addEventListener('click', function(){ b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); render(); });
+  });
+  render();
+  document.getElementById('copy').addEventListener('click', function(){
+    var btn = this;
+    function sel(){ var r = document.createRange(); r.selectNodeContents(out); var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(r); btn.textContent = 'Texte sélectionné'; }
+    try { navigator.clipboard.writeText(out.textContent).then(function(){ btn.textContent = 'Copié'; setTimeout(function(){ btn.textContent = 'Copier la sélection'; }, 1600); }, sel); } catch(e){ sel(); }
+  });
+})();
+</script>

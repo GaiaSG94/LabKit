@@ -1,0 +1,374 @@
+<title>Planches AuraLab P–T</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Atkinson+Hyperlegible:wght@400;700&family=Hanken+Grotesk:wght@400;600;800&family=Instrument+Sans:wght@400;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;800&family=Martian+Mono:wght@400;600&family=Outfit:wght@200;300;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: planche de présentation — rappel de N, 5 maquettes minimalistes (P à T) avec leurs notes, sélection fixée en bas. */
+:root{
+  --bg:#f3f2f7; --surface:#ffffff; --fg:#17151f; --muted:#5f5b70; --line:#dcd9e6; --accent:#e0681f; --accent-soft:#fdebdf;
+  --f-display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  --f-mono:"Martian Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--fg); font:16px/1.55 var(--f-body); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 120px}
+.wrap{max-width:1180px; margin:0 auto}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
+p{margin:0}
+.label{font:600 11px/1.4 var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+a{color:var(--accent)}
+.intro{padding-block:52px 28px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:40px; align-items:end}
+.intro h1{font:700 clamp(32px,5vw,58px)/1.05 var(--f-display); letter-spacing:-.02em; margin-top:12px}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted); max-width:58ch; margin-top:16px; font-size:17px}
+.keep{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:18px 20px; display:grid; gap:8px; font-size:15px}
+.keep ul{margin:0; padding-left:18px; display:grid; gap:4px}
+.board{display:grid; gap:20px; padding-block:36px; border-top:2px solid var(--fg)}
+.board-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap}
+.board-head h2{font:700 30px/1.1 var(--f-display)}
+.board-head .code{font:600 13px var(--f-mono); color:var(--accent); margin-right:10px}
+.board-head .try{font:400 12px var(--f-mono); color:var(--muted)}
+.frame{border-radius:12px; overflow:hidden; border:1px solid var(--line); box-shadow:0 14px 36px -22px rgba(20,15,40,.45)}
+.viewport{position:relative; aspect-ratio:1000/620; overflow:hidden; max-width:100%; background:#eee}
+.mock{position:absolute; top:0; left:0; width:1000px; height:620px; transform-origin:0 0; transform:scale(var(--s,.6)); overflow:hidden}
+.notes{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:28px}
+.notes .pitch{color:var(--muted)}
+.swatches{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px}
+.swatches b{display:block; width:34px; height:34px; border-radius:8px; border:1px solid var(--line)}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:14px; margin:0; align-content:start}
+.kv dt{font:600 11px/1.9 var(--f-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.kv dd{margin:0}
+.pick{font:700 14px var(--f-body); border:1.5px solid var(--fg); background:transparent; color:var(--fg); border-radius:999px; padding:8px 16px; cursor:pointer}
+.pick:hover{background:var(--accent-soft)}
+.pick[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.pick:focus-visible, .copy:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.bar{position:fixed; left:0; right:0; bottom:0; background:var(--fg); color:var(--bg); padding:12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display:flex; justify-content:center}
+.bar .in{max-width:1180px; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between}
+.bar output{font:600 14px var(--f-mono)}
+.copy{font:700 14px var(--f-body); background:var(--bg); color:var(--fg); border:0; border-radius:999px; padding:8px 16px; cursor:pointer}
+@media (max-width:860px){ .intro, .notes{grid-template-columns:1fr} }
+.g{display:block}
+.g svg{display:block; width:100%; height:auto; overflow:visible}
+.lid{transform-box:fill-box; transform-origin:center; animation:blink 6s infinite}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)} 97.5%{transform:scaleY(.08)}}
+@media (prefers-reduced-motion: reduce){ .lid{animation:none} }
+.mock canvas{position:absolute; inset:0; width:100%; height:100%}
+
+/* ============ P · Épure nuit ============ */
+.pn{background:#0f0d16; color:#efeaff; font:15px/1.5 "Hanken Grotesk", sans-serif}
+.pn .nav{position:absolute; left:48px; right:48px; top:28px; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:14px; color:#a7a1c0}
+.pn .brand{display:flex; align-items:center; gap:10px; font:800 20px "Hanken Grotesk", sans-serif; color:#efeaff; letter-spacing:-.02em}
+.pn .brand .g{width:26px}
+.pn .nav nav{display:flex; gap:28px}
+.pn .nav nav span:last-child{color:#ff8a3d}
+.pn .ghost{position:absolute; right:40px; top:150px; width:560px}
+.pn h3{position:absolute; left:48px; top:110px; width:560px; font:800 78px/.92 "Hanken Grotesk", sans-serif; letter-spacing:-.045em}
+.pn h3 span{color:#ff8a3d; display:block}
+.pn .lede{position:absolute; left:48px; top:312px; width:380px; color:#a7a1c0; font-size:16px}
+.pn .row{position:absolute; left:48px; width:500px; bottom:40px; display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:22px}
+.pn .row div{border-top:1.5px solid #efeaff; padding-top:10px; font-size:13px; color:#a7a1c0; position:relative}
+.pn .row b{display:block; font:600 11px "JetBrains Mono", monospace; letter-spacing:.08em; text-transform:uppercase; color:#efeaff; margin-bottom:4px}
+.pn .row .v{height:110px; border:1.5px solid #efeaff; padding:0}
+
+/* ============ Q · Aplat orange ============ */
+.ao{background:#ff8a3d; color:#17141f; font:15px/1.5 "Archivo", sans-serif}
+.ao .nav{position:absolute; left:44px; right:44px; top:26px; display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:14px}
+.ao .brand{display:flex; align-items:center; gap:10px; font:900 22px "Archivo", sans-serif; font-stretch:80%}
+.ao .brand .g{width:26px}
+.ao .nav nav{display:flex; gap:26px}
+.ao .nav nav span:last-child{background:#17141f; color:#ff8a3d; padding:4px 14px; border-radius:999px}
+.ao h3{position:absolute; left:40px; top:84px; width:640px; font:900 132px/.84 "Archivo", sans-serif; font-stretch:68%; text-transform:uppercase; letter-spacing:-.01em}
+.ao h3 span{color:#fbf8ff; display:block}
+.ao .ghost{position:absolute; right:-40px; top:40px; width:470px}
+.ao .lede{position:absolute; left:44px; top:440px; width:380px; font-weight:500; font-size:16px}
+.ao .row{position:absolute; right:44px; bottom:36px; width:500px; display:grid; grid-template-columns:1fr 1.3fr 1fr; gap:14px}
+.ao .row div{background:#17141f; color:#fbf8ff; border-radius:12px; padding:10px 12px; font-size:12.5px; position:relative; min-height:96px; overflow:hidden}
+.ao .row b{display:block; font:800 12px "Archivo", sans-serif; letter-spacing:.06em; text-transform:uppercase; color:#ff8a3d; margin-bottom:4px}
+.ao .row .v{padding:0}
+
+/* ============ R · Galerie ============ */
+.ga{background:linear-gradient(#f7f7f4 0 78%, #ebeae5 78% 100%); color:#1b1a1f; font:14px/1.5 "Instrument Sans", sans-serif}
+.ga .nav{position:absolute; left:48px; right:48px; top:26px; display:flex; justify-content:space-between; align-items:center; font-size:13px; letter-spacing:.04em}
+.ga .brand{display:flex; align-items:center; gap:10px; font:400 italic 26px "Instrument Serif", serif; letter-spacing:0}
+.ga .brand .g{width:26px}
+.ga .nav nav{display:flex; gap:26px; text-transform:uppercase; font-size:11px; letter-spacing:.14em}
+.ga h3{position:absolute; left:48px; top:96px; width:360px; font:400 52px/1.02 "Instrument Serif", serif}
+.ga h3 em{color:#d4601a}
+.ga .lede{position:absolute; left:48px; top:230px; width:320px; color:#55525e}
+.ga .art{position:absolute; left:460px; top:70px; width:270px; height:330px; background:#fff; border:10px solid #1b1a1f; box-shadow:0 18px 30px -16px rgba(0,0,0,.35), 0 2px 0 rgba(0,0,0,.08); display:grid; place-items:center; padding:36px}
+.ga .art .g{width:100%}
+.ga .cartel{position:absolute; font-size:11px; line-height:1.45; color:#3b3944; width:170px; border-left:1px solid #1b1a1f; padding-left:10px}
+.ga .cartel b{display:block; font:600 12px "Instrument Sans", sans-serif; color:#1b1a1f}
+.ga .cartel i{font-family:"Instrument Serif", serif; font-size:13px}
+.ga .c-main{left:760px; top:300px}
+.ga .small{position:absolute; top:430px; width:150px; height:110px; background:#fff; border:5px solid #1b1a1f; box-shadow:0 12px 20px -12px rgba(0,0,0,.35); padding:10px; font-size:11.5px; overflow:hidden}
+.ga .s1{left:48px} .ga .s2{left:270px; width:200px; padding:0} .ga .s3{left:540px}
+.ga .small b{display:block; font:400 italic 15px "Instrument Serif", serif}
+.ga .c1{left:48px; top:556px} .ga .c2{left:270px; top:556px} .ga .c3{left:540px; top:556px}
+.ga .bench{position:absolute; left:760px; top:470px; width:200px; height:14px; background:#1b1a1f}
+
+/* ============ S · Moitié-moitié ============ */
+.mm{background:linear-gradient(90deg, #f4f2fa 0 50%, #17141f 50% 100%); font:15px/1.5 "Manrope", sans-serif}
+.mm .l{color:#17141f} .mm .r{color:#f4f2fa}
+.mm .nav{position:absolute; top:26px; display:flex; gap:24px; font-weight:600; font-size:14px}
+.mm .nav.l{left:44px} .mm .nav.r{right:44px}
+.mm .brand{display:flex; align-items:center; gap:8px; font:800 20px "Manrope", sans-serif}
+.mm .brand .g{width:24px}
+.mm .ghost{position:absolute; left:340px; top:60px; width:320px}
+.mm h3{position:absolute; top:100px; font:800 52px/1 "Manrope", sans-serif; letter-spacing:-.03em; width:300px}
+.mm h3.l{left:44px} .mm h3.r{right:44px; text-align:right}
+.mm h3.r span{color:#ff8a3d}
+.mm .who{position:absolute; top:250px; width:270px; font-size:14px}
+.mm .who.l{left:44px; color:#4c4760} .mm .who.r{right:44px; text-align:right; color:#b8b2d0}
+.mm .who b{display:block; font:600 11px "JetBrains Mono", monospace; letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; color:inherit}
+.mm .who.l b{color:#17141f} .mm .who.r b{color:#f4f2fa}
+.mm .row{position:absolute; top:420px; bottom:36px; width:430px; display:grid; gap:14px}
+.mm .row.l{left:44px; grid-template-columns:1fr 1.2fr} .mm .row.r{right:44px; grid-template-columns:1fr 1fr}
+.mm .cell{border:1.5px solid currentColor; border-radius:12px; padding:10px 12px; font-size:12.5px; position:relative; overflow:hidden}
+.mm .cell b{display:block; font:600 11px "JetBrains Mono", monospace; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px}
+.mm .cell pre{margin:0; font:400 11px/1.55 "JetBrains Mono", monospace; color:#b8b2d0}
+.mm .cell pre em{font-style:normal; color:#ff8a3d}
+
+/* ============ T · Trait ============ */
+.tr{background:#fbfbfd; color:#17141f; font:15px/1.5 "Outfit", sans-serif}
+.tr .nav{position:absolute; left:48px; right:48px; top:28px; display:flex; justify-content:space-between; align-items:center; font-weight:300; font-size:14px}
+.tr .brand{display:flex; align-items:center; gap:10px; font:600 20px "Outfit", sans-serif}
+.tr .brand .g{width:26px}
+.tr .nav nav{display:flex; gap:28px}
+.tr .nav nav span:last-child{border:1.5px solid #17141f; border-radius:999px; padding:4px 14px; font-weight:600}
+.tr h3{position:absolute; left:48px; top:100px; width:620px; font:200 82px/.98 "Outfit", sans-serif; letter-spacing:-.03em}
+.tr h3 span{font-weight:600; color:#e0681f}
+.tr .ghost{position:absolute; right:60px; top:70px; width:340px}
+.tr .lede{position:absolute; left:48px; top:300px; width:420px; font-weight:300; font-size:17px; color:#3d3950}
+.tr .row{position:absolute; left:48px; right:48px; bottom:40px; height:160px; display:grid; grid-template-columns:repeat(5,1fr) 1.6fr 1.2fr; gap:14px; align-items:end}
+.tr .tool{display:grid; justify-items:center; gap:8px; font-size:12px; font-weight:300; text-align:center}
+.tr .tool svg{width:54px; height:70px}
+.tr .tool.on{font-weight:600}
+.tr .tool.on::after{content:"posé"; font:600 9px "JetBrains Mono", monospace; letter-spacing:.1em; text-transform:uppercase; color:#e0681f}
+.tr .v{height:150px; border:1.5px solid #17141f; border-radius:14px; position:relative; overflow:hidden}
+.tr .nb{height:150px; border:1.5px solid #17141f; border-radius:14px; padding:12px; font-size:12.5px; font-weight:300}
+.tr .nb b{font-weight:600}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div>
+      <p class="label">AuraLab · planches P à T · 8 nov. 2026</p>
+      <h1>Cinq variations <span>autour de l'épure</span>.</h1>
+      <p class="lede">Tu as aimé N : un fond uni, une grosse typo, un fantôme géant qui te fixe et un seul accent. Ces cinq planches gardent cet esprit et changent un levier à la fois : la nuit, la couleur, le cadre, la composition, le trait.</p>
+    </div>
+    <aside class="keep">
+      <p class="label">Ce qu'on garde de N</p>
+      <ul><li>Un fond uni et presque aucun décor</li><li>Le fantôme en très grand, qui suit le curseur et cligne</li><li>Une typo massive et un seul accent orange</li></ul>
+      <p class="label" style="margin-top:6px">Avant : <a href="https://claude.ai/artifact/BjEPzYgnqvDvsHJUGQFrEh">K à O (dont N)</a></p>
+    </aside>
+  </header>
+
+  <!-- P -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">P</span>Épure nuit</h2><span class="try">N en négatif</span><button class="pick" type="button" id="pick-p" data-id="P · Épure nuit" aria-pressed="false">Retenir P</button></div>
+    <div class="frame"><div class="viewport"><div class="mock pn">
+      <span class="g ghost" data-g="ecto"></span>
+      <div class="nav"><span class="brand"><span class="g" data-g="ecto"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Créer un labo</span><span>Entrer →</span></nav></div>
+      <h3>Pas une expérience. <span>Un labo entier.</span></h3>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p>
+      <div class="row"><div><b>Étagère</b>Thermomètre, bain · posés<br>Manomètre, piston, pompe, He, CO₂</div><div class="v"><canvas data-p="pn"></canvas></div><div><b>Carnet</b>#1 293 K · —<br>#2 420 K · —<br>Il manque le manomètre.</div></div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Exactement la composition de N, sur le fond nuit de la toute première version. Le fantôme blanc lavande ressort comme une apparition. C'est la synthèse de tes deux préférences.</p>
+        <div class="swatches"><b style="background:#0f0d16"></b><b style="background:#efeaff"></b><b style="background:#a7a1c0"></b><b style="background:#ff8a3d"></b></div></div>
+      <dl class="kv"><dt>Titres et texte</dt><dd>Hanken Grotesk</dd><dt>Données</dt><dd>JetBrains Mono</dd><dt>Thème</dt><dd>Se combine avec N en mode clair / sombre</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>N et P forment un seul système avec deux thèmes</dd><dt>Contre</dt><dd>Le sombre se projette moins bien en classe</dd></dl>
+    </div>
+  </section>
+
+  <!-- Q -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">Q</span>Aplat orange</h2><span class="try">toute la page prend la couleur des bulles</span><button class="pick" type="button" id="pick-q" data-id="Q · Aplat orange" aria-pressed="false">Retenir Q</button></div>
+    <div class="frame"><div class="viewport"><div class="mock ao">
+      <span class="g ghost" data-g="white"></span>
+      <div class="nav"><span class="brand"><span class="g" data-g="inkw"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Entrer</span></nav></div>
+      <h3>Pas une expérience. <span>Un labo entier.</span></h3>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p>
+      <div class="row"><div><b>Étagère</b>Thermomètre ✓ Bain ✓<br>Manomètre · Piston · CO₂</div><div class="v"><canvas data-p="ao"></canvas></div><div><b>Carnet</b>#1 293 K · —<br>#2 420 K · —</div></div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Un aplat orange citrouille sur toute la page, une typo noire très condensée en capitales et un fantôme blanc géant qui sort par le bord. C'est l'épure en version affiche : on la reconnaît de loin.</p>
+        <div class="swatches"><b style="background:#ff8a3d"></b><b style="background:#17141f"></b><b style="background:#fbf8ff"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Archivo condensé, très gras</dd><dt>Texte</dt><dd>Archivo</dd><dt>Thème</dt><dd>Chaque labo pourrait avoir sa couleur d'aplat</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Le plus reconnaissable, très Kiroween sans aucun décor</dd><dt>Contre</dt><dd>Fatigant en grande surface : à garder pour l'accueil</dd></dl>
+    </div>
+  </section>
+
+  <!-- R -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">R</span>Galerie</h2><span class="try">le fantôme exposé comme une œuvre</span><button class="pick" type="button" id="pick-r" data-id="R · Galerie" aria-pressed="false">Retenir R</button></div>
+    <div class="frame"><div class="viewport"><div class="mock ga">
+      <div class="nav"><span class="brand"><span class="g" data-g="ink"></span>auralab</span><nav><span>Le labo</span><span>Collection</span><span>Pour les profs</span><span>Entrer</span></nav></div>
+      <h3>Pas une expérience. <em>Un labo entier.</em></h3>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p>
+      <div class="art"><span class="g" data-g="ink"></span></div>
+      <p class="cartel c-main"><b>Fiole-fantôme</b>AuraLab, 2026<br><i>Encre sur verre.</i><br>L'œuvre suit le visiteur du regard.</p>
+      <div class="small s1"><b>Étagère</b>thermomètre, bain<br>manomètre, piston<br>pompe, He, CO₂</div>
+      <div class="small s2"><canvas data-p="ga"></canvas></div>
+      <div class="small s3"><b>Carnet</b>#1 293 K · —<br>#2 420 K · —</div>
+      <p class="cartel c1"><b>L'étagère</b>9 objets, 2 posés</p>
+      <p class="cartel c2"><b>L'enceinte</b>N₂ × 50 · 293 K · soupape 5 atm</p>
+      <p class="cartel c3"><b>Le carnet</b>2 mesures</p>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Un mur blanc de musée : le fantôme est accroché comme une œuvre, dans un cadre noir avec passe-partout, et suit le visiteur des yeux. Chaque zone du labo est un petit tableau avec son cartel. Sobre, spirituel, très élégant.</p>
+        <div class="swatches"><b style="background:#f7f7f4"></b><b style="background:#ebeae5"></b><b style="background:#1b1a1f"></b><b style="background:#d4601a"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Instrument Serif</dd><dt>Texte</dt><dd>Instrument Sans</dd><dt>Idée</dt><dd>Les labos deviennent une « collection »</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Original et raffiné, beaucoup d'air</dd><dt>Contre</dt><dd>Plus adulte ; parle davantage aux profs qu'aux élèves</dd></dl>
+    </div>
+  </section>
+
+  <!-- S -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">S</span>Moitié-moitié</h2><span class="try">le fantôme à cheval sur deux mondes</span><button class="pick" type="button" id="pick-s" data-id="S · Moitié-moitié" aria-pressed="false">Retenir S</button></div>
+    <div class="frame"><div class="viewport"><div class="mock mm">
+      <div class="nav l"><span class="brand"><span class="g" data-g="ink"></span>auralab</span><span>Le labo</span></div>
+      <div class="nav r"><span>Pour les profs</span><span style="color:#ff8a3d">Entrer →</span></div>
+      <span class="g ghost" data-g="split"></span>
+      <h3 class="l">Pas une expérience.</h3>
+      <h3 class="r"><span>Un labo entier.</span></h3>
+      <p class="who l"><b>Côté élèves</b>On ouvre le fichier, on prend du matériel sur l'étagère et on manipule. Hors-ligne, sans compte.</p>
+      <p class="who r"><b>Côté profs</b>On règle l'étagère, l'état de départ et les pistes du fantôme dans un JSON. Le navigateur vérifie.</p>
+      <div class="row l"><div class="cell l"><b>Étagère</b>Thermomètre, bain · posés<br>Manomètre, piston, CO₂</div><div class="cell l"><canvas data-p="mm"></canvas></div></div>
+      <div class="row r"><div class="cell r"><b>Config</b><pre>"etagere": [
+  <em>"manometre"</em>,
+  <em>"piston"</em>, <em>"CO2"</em>
+]</pre></div><div class="cell r"><b>Carnet</b>#1 293 K · —<br>#2 420 K · —</div></div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">La page est coupée en deux, clair à gauche et sombre à droite, et le fantôme est à cheval sur la ligne, avec ses couleurs inversées de chaque côté. Les élèves sont d'un côté, les profs de l'autre : la composition raconte les deux usages du kit.</p>
+        <div class="swatches"><b style="background:#f4f2fa"></b><b style="background:#17141f"></b><b style="background:#ff8a3d"></b></div></div>
+      <dl class="kv"><dt>Titres et texte</dt><dd>Manrope</dd><dt>Code</dt><dd>JetBrains Mono</dd><dt>Idée</dt><dd>Clair et sombre réunis sur une seule page</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Une image forte et qui veut dire quelque chose</dd><dt>Contre</dt><dd>Moins adapté aux pages intérieures et au mobile</dd></dl>
+    </div>
+  </section>
+
+  <!-- T -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">T</span>Trait</h2><span class="try">tout au trait, rien de rempli</span><button class="pick" type="button" id="pick-t" data-id="T · Trait" aria-pressed="false">Retenir T</button></div>
+    <div class="frame"><div class="viewport"><div class="mock tr">
+      <span class="g ghost" data-g="line"></span>
+      <div class="nav"><span class="brand"><span class="g" data-g="line"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Créer un labo</span><span>Entrer</span></nav></div>
+      <h3>Pas une expérience. <span>Un labo entier.</span></h3>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p>
+      <div class="row">
+        <div class="tool on"><svg viewBox="0 0 54 70" fill="none" stroke="#17141f" stroke-width="1.6"><path d="M23 6a4 4 0 0 1 8 0v38a9 9 0 1 1-8 0z"/><path d="M27 50V22" stroke="#e0681f"/></svg>Thermomètre</div>
+        <div class="tool"><svg viewBox="0 0 54 70" fill="none" stroke="#17141f" stroke-width="1.6"><circle cx="27" cy="40" r="20"/><path d="M27 40l11-10M27 20v-8M21 12h12"/></svg>Manomètre</div>
+        <div class="tool on"><svg viewBox="0 0 54 70" fill="none" stroke="#17141f" stroke-width="1.6"><rect x="5" y="36" width="44" height="22" rx="5"/><path d="M18 30c0-5 4-5 4-10M32 30c0-5 4-5 4-10" stroke="#e0681f"/></svg>Bain</div>
+        <div class="tool"><svg viewBox="0 0 54 70" fill="none" stroke="#17141f" stroke-width="1.6"><rect x="5" y="24" width="30" height="30" rx="3"/><path d="M27 24v30M27 39h22"/></svg>Piston</div>
+        <div class="tool"><svg viewBox="0 0 54 70" fill="none" stroke="#17141f" stroke-width="1.6"><path d="M22 8h10v12c8 3 10 9 10 16v22a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V36c0-7 2-13 10-16z"/><path d="M18 46h18"/></svg>CO₂</div>
+        <div class="v"><canvas data-p="tr"></canvas></div>
+        <div class="nb"><b>Carnet</b><br>#1 · 293 K · —<br>#2 · 420 K · —<br>Il manque le manomètre.</div>
+      </div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Tout est dessiné au trait fin, sans aucun remplissage : le fantôme, les instruments et même les particules. Une typo très fine avec un seul mot en gras orange. On dirait une notice de matériel, aérée et précise.</p>
+        <div class="swatches"><b style="background:#fbfbfd"></b><b style="background:#17141f"></b><b style="background:#3d3950"></b><b style="background:#e0681f"></b></div></div>
+      <dl class="kv"><dt>Titres et texte</dt><dd>Outfit, maigre et grasse</dd><dt>Icônes</dt><dd>Un trait de 1,6 px partout</dd><dt>Idée</dt><dd>Les instruments sont dessinés, pas listés</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Très léger, net au vidéoprojecteur, facile à étendre</dd><dt>Contre</dt><dd>Peut paraître froid sans la couleur</dd></dl>
+    </div>
+  </section>
+</div>
+
+<div class="bar" id="bar" hidden><div class="in"><output id="sel" for="pick-p">Sélection</output><button class="copy" type="button" id="copy">Copier la sélection</button></div></div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BODY = 'M41 22 H59 V36 Q81 45 81 68 V86 Q75.8 80 70.7 86 Q65.5 92 60.3 86 Q55.2 80 50 86 Q44.8 92 39.7 86 Q34.5 80 29.3 86 Q24.2 92 19 86 V68 Q19 45 41 36 Z';
+  function eyes(fill){ return '<g class="eyes"><ellipse class="lid" cx="41" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/><ellipse class="lid" cx="59" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/></g>'; }
+  function flat(body, eye, bub){ return '<svg viewBox="0 0 100 100" class="gh"><circle cx="67" cy="13" r="3.6" fill="' + bub + '"/><circle cx="74" cy="4.5" r="2.2" fill="' + bub + '" opacity=".75"/><rect x="36" y="18" width="28" height="6" rx="3" fill="' + body + '"/><path d="' + BODY + '" fill="' + body + '"/>' + eyes(eye) + '</svg>'; }
+  var uid = 0;
+  var G = {
+    ecto:function(){ return flat('#efeaff', '#0f0d16', '#ff8a3d'); },
+    white:function(){ return flat('#fbf8ff', '#17141f', '#17141f'); },
+    inkw:function(){ return flat('#17141f', '#ff8a3d', '#fbf8ff'); },
+    ink:function(){ return flat('#1b1a1f', '#f7f7f4', '#d4601a'); },
+    line:function(){ return '<svg viewBox="0 0 100 100" class="gh"><circle cx="67" cy="13" r="3.4" fill="none" stroke="#e0681f" stroke-width="1.2"/><circle cx="74" cy="4.5" r="2" fill="none" stroke="#e0681f" stroke-width="1"/><rect x="36" y="18" width="28" height="6" rx="3" fill="none" stroke="#17141f" stroke-width="1.2"/><path d="' + BODY + '" fill="none" stroke="#17141f" stroke-width="1.3" stroke-linejoin="round"/>' + eyes('#17141f') + '</svg>'; },
+    split:function(){
+      var id = 'sp' + (++uid);
+      var inner = function(body, eye){ return '<rect x="36" y="18" width="28" height="6" rx="3" fill="' + body + '"/><path d="' + BODY + '" fill="' + body + '"/>' + eyes(eye); };
+      return '<svg viewBox="0 0 100 100" class="gh"><defs><clipPath id="' + id + 'l"><rect x="-10" y="-10" width="60" height="120"/></clipPath><clipPath id="' + id + 'r"><rect x="50" y="-10" width="60" height="120"/></clipPath></defs><circle cx="67" cy="13" r="3.6" fill="#ff8a3d"/><circle cx="74" cy="4.5" r="2.2" fill="#ff8a3d" opacity=".75"/><g clip-path="url(#' + id + 'l)">' + inner('#17141f', '#f4f2fa') + '</g><g clip-path="url(#' + id + 'r)">' + inner('#f4f2fa', '#17141f') + '</g></svg>';
+    }
+  };
+  document.querySelectorAll('[data-g]').forEach(function(el){ el.innerHTML = G[el.dataset.g](); });
+
+  // Yeux qui suivent (tous les groupes .eyes d'un logo)
+  var ghosts = [].slice.call(document.querySelectorAll('svg.gh'));
+  window.addEventListener('pointermove', function(ev){
+    if (reduce) return;
+    ghosts.forEach(function(sv){
+      var r = sv.getBoundingClientRect(); if (!r.width) return;
+      var cx = r.left + r.width / 2, cy = r.top + r.height * .6, dx = ev.clientX - cx, dy = ev.clientY - cy, dd = Math.hypot(dx, dy) || 1, k = Math.min(1, dd / 260);
+      var t = 'translate(' + (dx / dd * 3.2 * k).toFixed(2) + ' ' + (dy / dd * 2.6 * k).toFixed(2) + ')';
+      sv.querySelectorAll('.eyes').forEach(function(g){ g.setAttribute('transform', t); });
+    });
+  });
+
+  // Mise à l'échelle
+  var vps = document.querySelectorAll('.viewport');
+  function fit(vp){ vp.firstElementChild.style.setProperty('--s', vp.clientWidth / 1000); }
+  vps.forEach(fit);
+  if ('ResizeObserver' in window){ var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target); }); }); vps.forEach(function(v){ ro.observe(v); }); }
+  else window.addEventListener('resize', function(){ vps.forEach(fit); });
+
+  // Enceintes
+  var seed = 31; function rnd(){ seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function dot(col, alt, r){ return function(c, p){ c.fillStyle = p.i % 8 ? col : alt; c.beginPath(); c.arc(p.x, p.y, r, 0, 6.283); c.fill(); }; }
+  var CFG = {
+    pn:{n:34, draw:dot('#efeaff', '#ff8a3d', 2.6)},
+    ao:{n:30, draw:dot('#fbf8ff', '#ff8a3d', 2.6)},
+    ga:{n:30, draw:dot('#1b1a1f', '#d4601a', 2.4)},
+    mm:{n:30, draw:dot('#17141f', '#ff8a3d', 2.6)},
+    tr:{n:30, draw:function(c, p){ c.strokeStyle = p.i % 8 ? '#17141f' : '#e0681f'; c.lineWidth = 1.2; c.beginPath(); c.arc(p.x, p.y, 3.6, 0, 6.283); c.stroke(); }}
+  };
+  var sims = [];
+  document.querySelectorAll('canvas[data-p]').forEach(function(cv){
+    var cfg = CFG[cv.dataset.p], w = cv.offsetWidth || 200, h = cv.offsetHeight || 100;
+    cv.width = w * 2; cv.height = h * 2; var c = cv.getContext('2d'); c.scale(2, 2);
+    var ps = []; for (var i = 0; i < cfg.n; i++){ var a = rnd() * 6.283, sp = .4 + rnd() * .8; ps.push({i:i, x:6 + rnd() * (w - 12), y:6 + rnd() * (h - 12), vx:Math.cos(a) * sp, vy:Math.sin(a) * sp}); }
+    sims.push({c:c, w:w, h:h, ps:ps, cfg:cfg});
+  });
+  function frame(){
+    sims.forEach(function(sm){
+      sm.c.clearRect(0, 0, sm.w, sm.h);
+      sm.ps.forEach(function(p){
+        if (!reduce){ p.x += p.vx; p.y += p.vy; }
+        if (p.x < 5 || p.x > sm.w - 5){ p.vx *= -1; p.x = Math.max(5, Math.min(sm.w - 5, p.x)); }
+        if (p.y < 5 || p.y > sm.h - 5){ p.vy *= -1; p.y = Math.max(5, Math.min(sm.h - 5, p.y)); }
+        sm.cfg.draw(sm.c, p);
+      });
+    });
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  frame();
+
+  // Sélection
+  var picks = document.querySelectorAll('.pick'), bar = document.getElementById('bar'), out = document.getElementById('sel'), saved = [];
+  try { saved = JSON.parse(localStorage.getItem('auralab-planches-4') || '[]'); } catch(e){}
+  function render(){
+    var ids = []; picks.forEach(function(b){ if (b.getAttribute('aria-pressed') === 'true') ids.push(b.dataset.id); });
+    bar.hidden = !ids.length; out.textContent = 'Planches AuraLab retenues : ' + ids.join(' + ');
+    try { localStorage.setItem('auralab-planches-4', JSON.stringify(ids)); } catch(e){}
+  }
+  picks.forEach(function(b){
+    if (saved.indexOf(b.dataset.id) > -1) b.setAttribute('aria-pressed', 'true');
+    b.addEventListener('click', function(){ b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); render(); });
+  });
+  render();
+  document.getElementById('copy').addEventListener('click', function(){
+    var btn = this;
+    function sel(){ var r = document.createRange(); r.selectNodeContents(out); var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(r); btn.textContent = 'Texte sélectionné'; }
+    try { navigator.clipboard.writeText(out.textContent).then(function(){ btn.textContent = 'Copié'; setTimeout(function(){ btn.textContent = 'Copier la sélection'; }, 1600); }, sel); } catch(e){ sel(); }
+  });
+})();
+</script>

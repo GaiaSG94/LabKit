@@ -1,0 +1,453 @@
+<title>Planches AuraLab K–O</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bodoni+Moda:ital,wght@0,500;0,700;1,500&family=Figtree:wght@400;600;700&family=Hanken+Grotesk:wght@400;600;800&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@400;600&family=Martian+Mono:wght@400;600&family=Syne:wght@700;800&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: planche de présentation — intro, 5 maquettes interactives plein cadre (K à O) avec leurs notes, sélection fixée en bas. */
+:root{
+  --bg:#f3f2f7; --surface:#ffffff; --fg:#17151f; --muted:#5f5b70; --line:#dcd9e6; --accent:#e0681f; --accent-soft:#fdebdf;
+  --f-display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+  --f-mono:"Martian Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#0f0d16; --surface:#17141f; --fg:#efeaff; --muted:#a7a1c0; --line:#2b2639; --accent:#ff8a3d; --accent-soft:#2d1f1a; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--fg); font:16px/1.55 var(--f-body); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 120px}
+.wrap{max-width:1180px; margin:0 auto}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
+p{margin:0}
+.label{font:600 11px/1.4 var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+a{color:var(--accent)}
+.intro{padding-block:52px 28px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:40px; align-items:end}
+.intro h1{font:700 clamp(32px,5vw,58px)/1.05 var(--f-display); letter-spacing:-.02em; margin-top:12px}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted); max-width:58ch; margin-top:16px; font-size:17px}
+.keep{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:18px 20px; display:grid; gap:8px; font-size:15px}
+.board{display:grid; gap:20px; padding-block:36px; border-top:2px solid var(--fg)}
+.board-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap}
+.board-head h2{font:700 30px/1.1 var(--f-display)}
+.board-head .code{font:600 13px var(--f-mono); color:var(--accent); margin-right:10px}
+.board-head .try{font:400 12px var(--f-mono); color:var(--muted)}
+.frame{border-radius:12px; overflow:hidden; border:1px solid var(--line); box-shadow:0 14px 36px -22px rgba(20,15,40,.45)}
+.viewport{position:relative; aspect-ratio:1000/620; overflow:hidden; max-width:100%; background:#111}
+.mock{position:absolute; top:0; left:0; width:1000px; height:620px; transform-origin:0 0; transform:scale(var(--s,.6)); overflow:hidden}
+.notes{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:28px}
+.notes .pitch{color:var(--muted)}
+.swatches{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px}
+.swatches b{display:block; width:34px; height:34px; border-radius:8px; border:1px solid var(--line)}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:14px; margin:0; align-content:start}
+.kv dt{font:600 11px/1.9 var(--f-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.kv dd{margin:0}
+.pick{font:700 14px var(--f-body); border:1.5px solid var(--fg); background:transparent; color:var(--fg); border-radius:999px; padding:8px 16px; cursor:pointer}
+.pick:hover{background:var(--accent-soft)}
+.pick[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.pick:focus-visible, .copy:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.bar{position:fixed; left:0; right:0; bottom:0; background:var(--fg); color:var(--bg); padding:12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display:flex; justify-content:center}
+.bar .in{max-width:1180px; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between}
+.bar output{font:600 14px var(--f-mono)}
+.copy{font:700 14px var(--f-body); background:var(--bg); color:var(--fg); border:0; border-radius:999px; padding:8px 16px; cursor:pointer}
+@media (max-width:860px){ .intro, .notes{grid-template-columns:1fr} }
+.g{display:block}
+.g svg{display:block; width:100%; height:auto; overflow:visible}
+.mock canvas.fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+.lid{transform-box:fill-box; transform-origin:center; animation:blink 6s infinite}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)} 97.5%{transform:scaleY(.08)}}
+@media (prefers-reduced-motion: reduce){ .lid{animation:none} }
+
+/* ============ K · Lampe torche ============ */
+.tt{background:#07060b; color:#efeaff; font:15px/1.5 "Lexend", sans-serif; cursor:crosshair}
+.tt .room{position:absolute; inset:0; width:100%; height:100%}
+.tt .hid{position:absolute; font:600 12px "Martian Mono", monospace; color:#ffd2b3; background:rgba(255,138,61,.16); border:1px solid rgba(255,138,61,.5); padding:3px 8px; border-radius:6px}
+.tt .vessel{position:absolute; left:470px; top:330px; width:260px; height:130px; border:2px solid #b9a6ff; border-radius:10px; overflow:hidden}
+.tt .vessel canvas{position:absolute; inset:0; width:100%; height:100%}
+.tt .dark{position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle 165px at var(--mx,620px) var(--my,330px), rgba(7,6,11,0) 0, rgba(7,6,11,.25) 45%, rgba(7,6,11,.93) 100%)}
+.tt .nav{position:absolute; left:36px; right:36px; top:24px; display:flex; justify-content:space-between; align-items:center}
+.tt .brand{display:flex; align-items:center; gap:10px; font:700 22px "Unbounded", sans-serif}
+.tt .brand .g{width:32px}
+.tt .nav nav{display:flex; gap:20px; color:#a79fc4; font-weight:600; font-size:14px}
+.tt .txt{position:absolute; left:36px; top:96px; width:420px}
+.tt h3{font:700 42px/1.05 "Unbounded", sans-serif}
+.tt h3 span{color:#ff8a3d}
+.tt .lede{margin-top:14px; color:#a79fc4}
+.tt .ghost{position:absolute; left:770px; top:110px; width:150px; filter:drop-shadow(0 0 22px rgba(185,166,255,.55))}
+.tt .say{position:absolute; left:610px; top:96px; width:160px; background:#efeaff; color:#07060b; font-weight:600; font-size:13px; padding:9px 12px; border-radius:14px 14px 3px 14px}
+
+/* ============ L · Ectoplasme ============ */
+.ec{background:#0b0912; color:#f3efff; font:15px/1.5 "Figtree", sans-serif}
+.ec canvas.blobs{position:absolute; inset:0; width:100%; height:100%; filter:blur(26px) saturate(1.2)}
+.ec .nav{position:absolute; left:36px; right:36px; top:24px; display:flex; justify-content:space-between; align-items:center}
+.ec .brand{display:flex; align-items:center; gap:10px; font:800 24px "Syne", sans-serif}
+.ec .brand .g{width:32px}
+.ec .nav nav{display:flex; gap:8px}
+.ec .nav nav span{padding:7px 14px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); font-weight:600; font-size:13px; backdrop-filter:blur(10px)}
+.ec .txt{position:absolute; left:36px; top:110px; width:520px}
+.ec h3{font:800 64px/.95 "Syne", sans-serif; letter-spacing:-.02em}
+.ec h3 span{color:#ffb27a}
+.ec .lede{margin-top:16px; color:#cfc6ee; max-width:42ch; font-size:16px}
+.ec .ghost{position:absolute; left:690px; top:90px; width:200px; filter:drop-shadow(0 0 30px rgba(255,255,255,.35))}
+.ec .glass{position:absolute; top:400px; height:180px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:16px 18px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px)}
+.ec .glass h4{font:700 13px "Syne", sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#ffb27a; margin-bottom:8px}
+.ec .glass p{font-size:13.5px; color:#e3dcff}
+.ec .g1{left:36px; width:250px} .ec .g2{left:304px; width:390px; padding:0; overflow:hidden} .ec .g3{left:712px; width:252px}
+.ec .g2 canvas{position:absolute; inset:0; width:100%; height:100%}
+.ec .chips{display:flex; flex-wrap:wrap; gap:5px}
+.ec .chips span{border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:2px 9px; font-size:12.5px}
+.ec .chips span.on{background:#f3efff; color:#0b0912}
+
+/* ============ M · Fantôme vivant ============ */
+.fv{background:#0c0a12; color:#efeaff; font:15px/1.5 "Lexend", sans-serif}
+.fv .body{position:absolute; inset:0; width:100%; height:100%}
+.fv .navl, .fv .navr{position:absolute; top:20px; display:flex; gap:20px; color:#a79fc4; font-weight:600; font-size:14px}
+.fv .navl{left:34px} .fv .navr{right:34px}
+.fv .navr span{color:#0c0a12; background:#ff8a3d; padding:5px 14px; border-radius:999px}
+.fv .rim{position:absolute; left:430px; top:20px; width:140px; text-align:center; font:700 17px "Unbounded", sans-serif; color:#0c0a12}
+.fv .eyesbig{position:absolute; left:365px; top:128px; width:270px}
+.fv .txt{position:absolute; left:220px; right:220px; top:278px; text-align:center}
+.fv h3{font:700 38px/1.08 "Unbounded", sans-serif}
+.fv h3 span{color:#ff8a3d}
+.fv .lede{margin:12px auto 0; max-width:50ch; color:#b5addb}
+.fv .cards{position:absolute; left:130px; right:130px; top:420px; display:grid; grid-template-columns:1fr 1.4fr 1fr; gap:14px}
+.fv .card{background:rgba(239,234,255,.05); border:1px solid rgba(217,207,253,.2); border-radius:18px; padding:12px 14px; font-size:13px; color:#d6cff2; position:relative; overflow:hidden; min-height:110px}
+.fv .card h4{font:700 11px "Unbounded", sans-serif; letter-spacing:.06em; color:#efeaff; margin-bottom:6px}
+.fv .card canvas{position:absolute; inset:0; width:100%; height:100%}
+.fv .chips span{display:inline-block; margin:0 3px 4px 0; border:1px solid rgba(217,207,253,.3); border-radius:8px; padding:1px 7px}
+.fv .chips span.on{background:#efeaff; color:#0c0a12}
+
+/* ============ N · Épure ============ */
+.ep{background:#f4f2fa; color:#17141f; font:15px/1.5 "Hanken Grotesk", sans-serif}
+.ep .nav{position:absolute; left:48px; right:48px; top:28px; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:14px}
+.ep .brand{display:flex; align-items:center; gap:10px; font:800 20px "Hanken Grotesk", sans-serif; letter-spacing:-.02em}
+.ep .brand .g{width:26px}
+.ep .nav nav{display:flex; gap:28px}
+.ep .nav nav span:last-child{color:#e0681f}
+.ep .ghost{position:absolute; right:-130px; top:20px; width:620px}
+.ep h3{position:absolute; left:48px; top:112px; width:560px; font:800 78px/.92 "Hanken Grotesk", sans-serif; letter-spacing:-.045em}
+.ep h3 span{color:#e0681f; display:block}
+.ep .lede{position:absolute; left:48px; top:312px; width:400px; color:#4c4760; font-size:16px}
+.ep .row{position:absolute; left:48px; width:560px; bottom:40px; display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:22px}
+.ep .row div{border-top:1.5px solid #17141f; padding-top:10px; font-size:13px; color:#4c4760; position:relative}
+.ep .row b{display:block; font:600 11px "JetBrains Mono", monospace; letter-spacing:.08em; text-transform:uppercase; color:#17141f; margin-bottom:4px}
+.ep .row .v{height:110px; border:1.5px solid #17141f; border-top-width:1.5px; padding:0}
+.ep .row .v canvas{position:absolute; inset:0; width:100%; height:100%}
+
+/* ============ O · Constellation ============ */
+.co{background:radial-gradient(800px 600px at 75% 30%, #1d1a44, #090919); color:#ecebff; font:15px/1.5 "Atkinson Hyperlegible", sans-serif}
+.co .sky{position:absolute; inset:0; width:100%; height:100%}
+.co .nav{position:absolute; left:40px; right:40px; top:26px; display:flex; justify-content:space-between; align-items:center}
+.co .brand{display:flex; align-items:center; gap:10px; font:500 italic 26px "Bodoni Moda", serif}
+.co .brand .g{width:30px}
+.co .nav nav{display:flex; gap:22px; font:600 11px "Martian Mono", monospace; letter-spacing:.12em; text-transform:uppercase; color:#a9a6d6}
+.co .txt{position:absolute; left:40px; top:104px; width:470px}
+.co .kicker{font:600 11px "Martian Mono", monospace; letter-spacing:.14em; text-transform:uppercase; color:#ffb27a}
+.co h3{font:500 54px/1.02 "Bodoni Moda", serif; margin-top:10px}
+.co h3 em{color:#ffb27a}
+.co .lede{margin-top:14px; color:#b9b6e2; max-width:44ch}
+.co .lbl{position:absolute; font:italic 500 15px "Bodoni Moda", serif; color:#ecebff; text-align:center; transform:translateX(-50%); white-space:nowrap}
+.co .lbl small{display:block; font:600 10px "Martian Mono", monospace; font-style:normal; letter-spacing:.1em; text-transform:uppercase; color:#8f8cc4}
+.co .lbl.on small{color:#ffb27a}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div>
+      <p class="label">AuraLab · planches K à O · 8 nov. 2026</p>
+      <h1>Plus sombres, plus vivantes, <span>le fantôme au centre</span>.</h1>
+      <p class="lede">Tu as préféré la version Nuit et la planche I, où le logo devient l'interface. Ces cinq pistes partent de là, avec moins de côté « jouet » et plus d'effets à manipuler. Passe la souris sur chaque maquette : elles réagissent toutes.</p>
+    </div>
+    <aside class="keep">
+      <p class="label">Toujours pareil</p>
+      <p>La fiole-fantôme et son regard, le contenu, et les zones du labo : étagère, paillasse, carnet, fantôme guide.</p>
+      <p class="label" style="margin-top:6px">Avant : <a href="https://claude.ai/artifact/6TJ82RjJVtjiCPyBUa4ahq">F à J</a> · <a href="https://claude.ai/artifact/83mZjKZXE18658j87uk43t">A à E</a> · <a href="https://claude.ai/artifact/3LqmAy9K178sYpdrm4FB7u">Nuit</a></p>
+    </aside>
+  </header>
+
+  <!-- K -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">K</span>Lampe torche</h2><span class="try">la souris est une lampe</span><button class="pick" type="button" id="pick-k" data-id="K · Lampe torche" aria-pressed="false">Retenir K</button></div>
+    <div class="frame"><div class="viewport"><div class="mock tt" id="mk">
+      <svg class="room" viewBox="0 0 1000 620" aria-hidden="true">
+        <rect width="1000" height="620" fill="#1c1729"/>
+        <rect x="0" y="470" width="1000" height="150" fill="#14101e"/>
+        <rect x="70" y="300" width="300" height="12" fill="#4a3c73"/><rect x="70" y="390" width="300" height="12" fill="#4a3c73"/><rect x="70" y="210" width="300" height="12" fill="#4a3c73"/>
+        <rect x="90" y="250" width="26" height="50" rx="5" fill="#8fe3c4"/><rect x="130" y="262" width="22" height="38" rx="5" fill="#ff8a3d"/><rect x="168" y="245" width="30" height="55" rx="5" fill="#efeaff"/>
+        <circle cx="250" cy="275" r="22" fill="none" stroke="#efeaff" stroke-width="4"/><path d="M250 275 L262 262" stroke="#ff8a3d" stroke-width="3"/>
+        <rect x="300" y="255" width="12" height="45" rx="6" fill="#ffb3c7"/>
+        <rect x="100" y="340" width="70" height="50" rx="6" fill="#6ec3f4"/><rect x="200" y="330" width="40" height="60" rx="4" fill="#b9a6ff"/><rect x="270" y="350" width="80" height="40" rx="4" fill="#efeaff"/>
+        <rect x="420" y="460" width="560" height="22" fill="#ff8a3d"/><rect x="440" y="482" width="14" height="138" fill="#a5501a"/><rect x="940" y="482" width="14" height="138" fill="#a5501a"/>
+        <rect x="760" y="420" width="150" height="40" rx="4" fill="#fffaf0"/><path d="M775 432 H895 M775 444 H880" stroke="#b8acd6" stroke-width="2"/>
+        <rect x="560" y="60" width="200" height="120" fill="none" stroke="#efeaff" stroke-width="2" opacity=".7"/>
+        <text x="660" y="132" text-anchor="middle" fill="#efeaff" font-family="Bodoni Moda, serif" font-size="34" font-style="italic" opacity=".85">PV = nRT</text>
+        <rect x="820" y="230" width="120" height="120" fill="#100c20" stroke="#4a3c73" stroke-width="6"/><circle cx="900" cy="262" r="12" fill="#ffb27a"/>
+      </svg>
+      <div class="vessel"><canvas data-p="tt"></canvas></div>
+      <span class="hid" style="left:90px; top:180px">étagère · 9 objets</span>
+      <span class="hid" style="left:220px; top:228px">manomètre : pas encore posé</span>
+      <span class="hid" style="left:472px; top:300px">enceinte · N₂ 50 · 293 K</span>
+      <span class="hid" style="left:760px; top:392px">carnet · 2 mesures</span>
+      <div class="dark" id="ttDark"></div>
+      <div class="nav"><span class="brand"><span class="g" data-g="glow"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Entrer</span></nav></div>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Promène la lampe dans la pièce : l'étagère, la paillasse, le carnet… tout le matériel est là, dans le noir.</p></div>
+      <p class="say">Psst… éclaire l'étagère, il y a un manomètre.</p>
+      <span class="g ghost" data-g="glow"></span>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Le labo est plongé dans le noir et le curseur devient une lampe torche. On part à la chasse au fantôme, mais on découvre le matériel. Le fantôme brille dans l'obscurité et te suit des yeux. L'esprit Kiroween, sans faire enfantin.</p>
+        <div class="swatches"><b style="background:#07060b"></b><b style="background:#1c1729"></b><b style="background:#efeaff"></b><b style="background:#b9a6ff"></b><b style="background:#ff8a3d"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Unbounded</dd><dt>Texte</dt><dd>Lexend</dd><dt>Effet</dt><dd>Un masque radial qui suit le curseur ; au doigt sur tablette</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Très immersif ; idéal pour l'accueil et la démo</dd><dt>Contre</dt><dd>Seulement pour l'accueil : dans un labo, il faut tout voir</dd></dl>
+    </div>
+  </section>
+
+  <!-- L -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">L</span>Ectoplasme</h2><span class="try">les nappes suivent la souris</span><button class="pick" type="button" id="pick-l" data-id="L · Ectoplasme" aria-pressed="false">Retenir L</button></div>
+    <div class="frame"><div class="viewport"><div class="mock ec" id="ml">
+      <canvas class="blobs" id="blobs"></canvas>
+      <div class="nav"><span class="brand"><span class="g" data-g="glow"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Entrer</span></nav></div>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p></div>
+      <span class="g ghost" data-g="glow"></span>
+      <div class="glass g1"><h4>Étagère</h4><div class="chips"><span class="on">thermomètre</span><span class="on">bain</span><span>manomètre</span><span>chrono</span><span>piston</span><span>pompe</span><span>He</span><span>CO₂</span></div></div>
+      <div class="glass g2"><canvas data-p="ec"></canvas></div>
+      <div class="glass g3"><h4>Carnet</h4><p>#1 · 293 K · —<br>#2 · 420 K · —<br><br>Le fantôme : sans manomètre, la pression reste un mystère.</p></div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">De grandes nappes lumineuses d'ectoplasme dérivent sous des panneaux en verre dépoli et se laissent attirer par le curseur. Une typo très large et serrée, le fantôme qui irradie. Le rendu le plus « produit premium », dans l'esprit d'une app moderne.</p>
+        <div class="swatches"><b style="background:#0b0912"></b><b style="background:#7d5cff"></b><b style="background:#ff8a3d"></b><b style="background:#3fd0b4"></b><b style="background:#f3efff"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Syne</dd><dt>Texte</dt><dd>Figtree</dd><dt>Effet</dt><dd>Nappes sur canvas floutées, panneaux en verre</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Élégant, moderne, se décline sur tous les écrans du labo</dd><dt>Contre</dt><dd>Le flou coûte cher sur les vieux PC ; à prévoir désactivable</dd></dl>
+    </div>
+  </section>
+
+  <!-- M -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">M</span>Fantôme vivant</h2><span class="try">la suite de la planche I, de nuit</span><button class="pick" type="button" id="pick-m" data-id="M · Fantôme vivant" aria-pressed="false">Retenir M</button></div>
+    <div class="frame"><div class="viewport"><div class="mock fv" id="mm">
+      <svg class="body" id="fvBody" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <canvas class="fx" id="fvFx"></canvas>
+      <div class="navl"><span>Le labo</span><span>Qu'est-ce qu'un labo</span></div>
+      <div class="navr"><span>Entrer</span></div>
+      <div class="rim">auralab</div>
+      <span class="g eyesbig" data-g="eyesglow"></span>
+      <div class="txt"><h3>Pas une expérience. <span>Un labo entier.</span></h3><p class="lede">Tu es dans la fiole. Une paillasse, une étagère de matériel, des substances et un carnet. Le fantôme cligne des yeux et te regarde travailler.</p></div>
+      <div class="cards">
+        <div class="card"><h4>Étagère</h4><div class="chips"><span class="on">thermomètre</span><span class="on">bain</span><span>manomètre</span><span>piston</span><span>CO₂</span></div></div>
+        <div class="card"><canvas data-p="fv"></canvas></div>
+        <div class="card"><h4>Carnet</h4><p>#1 293 K · —<br>#2 420 K · —</p></div>
+      </div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">L'idée de la planche I, passée en version nuit et plus raffinée. Le corps du fantôme est une silhouette sombre bordée de lumière, et les yeux deviennent clairs et clignent. Des bulles orange montent du col et sortent de l'écran. Le contenu vit dans le ventre de la fiole.</p>
+        <div class="swatches"><b style="background:#0c0a12"></b><b style="background:#1e1830"></b><b style="background:#d9cffd"></b><b style="background:#efeaff"></b><b style="background:#ff8a3d"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Unbounded</dd><dt>Texte</dt><dd>Lexend</dd><dt>Effet</dt><dd>Silhouette SVG plein écran, yeux qui suivent et clignent</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Garde l'idée qui t'a plu, avec la sobriété de la version Nuit</dd><dt>Contre</dt><dd>Forme imposée : les pages longues doivent défiler dans le ventre</dd></dl>
+    </div>
+  </section>
+
+  <!-- N -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">N</span>Épure</h2><span class="try">le contrepied : clair et minimal</span><button class="pick" type="button" id="pick-n" data-id="N · Épure" aria-pressed="false">Retenir N</button></div>
+    <div class="frame"><div class="viewport"><div class="mock ep">
+      <span class="g ghost" data-g="ink"></span>
+      <div class="nav"><span class="brand"><span class="g" data-g="ink"></span>auralab</span><nav><span>Le labo</span><span>Pour les profs</span><span>Créer un labo</span><span>Entrer →</span></nav></div>
+      <h3>Pas une expérience. <span>Un labo entier.</span></h3>
+      <p class="lede">Une paillasse, une étagère de matériel, des substances et un carnet. Plus simple qu'un labo de recherche, tout aussi ouvert.</p>
+      <div class="row">
+        <div><b>Étagère</b>Thermomètre, bain · posés<br>Manomètre, piston, pompe, He, CO₂</div>
+        <div class="v"><canvas data-p="ep"></canvas></div>
+        <div><b>Carnet</b>#1 293 K · —<br>#2 420 K · —<br>Il manque le manomètre.</div>
+      </div>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Le contrepied total : un fond très clair, une grosse typo noire et un fantôme géant qui déborde de l'écran et te fixe. Un seul accent orange, aucun décor. Le logo suffit à porter toute l'identité.</p>
+        <div class="swatches"><b style="background:#f4f2fa"></b><b style="background:#17141f"></b><b style="background:#e0681f"></b><b style="background:#4c4760"></b></div></div>
+      <dl class="kv"><dt>Titres et texte</dt><dd>Hanken Grotesk</dd><dt>Données</dt><dd>JetBrains Mono</dd><dt>Effet</dt><dd>Seulement le regard du fantôme</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Le plus lisible en classe et le plus léger à coder</dd><dt>Contre</dt><dd>Moins d'ambiance ; tout repose sur le logo</dd></dl>
+    </div>
+  </section>
+
+  <!-- O -->
+  <section class="board">
+    <div class="board-head"><h2><span class="code">O</span>Constellation</h2><span class="try">le ciel scintille, les yeux sont deux étoiles</span><button class="pick" type="button" id="pick-o" data-id="O · Constellation" aria-pressed="false">Retenir O</button></div>
+    <div class="frame"><div class="viewport"><div class="mock co" id="mo">
+      <canvas class="fx" id="stars"></canvas>
+      <svg class="sky" id="sky" viewBox="0 0 1000 620" aria-hidden="true"></svg>
+      <span class="g" data-g="starbig" style="position:absolute; left:600px; top:70px; width:310px"></span>
+      <div class="nav"><span class="brand"><span class="g" data-g="star"></span>auralab</span><nav><span>Le labo</span><span>Atlas des labos</span><span>Entrer</span></nav></div>
+      <div class="txt"><p class="kicker">Atlas des laboratoires · labo des gaz</p><h3>Pas une expérience. <em>Un labo entier.</em></h3><p class="lede">Chaque instrument est une constellation. Les étoiles brillantes sont posées sur la paillasse, les pâles attendent sur l'étagère.</p></div>
+      <p class="lbl on" style="left:120px; top:536px"><small>posé</small>Thermomètre</p>
+      <p class="lbl on" style="left:290px; top:536px"><small>posé</small>Bain</p>
+      <p class="lbl" style="left:470px; top:536px"><small>sur l'étagère</small>Manomètre</p>
+      <p class="lbl on" style="left:650px; top:536px"><small>2 mesures</small>Carnet</p>
+      <p class="lbl" style="left:820px; top:536px"><small>sur l'étagère</small>Piston</p>
+    </div></div></div>
+    <div class="notes">
+      <div><p class="pitch">Un atlas céleste ancien. Le logo est tracé en étoiles reliées, ses yeux sont deux étoiles qui te suivent, et chaque instrument devient une constellation. Les étoiles brillent si l'objet est posé et restent pâles s'il est sur l'étagère. Poétique, mais sérieux.</p>
+        <div class="swatches"><b style="background:#090919"></b><b style="background:#1d1a44"></b><b style="background:#ecebff"></b><b style="background:#8f8cc4"></b><b style="background:#ffb27a"></b></div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Bodoni Moda</dd><dt>Texte</dt><dd>Atkinson Hyperlegible · Martian Mono</dd><dt>Effet</dt><dd>Ciel qui scintille, logo en étoiles</dd></dl>
+      <dl class="kv"><dt>Pour</dt><dd>Très original et beau en grand écran</dd><dt>Contre</dt><dd>Plus difficile à appliquer aux écrans de labo chargés</dd></dl>
+    </div>
+  </section>
+</div>
+
+<div class="bar" id="bar" hidden><div class="in"><output id="sel" for="pick-k">Sélection</output><button class="copy" type="button" id="copy">Copier la sélection</button></div></div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BODY = 'M41 22 H59 V36 Q81 45 81 68 V86 Q75.8 80 70.7 86 Q65.5 92 60.3 86 Q55.2 80 50 86 Q44.8 92 39.7 86 Q34.5 80 29.3 86 Q24.2 92 19 86 V68 Q19 45 41 36 Z';
+  var seed = 21; function rnd(){ seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function eyes(fill, cls){ return '<g class="eyes"><ellipse class="' + (cls || '') + '" cx="41" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/><ellipse class="' + (cls || '') + '" cx="59" cy="62" rx="4.6" ry="6.2" fill="' + fill + '"/></g>'; }
+  var G = {
+    glow:function(){ return '<svg viewBox="0 0 100 100" class="gh"><circle cx="67" cy="13" r="3.6" fill="#ff8a3d"/><circle cx="74" cy="4.5" r="2.2" fill="#ff8a3d" opacity=".75"/><rect x="36" y="18" width="28" height="6" rx="3" fill="#efeaff"/><path d="' + BODY + '" fill="#efeaff"/>' + eyes('#0b0912', 'lid') + '</svg>'; },
+    ink:function(){ return '<svg viewBox="0 0 100 100" class="gh"><circle cx="67" cy="13" r="3.6" fill="#e0681f"/><circle cx="74" cy="4.5" r="2.2" fill="#e0681f" opacity=".75"/><rect x="36" y="18" width="28" height="6" rx="3" fill="#17141f"/><path d="' + BODY + '" fill="#17141f"/>' + eyes('#f4f2fa', 'lid') + '</svg>'; },
+    eyesglow:function(){ return '<svg viewBox="0 0 100 44" class="gh" data-max="5" style="filter:drop-shadow(0 0 14px rgba(239,234,255,.55))"><g class="eyes"><ellipse class="lid" cx="26" cy="22" rx="12" ry="17" fill="#efeaff"/><ellipse class="lid" cx="74" cy="22" rx="12" ry="17" fill="#efeaff"/></g></svg>'; },
+    star:function(){ return starGhost(100, 1); },
+    starbig:function(){ return starGhost(310, 0); }
+  };
+  // Fantôme en étoiles : points échantillonnés sur le contour
+  var probe = document.createElementNS('http://www.w3.org/2000/svg', 'path'); probe.setAttribute('d', BODY);
+  var tmp = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); tmp.setAttribute('width', '0'); tmp.setAttribute('height', '0'); tmp.style.position = 'absolute'; tmp.appendChild(probe); document.body.appendChild(tmp);
+  var L = probe.getTotalLength(), pts = [];
+  for (var i = 0; i < 30; i++){ var p = probe.getPointAtLength(L * i / 30); pts.push([p.x, p.y]); }
+  function starGhost(size, small){
+    var line = pts.map(function(p){ return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+    var dots = pts.map(function(p, k){ var r = small ? (k % 5 ? 1.4 : 2.6) : (k % 5 ? 1 : 1.9); return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r + '" fill="#ecebff"/>'; }).join('');
+    return '<svg viewBox="0 0 100 100" class="gh"><polygon points="' + line + '" fill="none" stroke="#8f8cc4" stroke-width="' + (small ? 1.6 : .6) + '" opacity=".7"/>' + dots + '<path d="M36 22 H64" stroke="#8f8cc4" stroke-width="' + (small ? 1.6 : .6) + '"/><circle cx="36" cy="22" r="1.6" fill="#ecebff"/><circle cx="64" cy="22" r="1.6" fill="#ecebff"/><circle cx="67" cy="12" r="' + (small ? 3 : 2) + '" fill="#ffb27a"/><circle cx="74" cy="4" r="' + (small ? 2 : 1.3) + '" fill="#ffb27a"/><g class="eyes"><circle cx="41" cy="62" r="' + (small ? 5 : 3.4) + '" fill="#ffffff" style="filter:drop-shadow(0 0 3px #fff)"/><circle cx="59" cy="62" r="' + (small ? 5 : 3.4) + '" fill="#ffffff" style="filter:drop-shadow(0 0 3px #fff)"/></g></svg>';
+  }
+  document.querySelectorAll('[data-g]').forEach(function(el){ el.innerHTML = G[el.dataset.g](); });
+
+  // O : grand fantôme et constellations d'instruments
+  (function(){
+    var sky = document.getElementById('sky'), h = '';
+    function constel(ox, oy, arr, bright){
+      var col = bright ? '#ecebff' : '#5e5b94', ln = bright ? 'rgba(236,235,255,.5)' : 'rgba(143,140,196,.3)';
+      var s = '<polyline points="' + arr.map(function(p){ return (ox + p[0]) + ',' + (oy + p[1]); }).join(' ') + '" fill="none" stroke="' + ln + '" stroke-width="1"/>';
+      arr.forEach(function(p, k){ s += '<circle cx="' + (ox + p[0]) + '" cy="' + (oy + p[1]) + '" r="' + (k % 3 ? 2 : 3.2) + '" fill="' + col + '"/>'; });
+      return s;
+    }
+    h += constel(120, 430, [[0,0],[0,30],[0,60],[-8,74],[0,84],[8,74],[0,60]], true);
+    h += constel(290, 450, [[-50,20],[-50,60],[50,60],[50,20],[-50,20],[-20,0],[0,14],[20,0]], true);
+    var circ = []; for (var a = 0; a <= 8; a++){ circ.push([Math.cos(a / 8 * 6.283) * 38, Math.sin(a / 8 * 6.283) * 38 + 40]); } circ.push([0,40],[22,22]);
+    h += constel(470, 432, circ, false);
+    h += constel(650, 440, [[-40,0],[40,0],[40,70],[-40,70],[-40,0],[-28,20],[28,20],[-28,40],[20,40]], true);
+    h += constel(820, 450, [[-50,0],[30,0],[30,60],[-50,60],[-50,0],[10,0],[10,60],[10,30],[60,30]], false);
+    sky.innerHTML = h;
+  })();
+
+  // M : corps du fantôme sombre bordé de lumière
+  (function(){
+    var d = 'M440 60 H560 V100 Q985 125 985 340 V585', n = 12, x0 = 985, x1 = 15, w = (x0 - x1) / n;
+    for (var k = 0; k < n; k++){ var xa = x0 - w * (k + 1), cx = x0 - w * (k + .5), cy = k % 2 ? 616 : 558; d += ' Q' + cx.toFixed(1) + ' ' + cy + ' ' + xa.toFixed(1) + ' 585'; }
+    d += ' V340 Q15 125 440 100 Z';
+    document.getElementById('fvBody').innerHTML = '<defs><linearGradient id="fvG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#261f3d"/><stop offset="1" stop-color="#151120"/></linearGradient><filter id="fvGlow" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="6"/></filter></defs><rect x="425" y="14" width="150" height="34" rx="10" fill="#d9cffd"/><path d="' + d + '" fill="none" stroke="#b9a6ff" stroke-width="8" opacity=".55" filter="url(#fvGlow)"/><path d="' + d + '" fill="url(#fvG)" stroke="#d9cffd" stroke-width="2"/>';
+  })();
+
+  // Yeux qui suivent
+  var ghosts = [].slice.call(document.querySelectorAll('svg.gh'));
+  window.addEventListener('pointermove', function(ev){
+    if (reduce) return;
+    ghosts.forEach(function(sv){
+      var r = sv.getBoundingClientRect(); if (!r.width) return;
+      var max = +(sv.dataset.max || 3.2), cx = r.left + r.width / 2, cy = r.top + r.height * (sv.dataset.max ? .5 : .6);
+      var dx = ev.clientX - cx, dy = ev.clientY - cy, dd = Math.hypot(dx, dy) || 1, k = Math.min(1, dd / 260);
+      var g = sv.querySelector('.eyes'); if (g) g.setAttribute('transform', 'translate(' + (dx / dd * max * k).toFixed(2) + ' ' + (dy / dd * max * .8 * k).toFixed(2) + ')');
+    });
+  });
+
+  // Mise à l'échelle
+  var vps = document.querySelectorAll('.viewport');
+  function fit(vp){ vp.firstElementChild.style.setProperty('--s', vp.clientWidth / 1000); }
+  vps.forEach(fit);
+  if ('ResizeObserver' in window){ var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target); }); }); vps.forEach(function(v){ ro.observe(v); }); }
+  else window.addEventListener('resize', function(){ vps.forEach(fit); });
+
+  // Souris locale à une maquette (coordonnées 1000×620)
+  function local(el){ var m = {x:-999, y:-999, t:0}; el.addEventListener('pointermove', function(e){ var r = el.getBoundingClientRect(), k = 1000 / r.width; m.x = (e.clientX - r.left) * k; m.y = (e.clientY - r.top) * k; m.t = performance.now(); }); el.addEventListener('pointerleave', function(){ m.t = 0; }); return m; }
+  var mK = local(document.getElementById('mk')), mL = local(document.getElementById('ml'));
+  var dark = document.getElementById('ttDark');
+
+  // Enceintes
+  var CFG = {
+    tt:{n:40, draw:function(c,p){ c.fillStyle = p.i % 7 ? '#efeaff' : '#ff8a3d'; c.beginPath(); c.arc(p.x, p.y, 3, 0, 6.283); c.fill(); }},
+    ec:{n:46, draw:function(c,p){ c.shadowBlur = 10; c.shadowColor = '#fff'; c.fillStyle = p.i % 6 ? 'rgba(243,239,255,.9)' : '#ffb27a'; c.beginPath(); c.arc(p.x, p.y, 3, 0, 6.283); c.fill(); c.shadowBlur = 0; }},
+    fv:{n:30, draw:function(c,p){ c.fillStyle = p.i % 6 ? '#efeaff' : '#ff8a3d'; c.beginPath(); c.arc(p.x, p.y, 2.6, 0, 6.283); c.fill(); }},
+    ep:{n:34, draw:function(c,p){ c.fillStyle = p.i % 8 ? '#17141f' : '#e0681f'; c.beginPath(); c.arc(p.x, p.y, 2.6, 0, 6.283); c.fill(); }}
+  };
+  var sims = [];
+  document.querySelectorAll('canvas[data-p]').forEach(function(cv){
+    var cfg = CFG[cv.dataset.p], w = cv.offsetWidth || 300, hh = cv.offsetHeight || 150;
+    cv.width = w * 2; cv.height = hh * 2; var c = cv.getContext('2d'); c.scale(2, 2);
+    var ps = []; for (var i = 0; i < cfg.n; i++){ var a = rnd() * 6.283, sp = .4 + rnd() * .8; ps.push({i:i, x:6 + rnd() * (w - 12), y:6 + rnd() * (hh - 12), vx:Math.cos(a) * sp, vy:Math.sin(a) * sp}); }
+    sims.push({c:c, w:w, h:hh, ps:ps, cfg:cfg});
+  });
+  function big(id){ var cv = document.getElementById(id), c = cv.getContext('2d'); cv.width = 1000; cv.height = 620; return c; }
+  var cB = big('blobs'), cM = big('fvFx'), cS = big('stars');
+  var blobs = [['#7d5cff',220],['#ff8a3d',160],['#3fd0b4',150],['#b9a6ff',190],['#ff5fa2',120]].map(function(b, k){ return {col:b[0], r:b[1], x:200 + rnd() * 600, y:150 + rnd() * 320, a:rnd() * 6.283, sp:.002 + rnd() * .003, ox:0, oy:0}; });
+  var bub = []; for (var q = 0; q < 16; q++) bub.push({t:rnd(), x:rnd() * 40 - 20, r:2 + rnd() * 5});
+  var stars = []; for (var z = 0; z < 170; z++) stars.push({x:rnd() * 1000, y:rnd() * 620, r:rnd() * 1.3 + .3, ph:rnd() * 6.283});
+
+  function frame(ts){
+    ts = ts || 0;
+    sims.forEach(function(sm){
+      sm.c.clearRect(0, 0, sm.w, sm.h);
+      sm.ps.forEach(function(p){
+        if (!reduce){ p.x += p.vx; p.y += p.vy; }
+        if (p.x < 5 || p.x > sm.w - 5){ p.vx *= -1; p.x = Math.max(5, Math.min(sm.w - 5, p.x)); }
+        if (p.y < 5 || p.y > sm.h - 5){ p.vy *= -1; p.y = Math.max(5, Math.min(sm.h - 5, p.y)); }
+        sm.cfg.draw(sm.c, p);
+      });
+    });
+    // K : lampe
+    var lx, ly;
+    if (mK.t && ts - mK.t < 2500){ lx = mK.x; ly = mK.y; } else { lx = 560 + Math.sin(ts / 2300) * 330; ly = 360 + Math.sin(ts / 1700) * 120; }
+    dark.style.setProperty('--mx', lx.toFixed(0) + 'px'); dark.style.setProperty('--my', ly.toFixed(0) + 'px');
+    // L : nappes
+    cB.clearRect(0, 0, 1000, 620); cB.globalCompositeOperation = 'lighter';
+    blobs.forEach(function(b, k){
+      if (!reduce) b.a += b.sp * 16;
+      var tx = 0, ty = 0;
+      if (mL.t){ tx = (mL.x - b.x) * .25; ty = (mL.y - b.y) * .25; }
+      b.ox += (tx - b.ox) * .04; b.oy += (ty - b.oy) * .04;
+      var x = b.x + Math.cos(b.a + k) * 110 + b.ox, y = b.y + Math.sin(b.a * 1.3 + k) * 70 + b.oy;
+      var g = cB.createRadialGradient(x, y, 0, x, y, b.r); g.addColorStop(0, b.col); g.addColorStop(1, 'rgba(0,0,0,0)');
+      cB.globalAlpha = .55; cB.fillStyle = g; cB.beginPath(); cB.arc(x, y, b.r, 0, 6.283); cB.fill();
+    });
+    cB.globalAlpha = 1; cB.globalCompositeOperation = 'source-over';
+    // M : bulles du col
+    cM.clearRect(0, 0, 1000, 620);
+    bub.forEach(function(b){
+      if (!reduce){ b.t += .005; if (b.t > 1) b.t -= 1; }
+      var y = 58 - b.t * 70, x = 500 + b.x + Math.sin(b.t * 8 + b.r) * 10;
+      cM.globalAlpha = Math.max(0, 1 - b.t); cM.fillStyle = '#ff8a3d'; cM.beginPath(); cM.arc(x, y, b.r, 0, 6.283); cM.fill();
+    });
+    cM.globalAlpha = 1;
+    // O : ciel
+    cS.clearRect(0, 0, 1000, 620);
+    stars.forEach(function(s){ var a = reduce ? .6 : .35 + .45 * (0.5 + 0.5 * Math.sin(ts / 700 + s.ph)); cS.globalAlpha = a; cS.fillStyle = '#ecebff'; cS.beginPath(); cS.arc(s.x, s.y, s.r, 0, 6.283); cS.fill(); });
+    cS.globalAlpha = 1;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Sélection
+  var picks = document.querySelectorAll('.pick'), bar = document.getElementById('bar'), out = document.getElementById('sel'), saved = [];
+  try { saved = JSON.parse(localStorage.getItem('auralab-planches-3') || '[]'); } catch(e){}
+  function render(){
+    var ids = []; picks.forEach(function(b){ if (b.getAttribute('aria-pressed') === 'true') ids.push(b.dataset.id); });
+    bar.hidden = !ids.length; out.textContent = 'Planches AuraLab retenues : ' + ids.join(' + ');
+    try { localStorage.setItem('auralab-planches-3', JSON.stringify(ids)); } catch(e){}
+  }
+  picks.forEach(function(b){
+    if (saved.indexOf(b.dataset.id) > -1) b.setAttribute('aria-pressed', 'true');
+    b.addEventListener('click', function(){ b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); render(); });
+  });
+  render();
+  document.getElementById('copy').addEventListener('click', function(){
+    var btn = this;
+    function sel(){ var r = document.createRange(); r.selectNodeContents(out); var s2 = window.getSelection(); s2.removeAllRanges(); s2.addRange(r); btn.textContent = 'Texte sélectionné'; }
+    try { navigator.clipboard.writeText(out.textContent).then(function(){ btn.textContent = 'Copié'; setTimeout(function(){ btn.textContent = 'Copier la sélection'; }, 1600); }, sel); } catch(e){ sel(); }
+  });
+})();
+</script>

@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planches labos chimie et ponts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* Planche : 3 pistes très modernes pour le labo chimie (fond vert EcoLab) et 3 pour le labo ponts (3D plein écran, vraie 3D three.js). */
+:root{--bg:#f3f2f7;--surface:#fff;--fg:#17141f;--muted:#5f5b70;--line:#dcd9e6;--accent:#2f8f3a;--f:"Archivo","Arial Narrow",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f0d16;--surface:#17141f;--fg:#efeaff;--muted:#a7a1c0;--line:#2b2639;--accent:#7fd069;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f0d16;--surface:#17141f;--fg:#efeaff;--muted:#a7a1c0;--line:#2b2639;--accent:#7fd069;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--f);padding:0 16px 80px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+.label{font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.intro{padding:48px 0 24px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:36px;align-items:end}
+.intro h1{font:900 clamp(34px,6vw,64px)/1 var(--f);font-stretch:72%;margin-top:10px}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted);max-width:60ch;margin-top:14px;font-size:17px}
+.keep{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:16px 20px;font-size:15px}
+.keep ul{margin:8px 0 0;padding-left:18px;display:grid;gap:3px}
+.part{font:900 clamp(30px,4vw,44px)/1 var(--f);font-stretch:72%;padding:40px 0 6px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.part small{font:400 15px var(--f);font-stretch:100%;color:var(--muted)}
+.board{display:grid;gap:18px;padding:30px 0;border-top:2px solid var(--fg)}
+.board-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.board-head .code{font:700 14px var(--mono);color:var(--accent)}
+.board-head h2{font:900 30px/1.1 var(--f);font-stretch:80%}
+.frame{border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 14px 36px -22px rgba(20,15,40,.45)}
+.viewport{position:relative;aspect-ratio:1000/620;overflow:hidden}
+.notes{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:26px;font-size:15px}
+.notes .pitch{color:var(--muted)}
+.notes ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+.swatch{display:flex;gap:6px;margin-top:10px;align-items:center;font:12px var(--mono);color:var(--muted)}
+.swatch b{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:block}
+@media (max-width:760px){.intro,.notes{grid-template-columns:minmax(0,1fr)}}
+
+/* ================= Maquettes (1000 × 620, mises à l'échelle) ================= */
+.m{position:absolute;top:0;left:0;width:1000px;height:620px;transform-origin:0 0;transform:scale(var(--s,1));overflow:hidden;font:13px/1.35 "Archivo","Arial Narrow",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.m *{box-sizing:border-box}
+.m p{margin:0}
+.m .ab{position:absolute}
+.m svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex:none}
+.m .num{font-family:"Archivo","Arial Narrow",sans-serif;font-stretch:66%;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:.9}
+.m .num sup{font-size:.34em;font-stretch:100%;font-weight:700;vertical-align:top;margin-left:3px;position:relative;top:.3em;letter-spacing:0}
+.m .cap{font:700 10.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.m .gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.m .g{display:block;flex:none}
+.m .noweb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:700 14px "Archivo";color:#fff;background:#0008;padding:8px 14px;border-radius:999px}
+
+/* flask drawing shared by the chimie mockups */
+.fk{display:block;width:100%;height:100%;overflow:visible}
+.fk .flame{transform-box:fill-box;transform-origin:50% 100%;animation:fk-flick .16s ease-in-out infinite alternate}
+@keyframes fk-flick{from{transform:scale(1.03,.92)}to{transform:scale(.97,1.06)}}
+.fk .bub{animation:fk-rise 3.2s ease-in infinite}
+@keyframes fk-rise{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(var(--rise));opacity:0}}
+.fk .drop{animation:fk-drop 3.4s ease-in infinite}
+@keyframes fk-drop{0%{transform:translateY(0);opacity:0}8%{opacity:1}58%{transform:translateY(222px);opacity:1}60%,100%{transform:translateY(222px);opacity:0}}
+.fk .rip{transform-box:fill-box;transform-origin:center;animation:fk-rip 3.4s ease-out infinite}
+@keyframes fk-rip{0%,58%{transform:scale(.2);opacity:0}61%{opacity:.9}100%{transform:scale(5);opacity:0}}
+@media (prefers-reduced-motion: reduce){.fk *{animation:none!important}.fk .drop,.fk .rip{display:none}}
+
+/* ---------- C1 · verrerie flottante ---------- */
+.c1{background:#6cc95a;color:#0b2a17}
+.c1::before{content:"";position:absolute;inset:0;background:radial-gradient(470px 370px at 50% 60%,rgba(255,255,255,.32),rgba(255,255,255,0) 72%)}
+.c1 .gls{background:rgba(255,255,255,.38);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.62);box-shadow:0 20px 40px -24px rgba(5,45,20,.6),inset 0 1px 0 rgba(255,255,255,.75);border-radius:24px}
+.c1-brand{left:24px;top:16px;height:46px;display:flex;align-items:center;gap:10px}
+.c1-brand .g{width:40px}
+.c1-brand b{font:900 31px/1 "Archivo";font-stretch:70%;letter-spacing:-.01em}
+.c1-seg{left:50%;top:16px;height:46px;transform:translateX(-50%);padding:5px;display:flex;gap:2px;border-radius:999px!important}
+.c1-seg span{padding:0 18px;border-radius:999px;font:600 13.5px/36px "Archivo";white-space:nowrap}
+.c1-seg .on{background:#0b2a17;color:#fff}
+.c1-back{right:24px;top:16px;height:46px;padding:0 18px 0 12px;border-radius:999px!important;display:flex;align-items:center;gap:6px;font:700 13px "Archivo";white-space:nowrap}
+.c1-back .i{width:16px;height:16px}
+.c1-left{left:24px;top:84px;width:240px;height:452px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.c1 .cap{color:rgba(11,42,23,.6);margin:4px 2px 0}
+.c1 .rg{display:flex;align-items:center;gap:10px;padding:8px;border-radius:16px;background:rgba(255,255,255,.55)}
+.c1 .rg i{width:32px;height:32px;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.85) 0 14%,rgba(255,255,255,0) 15%),var(--c);box-shadow:inset 0 -4px 8px rgba(0,0,0,.2),0 6px 12px -6px var(--c)}
+.c1 .rg>div{flex:1;min-width:0}
+.c1 .rg>div b{display:block;font:700 13.5px/1.15 "Archivo"}
+.c1 .rg>div small{font-size:11px;color:rgba(11,42,23,.6)}
+.c1 .stp{display:flex;align-items:center;gap:2px;background:#fff;border-radius:999px;padding:2px}
+.c1 .stp em{width:24px;height:24px;border-radius:50%;display:grid;place-items:center}
+.c1 .stp em .i{width:13px;height:13px;stroke-width:2.6}
+.c1 .stp em:last-child{background:#0b2a17;color:#fff}
+.c1 .stp b{min-width:16px;text-align:center;font:700 12px "JetBrains Mono"}
+.c1 .tg{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 10px 10px 12px;border-radius:16px;background:rgba(255,255,255,.55);font:600 13px "Archivo"}
+.c1 .sw{width:38px;height:22px;border-radius:999px;background:rgba(11,42,23,.2);position:relative;flex:none}
+.c1 .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.c1 .sw.on{background:#0b2a17}.c1 .sw.on::after{left:19px}
+.c1 .sl{padding:10px 12px 14px;border-radius:16px;background:rgba(255,255,255,.55)}
+.c1 .sl>div:first-child{display:flex;justify-content:space-between;font:600 13px "Archivo";margin-bottom:12px}
+.c1 .sl b{font:700 12px "JetBrains Mono"}
+.c1 .tr{height:6px;border-radius:3px;background:rgba(11,42,23,.15);position:relative}
+.c1 .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#2f7bff,#ff8a3d)}
+.c1 .tr u{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.c1-stage{left:300px;top:72px;width:400px;height:460px}
+.c1-right{right:24px;top:84px;width:240px;height:452px;display:flex;flex-direction:column;gap:12px}
+.c1 .w{padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.c1 .w-t{flex:1;min-height:0}
+.c1 .wh{display:flex;justify-content:space-between;align-items:center}
+.c1 .wh .cap{margin:0}
+.c1 .chip{font:700 11px "Archivo";background:#ff5a3d;color:#fff;border-radius:999px;padding:3px 9px}
+.c1 .mut{font:600 12px "Archivo";color:rgba(11,42,23,.6)}
+.c1 .big{font-size:66px}
+.c1 .mid{font-size:44px}
+.c1 .spark{width:100%;flex:1;min-height:36px;display:block}
+.c1 .phb{height:10px;border-radius:5px;background:linear-gradient(90deg,#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#5e35b1);position:relative;margin-top:4px}
+.c1 .phb u{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;border:3px solid #0b2a17}
+.c1 .phl{display:flex;justify-content:space-between;font-size:10.5px;color:rgba(11,42,23,.55)}
+.c1 .vb{height:10px;border-radius:5px;background:rgba(11,42,23,.12);overflow:hidden;margin-top:4px}
+.c1 .vb i{display:block;height:100%;background:#0b2a17;border-radius:5px}
+.c1-bar{left:50%;bottom:20px;transform:translateX(-50%);height:58px;padding:8px;display:flex;align-items:center;gap:6px;border-radius:999px!important}
+.c1 .ib{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62)}
+.c1 .ib .i{width:18px;height:18px}
+.c1 .ink{background:#0b2a17;color:#fff}
+.c1 .sep{width:1px;height:24px;background:rgba(11,42,23,.18);margin:0 6px}
+.c1 .stat{display:flex;align-items:center;gap:8px;font:600 13.5px "Archivo";white-space:nowrap}
+.c1 .stat i{width:10px;height:10px;border-radius:50%;background:#16c063;box-shadow:0 0 0 4px rgba(22,192,99,.25)}
+.c1 .pl{height:42px;border-radius:999px;padding:0 18px 0 14px;display:flex;align-items:center;gap:7px;font:700 13.5px "Archivo";white-space:nowrap}
+.c1 .pl .i{width:12px;height:12px;color:#ff5a3d}
+
+/* ---------- C2 · bento ---------- */
+.c2{background:#6cc95a;color:#0c2416}
+.c2-brand{left:20px;top:12px;height:46px;display:flex;align-items:center;gap:10px}
+.c2-brand .g{width:40px}
+.c2-brand b{font:900 31px/1 "Archivo";font-stretch:70%}
+.c2-live{left:50%;top:21px;transform:translateX(-50%);height:28px;padding:0 13px;border-radius:999px;background:rgba(12,36,22,.12);display:flex;align-items:center;gap:8px;font:600 12px "JetBrains Mono";white-space:nowrap}
+.c2-live i{width:8px;height:8px;border-radius:50%;background:#ff3d3d;box-shadow:0 0 0 3px rgba(255,61,61,.25)}
+.c2-back{right:20px;top:15px;height:40px;padding:0 16px 0 11px;border-radius:999px;background:#0c2416;color:#fff;display:flex;align-items:center;gap:6px;font:700 13px "Archivo";white-space:nowrap}
+.c2-back .i{width:16px;height:16px}
+.c2-grid{left:20px;right:20px;top:70px;bottom:18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:12px}
+.c2 .t{border-radius:26px;padding:16px;min-width:0;min-height:0;position:relative;overflow:hidden;box-shadow:0 16px 30px -22px rgba(5,40,18,.7)}
+.c2 .cap{color:rgba(12,36,22,.55);display:flex;align-items:center;gap:7px}
+.c2 .hero{grid-column:1/3;grid-row:1/4;background:radial-gradient(330px 300px at 50% 56%,rgba(93,255,158,.22),rgba(0,0,0,0) 70%),#0c2416;color:#eafff2;display:flex;flex-direction:column;gap:12px}
+.c2 .hero .cap{color:rgba(234,255,242,.6)}
+.c2 .hero .dot{width:8px;height:8px;border-radius:50%;background:#5dff9e;box-shadow:0 0 10px #5dff9e}
+.c2 .th{display:flex;justify-content:space-between;align-items:center}
+.c2 .ibs{display:flex;gap:6px}
+.c2 .ibs span{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center}
+.c2 .ibs span:first-child{background:#5dff9e;color:#0c2416}
+.c2 .ibs .i{width:16px;height:16px}
+.c2 .fl{flex:1;min-height:0;display:flex;justify-content:center}
+.c2 .fl .fk{width:auto;height:100%}
+.c2 .laws{display:flex;gap:6px;flex-wrap:wrap}
+.c2 .lw{padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font:600 12px "Archivo";display:flex;align-items:center;gap:7px}
+.c2 .lw::before{content:"";width:7px;height:7px;border-radius:50%;background:#5dff9e}
+.c2 .temp{grid-column:3;grid-row:1;background:#f4f1e4;display:flex;flex-direction:column;gap:6px}
+.c2 .temp .num{font-size:60px}
+.c2 .spark{width:100%;flex:1;min-height:30px;display:block}
+.c2 .ph{grid-column:4;grid-row:1;background:#ffffff;display:flex;align-items:center;gap:14px}
+.c2 .donut{width:104px;height:104px;border-radius:50%;flex:none;background:conic-gradient(from 225deg,#e53935 0deg,#fb8c00 54deg,#fdd835 108deg,#43a047 150deg,#1e88e5 210deg,#5e35b1 270deg,transparent 270deg);display:grid;place-items:center;position:relative}
+.c2 .donut::before{content:"";position:absolute;inset:12px;border-radius:50%;background:#fff}
+.c2 .donut .num{position:relative;font-size:38px}
+.c2 .donut u{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:#fff;border:3px solid #0c2416;transform:rotate(var(--a)) translateY(-46px)}
+.c2 .ph b{display:block;font:800 19px "Archivo";margin-top:6px}
+.c2 .ph small{font-size:11.5px;color:rgba(12,36,22,.55)}
+.c2 .vol{grid-column:3;grid-row:2;background:#d8f86a;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.c2 .vol .num{font-size:52px;margin-top:8px}
+.c2 .vol small{display:block;font-size:11.5px;color:rgba(12,36,22,.6);margin-top:4px}
+.c2 .bk{width:62px;height:86px;flex:none}
+.c2 .bec{grid-column:4;grid-row:2;background:#0c2416;color:#fff;display:flex;align-items:center;gap:12px}
+.c2 .bec .cap{color:rgba(255,255,255,.55)}
+.c2 .dial{width:96px;height:96px;flex:none}
+.c2 .bec .num{font-size:44px;margin-top:8px}
+.c2 .bec em{display:inline-block;margin-top:6px;font:700 11px "Archivo";font-style:normal;color:#ffb27a}
+.c2 .fla{grid-column:3;grid-row:3;background:#ffffff;display:flex;flex-direction:column;gap:10px}
+.c2 .fla .cap small{font:600 11px "Archivo";letter-spacing:0;text-transform:none;color:rgba(12,36,22,.45)}
+.c2 .drops{flex:1;display:flex;justify-content:space-between;align-items:center}
+.c2 .dp{display:flex;flex-direction:column;align-items:center;gap:3px;width:58px}
+.c2 .dp i{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.75) 0 12%,rgba(255,255,255,0) 13%),var(--c);box-shadow:inset 0 -5px 10px rgba(0,0,0,.18),0 8px 16px -8px var(--c)}
+.c2 .dp i .i{width:20px;height:20px;stroke-width:2.8}
+.c2 .dp b{font:700 12px "Archivo"}
+.c2 .dp small{font:600 11px "JetBrains Mono";color:rgba(12,36,22,.5)}
+.c2 .nb{grid-column:4;grid-row:3;background:#f4f1e4;display:flex;flex-direction:column;gap:8px}
+.c2 .nb .q{font:800 16px/1.2 "Archivo";flex:1}
+.c2 .btns{display:flex;gap:6px}
+.c2 .pl{height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;gap:6px;font:700 12.5px "Archivo";border:1.5px solid #0c2416;white-space:nowrap}
+.c2 .pl.ink{background:#0c2416;color:#fff}
+.c2 .pl .i{width:13px;height:13px}
+
+/* ---------- C3 · studio ---------- */
+.c3{background:#6cc95a;color:#0c2416}
+.c3-brand{left:20px;top:12px;height:46px;display:flex;align-items:center;gap:10px}
+.c3-brand .g{width:40px}
+.c3-brand b{font:900 31px/1 "Archivo";font-stretch:70%}
+.c3-title{left:50%;top:18px;transform:translateX(-50%);height:34px;padding:0 14px;border-radius:12px;background:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px;font:700 13.5px "Archivo";white-space:nowrap}
+.c3-title .i{width:14px;height:14px;opacity:.6}
+.c3-saved{right:176px;top:26px;display:flex;align-items:center;gap:5px;font:600 12px "Archivo";color:rgba(12,36,22,.65);white-space:nowrap}
+.c3-saved .i{width:14px;height:14px}
+.c3-back{right:20px;top:15px;height:40px;padding:0 16px 0 11px;border-radius:999px;background:#0c2416;color:#fff;display:flex;align-items:center;gap:6px;font:700 13px "Archivo";white-space:nowrap}
+.c3-back .i{width:16px;height:16px}
+.c3-rail{left:20px;top:70px;bottom:16px;width:64px;background:#0c2416;border-radius:22px;padding:7px;display:flex;flex-direction:column;gap:6px}
+.c3-rail span{height:58px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:rgba(234,255,242,.62);font:600 9.5px "Archivo"}
+.c3-rail .on{background:#d8f86a;color:#0c2416}
+.c3-canvas{left:96px;top:70px;width:580px;height:370px;border-radius:22px;overflow:hidden;background-color:#f7f5ec;background-image:radial-gradient(rgba(12,36,22,.16) 1.2px,transparent 1.5px);background-size:18px 18px;box-shadow:0 16px 30px -22px rgba(5,40,18,.7)}
+.c3 .fl{position:absolute;left:155px;top:16px;width:270px;height:310px}
+.c3 .tag{position:absolute;display:flex;align-items:center;gap:0;font:700 12px "Archivo";white-space:nowrap}
+.c3 .tag i{width:16px;height:2px;background:#0c2416;position:relative;flex:none}
+.c3 .tag i::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#0c2416}
+.c3 .tag span{background:#0c2416;color:#fff;border-radius:999px;padding:5px 11px}
+.c3 .tag.solo span{background:#fff;color:#0c2416;box-shadow:0 6px 14px -8px rgba(0,0,0,.4)}
+.c3 .zoom{position:absolute;right:12px;bottom:12px;height:30px;padding:0 6px;border-radius:999px;background:#fff;display:flex;align-items:center;gap:8px;font:600 12px "JetBrains Mono";box-shadow:0 6px 14px -8px rgba(0,0,0,.35)}
+.c3 .zoom .i{width:14px;height:14px}
+.c3-insp{left:688px;top:70px;right:20px;height:370px;border-radius:22px;background:#fff;padding:16px;display:flex;flex-direction:column;gap:6px;box-shadow:0 16px 30px -22px rgba(5,40,18,.7)}
+.c3 .cap{color:rgba(12,36,22,.5);display:flex;justify-content:space-between;margin-top:6px}
+.c3 .cap:first-child{margin-top:0}
+.c3 .cap b{color:#0c2416;font-weight:700}
+.c3 .row{height:32px;display:flex;align-items:center;gap:10px;font:600 13px "Archivo"}
+.c3 .row>i{width:16px;height:16px;border-radius:50%;background:var(--c);flex:none;box-shadow:inset 0 -2px 4px rgba(0,0,0,.2)}
+.c3 .row>span:first-of-type{flex:1;min-width:0}
+.c3 .stp{display:flex;align-items:center;gap:2px;background:#f0efe8;border-radius:999px;padding:2px}
+.c3 .stp em{width:24px;height:24px;border-radius:50%;display:grid;place-items:center}
+.c3 .stp em .i{width:12px;height:12px;stroke-width:2.6}
+.c3 .stp em:last-child{background:#0c2416;color:#fff}
+.c3 .stp b{min-width:16px;text-align:center;font:700 12px "JetBrains Mono"}
+.c3 .tr{height:6px;border-radius:3px;background:#ecebe3;position:relative;margin:8px 0 6px}
+.c3 .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#2f7bff,#ff8a3d)}
+.c3 .tr u{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.c3 .sw{width:36px;height:21px;border-radius:999px;background:#d9d8cf;position:relative;flex:none}
+.c3 .sw::after{content:"";position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.c3 .sw.on{background:#0c2416}.c3 .sw.on::after{left:18px}
+.c3-tl{left:96px;right:20px;top:452px;bottom:16px;border-radius:22px;background:#0c2416;color:#eafff2;padding:14px 18px 14px 12px;display:flex;gap:14px;box-shadow:0 16px 30px -22px rgba(5,40,18,.7)}
+.c3 .tp{width:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;flex:none}
+.c3 .play{width:52px;height:52px;border-radius:50%;background:#d8f86a;color:#0c2416;display:grid;place-items:center}
+.c3 .play .i{width:22px;height:22px}
+.c3 .rec{height:28px;padding:0 11px;border-radius:999px;background:rgba(255,255,255,.1);display:flex;align-items:center;gap:6px;font:600 12px "Archivo";white-space:nowrap}
+.c3 .rec i{width:8px;height:8px;border-radius:50%;background:#ff5a3d}
+.c3 .tracks{flex:1;min-width:0;display:flex;gap:10px}
+.c3 .labels{width:84px;flex:none;display:flex;flex-direction:column;gap:8px}
+.c3 .labels em{display:flex;align-items:center;font:600 11.5px "Archivo";font-style:normal;color:rgba(234,255,242,.6)}
+.c3 .lanes{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;gap:8px}
+.c3 .ruler{height:16px;position:relative;border-bottom:1px solid rgba(255,255,255,.12)}
+.c3 .ruler span{position:absolute;top:0;transform:translateX(-50%);font:500 10px "JetBrains Mono";color:rgba(234,255,242,.45)}
+.c3 .ruler span:first-child{transform:none}
+.c3 .ruler span:last-child{transform:translateX(-100%)}
+.c3 .lane{border-radius:10px;background:rgba(255,255,255,.05);position:relative}
+.c3 .ev{position:absolute;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;padding:4px 10px 4px 7px;border-radius:999px;background:rgba(255,255,255,.1);font:600 11px "Archivo";white-space:nowrap}
+.c3 .ev::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.c3 .lane svg{position:absolute;inset:0;width:100%;height:100%}
+.c3 .phd{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#d8f86a}
+.c3 .phd b{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:#d8f86a;color:#0c2416;font:700 10px "JetBrains Mono";padding:2px 6px;border-radius:6px}
+
+/* ---------- P1 · heure dorée ---------- */
+.p1{background:#ffd6ad;color:#1b1530}
+.p1 .gx{background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border:1px solid rgba(255,255,255,.72);box-shadow:0 18px 38px -22px rgba(30,20,70,.55),inset 0 1px 0 rgba(255,255,255,.85);border-radius:22px}
+.p1-brand{left:20px;top:18px;height:50px;padding:0 18px 0 8px;display:flex;align-items:center;gap:8px;border-radius:999px!important}
+.p1-brand .g{width:36px}
+.p1-brand b{font:900 26px/1 "Archivo";font-stretch:70%}
+.p1-seg{left:50%;top:18px;transform:translateX(-50%);height:50px;padding:6px;display:flex;gap:2px;border-radius:999px!important}
+.p1-seg span{padding:0 17px;border-radius:999px;font:600 13.5px/38px "Archivo";display:flex;align-items:center;gap:5px;white-space:nowrap}
+.p1-seg .on{background:#fff;box-shadow:0 4px 12px -6px rgba(30,20,70,.5)}
+.p1-seg .i{width:13px;height:13px;color:#f59e0b}
+.p1-back{right:20px;top:18px;height:50px;padding:0 18px 0 12px;border-radius:999px!important;display:flex;align-items:center;gap:6px;font:700 13px "Archivo";white-space:nowrap}
+.p1-back .i{width:16px;height:16px}
+.p1-dock{left:20px;top:168px;width:80px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.p1-dock span{height:62px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:600 11px "Archivo"}
+.p1-dock .on{background:#1b1530;color:#fff}
+.p1-card{right:20px;top:86px;width:216px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.p1 .cap{color:rgba(27,21,48,.55)}
+.p1 .kv{display:flex;justify-content:space-between;align-items:baseline;font:600 13px "Archivo"}
+.p1 .kv b{font:700 20px "JetBrains Mono";letter-spacing:-.02em}
+.p1 .kv small{font-size:11px;color:rgba(27,21,48,.55);font-weight:600}
+.p1 .bar{height:6px;border-radius:3px;background:rgba(27,21,48,.12);overflow:hidden;margin-top:-3px}
+.p1 .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#22c55e,#facc15,#fb923c)}
+.p1 .sepl{height:1px;background:rgba(27,21,48,.12);margin:2px 0}
+.p1 .li{display:flex;align-items:center;gap:6px;font:600 13px "Archivo";height:28px}
+.p1 .li small{margin-left:auto;font-size:11.5px;color:rgba(27,21,48,.55)}
+.p1 .li .i{width:14px;height:14px;opacity:.5}
+.p1-go{left:50%;bottom:20px;transform:translateX(-50%);height:64px;padding:8px 8px 8px 10px;display:flex;align-items:center;gap:12px;border-radius:999px!important}
+.p1 .ring{width:44px;height:44px;display:block;flex:none}
+.p1 .bt small{display:block;font:600 10.5px "Archivo";color:rgba(27,21,48,.55)}
+.p1 .bt b{font:700 15px "JetBrains Mono"}
+.p1 .sep{width:1px;height:28px;background:rgba(27,21,48,.15)}
+.p1 .hint{font:600 13px "Archivo";white-space:nowrap}
+.p1 .go{height:48px;padding:0 24px 0 18px;border-radius:999px;background:#1b1530;color:#fff;display:flex;align-items:center;gap:8px;font:800 15px "Archivo";white-space:nowrap}
+.p1 .go .i{width:16px;height:16px}
+
+/* ---------- P2 · diorama ---------- */
+.p2{background:radial-gradient(640px 420px at 50% 46%,rgba(255,255,255,.7),rgba(255,255,255,0) 70%),linear-gradient(160deg,#c6e3ff 0%,#ead8ff 52%,#ffe2cc 100%);color:#2b2350}
+.p2 .cl{background:#fff;border-radius:24px;box-shadow:inset 0 -5px 0 rgba(70,50,140,.08),inset 0 3px 0 #fff,0 14px 26px -12px rgba(90,60,170,.45)}
+.p2-brand{left:22px;top:18px;height:54px;padding:0 20px 0 10px;display:flex;align-items:center;gap:8px;border-radius:999px!important}
+.p2-brand .g{width:36px}
+.p2-brand b{font:900 26px/1 "Archivo";font-stretch:75%}
+.p2-budget{left:50%;top:22px;transform:translateX(-50%);height:46px;padding:0 18px;display:flex;align-items:center;gap:10px;border-radius:999px!important;font:800 13px "Archivo";white-space:nowrap}
+.p2 .tk{width:150px;height:14px;border-radius:7px;background:#eee8ff;box-shadow:inset 0 2px 3px rgba(70,50,140,.15);overflow:hidden}
+.p2 .tk i{display:block;height:100%;border-radius:7px;background:linear-gradient(180deg,#ffd27a,#ffab3d)}
+.p2-budget b{font:800 13px "JetBrains Mono"}
+.p2-stars{right:136px;top:22px;height:46px;padding:0 16px;display:flex;align-items:center;gap:6px;border-radius:999px!important;font:800 15px "Archivo";white-space:nowrap}
+.p2-stars .i{color:#ffb800;width:20px;height:20px}
+.p2-back{right:22px;top:22px;height:46px;padding:0 16px 0 10px;display:flex;align-items:center;gap:4px;border-radius:999px!important;font:800 13px "Archivo";white-space:nowrap}
+.p2-back .i{width:16px;height:16px}
+.p2-tools{left:22px;top:170px;display:flex;flex-direction:column;gap:14px}
+.p2-tools span{width:74px;height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:800 11.5px "Archivo"}
+.p2-tools .i{width:26px;height:26px;stroke-width:2.4}
+.p2-tools .on{background:#ffb547;color:#fff;box-shadow:inset 0 -5px 0 rgba(160,80,0,.18),inset 0 3px 0 rgba(255,255,255,.45),0 14px 24px -10px rgba(255,140,40,.6)}
+.p2-sens{right:22px;top:170px;display:flex;flex-direction:column;gap:12px;width:160px}
+.p2-sens .cl{padding:12px 14px;border-radius:20px}
+.p2-sens small{display:block;font:700 11px "Archivo";color:rgba(43,35,80,.55)}
+.p2-sens b{font:800 20px "Archivo"}
+.p2 .mini{height:8px;border-radius:4px;background:#eee8ff;margin-top:6px;overflow:hidden}
+.p2 .mini i{display:block;height:100%;background:linear-gradient(90deg,#5fd38d,#ffcf4d,#ff8a5b);border-radius:4px}
+.p2-levels{left:22px;bottom:22px;display:flex;gap:12px}
+.p2-levels>span{width:150px;height:76px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.p2-levels .on{background:#2b2350;color:#fff;box-shadow:inset 0 -5px 0 rgba(0,0,0,.25),inset 0 3px 0 rgba(255,255,255,.12),0 14px 26px -12px rgba(43,35,80,.7)}
+.p2-levels svg{width:44px;height:44px;flex:none}
+.p2-levels b{display:block;font:800 15px "Archivo"}
+.p2-levels em{font-style:normal;color:#ffb800;letter-spacing:2px;font-size:14px}
+.p2-levels s{text-decoration:none;color:rgba(43,35,80,.2)}
+.p2-levels .on s{color:rgba(255,255,255,.25)}
+.p2-go{right:22px;bottom:22px;width:104px;height:104px;border-radius:50%;background:#36d67e;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:inset 0 -7px 0 rgba(0,90,40,.25),inset 0 4px 0 rgba(255,255,255,.45),0 18px 30px -12px rgba(20,160,80,.7);font:900 14px "Archivo";text-transform:uppercase;letter-spacing:.05em}
+.p2-go .i{width:34px;height:34px}
+
+/* ---------- P3 · simulation de nuit ---------- */
+.p3{background:#0a0f24;color:#e6ecff}
+.p3 .dk{background:rgba(13,20,44,.62);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(150,180,255,.16);border-radius:16px;box-shadow:0 24px 44px -26px rgba(0,0,0,.9)}
+.p3-brand{left:22px;top:20px;height:44px;display:flex;align-items:center;gap:10px}
+.p3-brand .g{width:36px}
+.p3-brand b{font:900 26px/1 "Archivo";font-stretch:70%;color:#fff}
+.p3-brand em{font:700 10px "JetBrains Mono";font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:#38bdf8;border:1px solid rgba(56,189,248,.5);border-radius:6px;padding:4px 6px}
+.p3-seg{left:50%;top:20px;transform:translateX(-50%);height:44px;padding:5px;display:flex;gap:2px;border-radius:12px!important}
+.p3-seg span{padding:0 16px;border-radius:8px;font:600 13px/34px "Archivo";color:#aab6d8;white-space:nowrap}
+.p3-seg .on{background:#e6ecff;color:#0a0f24}
+.p3-back{right:22px;top:20px;height:44px;padding:0 16px 0 10px;border-radius:12px!important;display:flex;align-items:center;gap:6px;font:600 13px "Archivo";white-space:nowrap}
+.p3-back .i{width:16px;height:16px}
+.p3-tools{left:22px;top:150px;width:56px;padding:6px;display:flex;flex-direction:column;gap:4px;border-radius:14px!important}
+.p3-tools span{height:44px;border-radius:10px;display:grid;place-items:center;color:#aab6d8}
+.p3-tools .on{background:#38bdf8;color:#04121f}
+.p3-tools .sp{height:1px;background:rgba(150,180,255,.16);margin:4px 6px}
+.p3-insp{right:22px;top:80px;width:232px;padding:16px;display:flex;flex-direction:column;gap:7px}
+.p3 .cap{color:#7f8bb0}
+.p3 .tt{font:800 18px "Archivo";color:#fff}
+.p3 .sub{color:#7f8bb0;font-size:12px;margin-top:-4px}
+.p3 .big{display:flex;align-items:baseline;gap:4px;color:#ff5d5d}
+.p3 .big .num{font-size:54px}
+.p3 .big>span:nth-child(2){font:800 20px "Archivo"}
+.p3 .big em{margin-left:auto;font:600 11px "Archivo";font-style:normal;color:#7f8bb0}
+.p3 .heat{height:6px;border-radius:3px;background:linear-gradient(90deg,#22c55e,#facc15 50%,#fb923c 75%,#ef4444);position:relative;margin:2px 0 6px}
+.p3 .heat u{position:absolute;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #0d142c}
+.p3 .kv{display:flex;justify-content:space-between;font:500 12.5px "Archivo";color:#aab6d8}
+.p3 .kv b{font:600 12.5px "JetBrains Mono";color:#fff}
+.p3 .ln{height:1px;background:rgba(150,180,255,.14);margin:4px 0}
+.p3-run{left:22px;right:22px;bottom:20px;height:84px;padding:12px 18px 12px 12px;display:flex;align-items:center;gap:12px;border-radius:18px!important}
+.p3 .go{height:58px;padding:0 24px 0 18px;border-radius:12px;background:#38bdf8;color:#04121f;display:flex;align-items:center;gap:8px;font:800 15px "Archivo";white-space:nowrap}
+.p3 .go .i{width:16px;height:16px}
+.p3 .ib{width:46px;height:46px;border-radius:12px;border:1px solid rgba(150,180,255,.2);display:grid;place-items:center;color:#aab6d8;flex:none}
+.p3 .chart{flex:1;min-width:0;height:58px;display:flex;flex-direction:column;gap:5px;margin-left:6px}
+.p3 .ch{display:flex;justify-content:space-between}
+.p3 .ch .cap:last-child{color:#ff7a7a}
+.p3 .chart svg{flex:1;width:100%;display:block}
+.p3 .tm{text-align:right;width:84px;flex:none}
+.p3 .tm small{display:block;color:#7f8bb0;font-size:11px}
+.p3 .tm b{font:600 22px "JetBrains Mono";color:#fff}
+.p3 .call{position:absolute;left:-200px;top:-200px;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
+.p3 .call span{font:700 12px "JetBrains Mono";padding:5px 9px;border-radius:8px;background:rgba(230,236,255,.95);color:#0a0f24;white-space:nowrap}
+.p3 .call::after{content:"";width:1px;height:24px;background:rgba(230,236,255,.85)}
+.p3 .call i{position:absolute;bottom:-4px;left:50%;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:#fff}
+.p3 .call.hot span{background:#ff4d4d;color:#fff;box-shadow:0 0 22px rgba(255,77,77,.65)}
+.p3 .call.hot::after{background:#ff8080}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.2A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.7-2.8L14 9.5V3M7.6 15h8.8"/></symbol>
+  <symbol id="i-law" viewBox="0 0 24 24"><path d="M12 4v16M7 20h10M5 8h14M5 8l-2.5 6a2.5 2.5 0 0 0 5 0zM19 8l-2.5 6a2.5 2.5 0 0 0 5 0z"/></symbol>
+  <symbol id="i-knobs" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5.5v13M15 5.5v13" stroke-width="2.8"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></symbol>
+  <symbol id="i-step" viewBox="0 0 24 24"><path d="M6 5v14M10 12h9M15 8l4 4-4 4"/></symbol>
+  <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="currentColor"/></symbol>
+  <symbol id="i-beam" viewBox="0 0 24 24"><rect x="3" y="9.5" width="18" height="5" rx="1.5"/><path d="M8 9.5v5M12 9.5v5M16 9.5v5"/></symbol>
+  <symbol id="i-cable" viewBox="0 0 24 24"><path d="M4 18L20 6"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="6" r="2" fill="currentColor"/></symbol>
+  <symbol id="i-erase" viewBox="0 0 24 24"><path d="M8.5 19.5L3.8 14.8a1.8 1.8 0 0 1 0-2.6l8.4-8.4a1.8 1.8 0 0 1 2.6 0l5.4 5.4a1.8 1.8 0 0 1 0 2.6L13 19.5zM8.5 19.5H20M7 11l7 7"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 6L4 11l5 5M4 11h10.5a5 5 0 0 1 0 10H12"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5 3l6.5 17 2.4-7.1L21 10.5z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.4 1.2-3.7 2.3-5 .4 1.4 1.2 2.3 2.2 2.6C11 8.2 11.2 5.6 12 3z"/></symbol>
+</svg>
+
+<div class="wrap">
+
+<header class="intro">
+  <div>
+    <p class="label">auralab · planches · labos · v2</p>
+    <h1>labo <span>chimie</span> et labo <span>ponts</span></h1>
+    <p class="lede">Chaque labo garde son propre look. Le labo chimie reste sur le vert d'EcoLab, le labo ponts reste un jeu en 3D plein écran. Il y a trois pistes très modernes pour chacun. Les scènes ponts sont de vraies 3D qui bougent. Dis-moi les codes que tu gardes (par exemple C1 + P3).</p>
+  </div>
+  <div class="keep">
+    <p class="label">Ce qui ne bouge pas</p>
+    <ul>
+      <li>Chimie : fond vert EcoLab <b>#6cc95a</b></li>
+      <li>Ponts : 3D plein écran, l'interface flotte sur les bords</li>
+      <li>Fantôme fiole et nom en minuscules partout</li>
+      <li>Rien ne se chevauche, tout tient sans défiler</li>
+    </ul>
+  </div>
+</header>
+
+<!-- ============================ CHIMIE ============================ -->
+<h2 class="part">labo chimie <small>fond vert EcoLab · son propre look, différent du labo ponts</small></h2>
+
+<section class="board">
+  <div class="board-head"><span class="code">C1</span><h2>Verrerie flottante</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c1">
+      <div class="ab c1-brand"><span class="g" data-ghost="white"></span><b>labo chimie</b></div>
+      <nav class="ab gls c1-seg"><span class="on">Labo</span><span>Lois</span><span>Réglages</span><span>Carnet</span></nav>
+      <span class="ab gls c1-back"><svg class="i"><use href="#i-back"/></svg>tous les labos</span>
+      <aside class="ab gls c1-left">
+        <p class="cap">Flacons</p>
+        <div class="rg"><i style="--c:#2563eb"></i><div><b>Bleue</b><small>solution</small></div><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <div class="rg"><i style="--c:#facc15"></i><div><b>Jaune</b><small>solution</small></div><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <div class="rg"><i style="--c:#f97316"></i><div><b>Acide</b><small>doux</small></div><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>0</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <p class="cap">Matériel</p>
+        <div class="tg"><span>Erlenmeyer 500 mL</span><span class="sw on"></span></div>
+        <div class="tg"><span>Bec bunsen</span><span class="sw on"></span></div>
+        <div class="sl"><div><span>Puissance du bec</span><b>60 %</b></div><div class="tr"><i style="width:60%"></i><u style="left:60%"></u></div></div>
+      </aside>
+      <div class="ab c1-stage" data-flask="glass"></div>
+      <aside class="ab c1-right">
+        <div class="gls w w-t">
+          <div class="wh"><p class="cap">Température</p><span class="chip">↗ chauffe</span></div>
+          <p class="num big">41,2<sup>°C</sup></p>
+          <svg class="spark" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10V50H0Z" fill="#ff5a3d" fill-opacity=".16"/><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10" fill="none" stroke="#ff5a3d" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+        </div>
+        <div class="gls w">
+          <div class="wh"><p class="cap">pH</p><span class="mut">neutre</span></div>
+          <p class="num mid">6,8</p>
+          <div class="phb"><u style="left:48.6%"></u></div>
+          <div class="phl"><span>acide</span><span>basique</span></div>
+        </div>
+        <div class="gls w">
+          <div class="wh"><p class="cap">Volume</p><span class="mut">sur 500 mL</span></div>
+          <p class="num mid">320<sup>mL</sup></p>
+          <div class="vb"><i style="width:64%"></i></div>
+        </div>
+      </aside>
+      <div class="ab gls c1-bar">
+        <span class="ib ink"><svg class="i"><use href="#i-pause"/></svg></span>
+        <span class="ib"><svg class="i"><use href="#i-reset"/></svg></span>
+        <span class="ib"><svg class="i"><use href="#i-step"/></svg></span>
+        <span class="sep"></span>
+        <span class="stat"><i></i>Bleu + jaune → vert</span>
+        <span class="sep"></span>
+        <span class="pl ink"><svg class="i"><use href="#i-rec"/></svg>Mesurer</span>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Plus de cadre sombre : l'erlenmeyer flotte en grand au milieu du vert, en verre brillant, avec ses bulles et la goutte qui tombe. Autour, des panneaux de verre dépoli : les flacons à gauche, les mesures en gros chiffres à droite, les commandes dans une barre en bas.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0b2a17"></b><b style="background:#46ea96"></b><b style="background:#ff5a3d"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>L'expérience au centre, rien d'autre</li><li>Les chiffres se lisent de loin, même au tableau</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Lois et carnet passent dans les onglets du haut</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">C2</span><h2>Bento</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c2">
+      <div class="ab c2-brand"><span class="g" data-ghost="white"></span><b>labo chimie</b></div>
+      <span class="ab c2-live"><i></i>en direct · 00:42</span>
+      <span class="ab c2-back"><svg class="i"><use href="#i-back"/></svg>tous les labos</span>
+      <div class="ab c2-grid">
+        <section class="t hero">
+          <div class="th"><p class="cap"><i class="dot"></i>Paillasse</p><div class="ibs"><span><svg class="i"><use href="#i-pause"/></svg></span><span><svg class="i"><use href="#i-reset"/></svg></span><span><svg class="i"><use href="#i-step"/></svg></span></div></div>
+          <div class="fl" data-flask="neon"></div>
+          <div class="laws"><span class="lw">Mélange des couleurs</span><span class="lw">Réaction acide</span><span class="lw">Chauffage</span></div>
+        </section>
+        <section class="t temp">
+          <p class="cap">Température</p>
+          <p class="num">41,2<sup>°C</sup></p>
+          <svg class="spark" viewBox="0 0 200 50" preserveAspectRatio="none"><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10V50H0Z" fill="#ff5a3d" fill-opacity=".14"/><path d="M0 46L25 45L50 44L75 40L100 33L125 25L150 18L175 13L200 10" fill="none" stroke="#ff5a3d" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+        </section>
+        <section class="t ph">
+          <div class="donut"><span class="num">6,8</span><u style="--a:356deg"></u></div>
+          <div><p class="cap">pH</p><b>neutre</b><small>de 6 à 8</small></div>
+        </section>
+        <section class="t vol">
+          <div><p class="cap">Volume</p><p class="num">320<sup>mL</sup></p><small>sur 500 mL</small></div>
+          <svg class="bk" viewBox="0 0 62 86"><path d="M16 34h30v40a5 5 0 0 1-5 5H21a5 5 0 0 1-5-5z" fill="#0c2416"/><path d="M8 5h46M12 5v68a8 8 0 0 0 8 8h22a8 8 0 0 0 8-8V5" fill="none" stroke="#0c2416" stroke-width="3.5" stroke-linecap="round"/><path d="M18 14h8M18 22h12M18 30h8" stroke="#0c2416" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </section>
+        <section class="t bec">
+          <svg class="dial" viewBox="0 0 100 100"><defs><linearGradient id="c2dl" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="10" stroke-linecap="round" stroke-dasharray="188.5 251.3" transform="rotate(135 50 50)"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#c2dl)" stroke-width="10" stroke-linecap="round" stroke-dasharray="113.1 251.3" transform="rotate(135 50 50)"/><path d="M50 31c3 9 11.5 13 11.5 23.5a11.5 11.5 0 0 1-23 0c0-5.6 2.8-8.6 5.3-11.6.9 3.3 2.8 5.4 5.1 6C47.2 42.6 47.8 37 50 31z" fill="#ff8a3d"/></svg>
+          <div><p class="cap">Bec bunsen</p><p class="num">60<sup>%</sup></p><em>● allumé</em></div>
+        </section>
+        <section class="t fla">
+          <p class="cap">Flacons <small>touche pour verser</small></p>
+          <div class="drops">
+            <span class="dp"><i style="--c:#2563eb"><svg class="i"><use href="#i-plus"/></svg></i><b>Bleue</b><small>× 1</small></span>
+            <span class="dp"><i style="--c:#facc15"><svg class="i"><use href="#i-plus"/></svg></i><b>Jaune</b><small>× 1</small></span>
+            <span class="dp"><i style="--c:#f97316"><svg class="i"><use href="#i-plus"/></svg></i><b>Acide</b><small>× 0</small></span>
+          </div>
+        </section>
+        <section class="t nb">
+          <p class="cap">Carnet</p>
+          <p class="q">Bleu + jaune : quelle couleur obtiens-tu ?</p>
+          <div class="btns"><span class="pl ink"><svg class="i"><use href="#i-pen"/></svg>Écrire</span><span class="pl">Mesurer</span></div>
+        </section>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Tout le labo en tuiles arrondies, comme une page produit récente. Une grande tuile sombre pour la paillasse, puis une tuile par mesure, une pour les flacons, une pour le bec et une pour le carnet. Rien n'est caché derrière un onglet.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0c2416"></b><b style="background:#d8f86a"></b><b style="background:#f4f1e4"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>Tout est visible d'un coup d'œil</li><li>Une tuile = une seule chose</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Sur téléphone, les tuiles s'empilent</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">C3</span><h2>Studio avec frise du temps</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m c3">
+      <div class="ab c3-brand"><span class="g" data-ghost="white"></span><b>labo chimie</b></div>
+      <span class="ab c3-title">Expérience 1 · couleurs<svg class="i"><use href="#i-pen"/></svg></span>
+      <span class="ab c3-saved"><svg class="i"><use href="#i-check"/></svg>enregistré</span>
+      <span class="ab c3-back"><svg class="i"><use href="#i-back"/></svg>tous les labos</span>
+      <nav class="ab c3-rail">
+        <span class="on"><svg class="i"><use href="#i-flask"/></svg>Labo</span>
+        <span><svg class="i"><use href="#i-law"/></svg>Lois</span>
+        <span><svg class="i"><use href="#i-knobs"/></svg>Réglages</span>
+        <span><svg class="i"><use href="#i-book"/></svg>Carnet</span>
+      </nav>
+      <div class="ab c3-canvas">
+        <div class="fl" data-flask="paper"></div>
+        <span class="tag" style="left:344px;top:174px"><i></i><span>Erlenmeyer · 315 mL</span></span>
+        <span class="tag solo" style="left:244px;top:331px"><span>Bec bunsen · 60 %</span></span>
+        <span class="zoom"><svg class="i"><use href="#i-minus"/></svg>100 %<svg class="i"><use href="#i-plus"/></svg></span>
+      </div>
+      <aside class="ab c3-insp">
+        <p class="cap">Flacons</p>
+        <div class="row"><i style="--c:#2563eb"></i><span>Solution bleue</span><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <div class="row"><i style="--c:#facc15"></i><span>Solution jaune</span><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>1</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <div class="row"><i style="--c:#f97316"></i><span>Acide doux</span><span class="stp"><em><svg class="i"><use href="#i-minus"/></svg></em><b>0</b><em><svg class="i"><use href="#i-plus"/></svg></em></span></div>
+        <p class="cap">Bec bunsen <b>60 %</b></p>
+        <div class="tr"><i style="width:60%"></i><u style="left:60%"></u></div>
+        <p class="cap">Lois</p>
+        <div class="row"><span>Mélange des couleurs</span><span class="sw on"></span></div>
+        <div class="row"><span>Réaction acide</span><span class="sw on"></span></div>
+        <div class="row"><span>Chauffage</span><span class="sw on"></span></div>
+      </aside>
+      <div class="ab c3-tl">
+        <div class="tp"><span class="play"><svg class="i"><use href="#i-play"/></svg></span><span class="rec"><i></i>Mesurer</span></div>
+        <div class="tracks">
+          <div class="labels"><span style="height:16px"></span><em style="height:34px">Gestes</em><em style="height:50px">Température</em></div>
+          <div class="lanes">
+            <div class="ruler"><span style="left:0%">0:00</span><span style="left:33.33%">0:20</span><span style="left:66.67%">0:40</span><span style="left:100%">1:00</span></div>
+            <div class="lane" style="height:34px">
+              <span class="ev" style="left:8.3%;--c:#2563eb">+ bleu</span>
+              <span class="ev" style="left:23.3%;--c:#facc15">+ jaune</span>
+              <span class="ev" style="left:40%;--c:#ff8a3d">bec 60 %</span>
+            </div>
+            <div class="lane" style="height:50px">
+              <svg viewBox="0 0 600 50" preserveAspectRatio="none"><path d="M0 42L240 42C300 41 380 24 460 10V50H0Z" fill="#ff8a3d" fill-opacity=".18"/><path d="M0 42L240 42C300 41 380 24 460 10" fill="none" stroke="#ff8a3d" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+            </div>
+            <div class="phd" style="left:76.7%"><b>0:46</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Comme un logiciel de montage : la paillasse sur une feuille quadrillée, les réglages à droite, et en bas une frise du temps qui garde chaque geste et la courbe de température. On rejoue l'expérience en faisant glisser la tête de lecture.</p>
+      <div class="swatch"><b style="background:#6cc95a"></b><b style="background:#0c2416"></b><b style="background:#d8f86a"></b><b style="background:#f7f5ec"></b> fond #6cc95a</div></div>
+    <div><p class="label">Pour</p><ul><li>Le carnet se remplit tout seul</li><li>Idéal pour comparer deux essais</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Plus d'éléments à l'écran</li><li>La frise demande du code en plus</li></ul></div>
+  </div>
+</section>
+
+<!-- ============================ PONTS ============================ -->
+<h2 class="part">labo ponts <small>3D plein écran · vraie 3D dans les planches, elle bouge</small></h2>
+
+<section class="board">
+  <div class="board-head"><span class="code">P1</span><h2>Heure dorée</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m p1" data-scene="p1">
+      <div class="ab gx p1-brand"><span class="g" data-ghost="ink"></span><b>labo ponts</b></div>
+      <nav class="ab gx p1-seg"><span class="on">Ruisseau<svg class="i"><use href="#i-star"/></svg></span><span>Rivière</span><span>Fleuve</span></nav>
+      <span class="ab gx p1-back"><svg class="i"><use href="#i-back"/></svg>tous les labos</span>
+      <nav class="ab gx p1-dock">
+        <span class="on"><svg class="i"><use href="#i-beam"/></svg>Poutre</span>
+        <span><svg class="i"><use href="#i-cable"/></svg>Câble</span>
+        <span><svg class="i"><use href="#i-erase"/></svg>Gomme</span>
+        <span><svg class="i"><use href="#i-undo"/></svg>Annuler</span>
+      </nav>
+      <aside class="ab gx p1-card">
+        <p class="cap">Capteurs</p>
+        <div class="kv"><span>Flèche</span><b>12 <small>mm</small></b></div>
+        <div class="kv"><span>Contrainte</span><b>68 <small>%</small></b></div>
+        <div class="bar"><i style="width:68%"></i></div>
+        <div class="kv"><span>Coût</span><b>34 <small>/ 80</small></b></div>
+        <div class="sepl"></div>
+        <div class="li"><span>Lois</span><small>4 actives</small><svg class="i"><use href="#i-chev"/></svg></div>
+        <div class="li"><span>Réglages</span><small>20 t</small><svg class="i"><use href="#i-chev"/></svg></div>
+        <div class="li"><span>Carnet</span><small>2 notes</small><svg class="i"><use href="#i-chev"/></svg></div>
+      </aside>
+      <div class="ab gx p1-go">
+        <svg class="ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(27,21,48,.12)" stroke-width="5"/><circle cx="22" cy="22" r="18" fill="none" stroke="#1b1530" stroke-width="5" stroke-linecap="round" stroke-dasharray="48 113.1" transform="rotate(-90 22 22)"/></svg>
+        <div class="bt"><small>Budget</small><b>34 / 80</b></div>
+        <span class="sep"></span>
+        <span class="hint">Relie les deux rives</span>
+        <span class="go"><svg class="i"><use href="#i-play"/></svg>Tester</span>
+      </div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">La vallée en 3D plein écran, avec une lumière de fin de journée. L'interface en verre dépoli flotte sur les bords : les outils à gauche, les capteurs à droite, un gros bouton « Tester » en bas. Le pont reste libre au centre.</p>
+      <div class="swatch"><b style="background:#6d9cf0"></b><b style="background:#ffd6ad"></b><b style="background:#8fd063"></b><b style="background:#1b1530"></b> verre + ciel chaud</div></div>
+    <div><p class="label">Pour</p><ul><li>Le plus élégant, le décor respire</li><li>Le jeu actuel s'y adapte facilement : décor et HUD</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Le flou du verre coûte un peu sur les vieux PC</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">P2</span><h2>Diorama</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m p2" data-scene="p2">
+      <div class="ab cl p2-brand"><span class="g" data-ghost="ink"></span><b>labo ponts</b></div>
+      <div class="ab cl p2-budget"><span>Budget</span><div class="tk"><i style="width:42%"></i></div><b>34/80</b></div>
+      <span class="ab cl p2-stars"><svg class="i"><use href="#i-star"/></svg>4 / 9</span>
+      <span class="ab cl p2-back"><svg class="i"><use href="#i-back"/></svg>labos</span>
+      <nav class="ab p2-tools">
+        <span class="cl on"><svg class="i"><use href="#i-beam"/></svg>Poutre</span>
+        <span class="cl"><svg class="i"><use href="#i-cable"/></svg>Câble</span>
+        <span class="cl"><svg class="i"><use href="#i-erase"/></svg>Gomme</span>
+      </nav>
+      <aside class="ab p2-sens">
+        <div class="cl"><small>Flèche</small><b>12 mm</b></div>
+        <div class="cl"><small>Contrainte</small><b>68 %</b><div class="mini"><i style="width:68%"></i></div></div>
+      </aside>
+      <div class="ab p2-levels">
+        <span class="cl on"><svg viewBox="0 0 48 48"><path d="M5 22h38l-3 7H8z" fill="#d69c63"/><path d="M8 29h32l-6 10H14z" fill="#a5abc6"/><rect x="4" y="17" width="40" height="6" rx="3" fill="#8fd46b"/><rect x="22" y="17" width="4" height="6" fill="#5fcdff"/></svg><div><b>Ruisseau</b><em>★★★</em></div></span>
+        <span class="cl"><svg viewBox="0 0 48 48"><path d="M5 22h38l-3 7H8z" fill="#d69c63"/><path d="M8 29h32l-6 10H14z" fill="#a5abc6"/><rect x="4" y="17" width="40" height="6" rx="3" fill="#8fd46b"/><rect x="20" y="17" width="8" height="6" fill="#5fcdff"/></svg><div><b>Rivière</b><em>★<s>★★</s></em></div></span>
+        <span class="cl"><svg viewBox="0 0 48 48"><path d="M5 22h38l-3 7H8z" fill="#d69c63"/><path d="M8 29h32l-6 10H14z" fill="#a5abc6"/><rect x="4" y="17" width="40" height="6" rx="3" fill="#8fd46b"/><rect x="17" y="17" width="14" height="6" fill="#5fcdff"/></svg><div><b>Fleuve</b><em><s>★★★</s></em></div></span>
+      </div>
+      <span class="ab p2-go"><svg class="i"><use href="#i-play"/></svg>Tester</span>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Chaque site devient une petite île qui flotte, coupée comme un gâteau (herbe, terre, roche), avec sa cascade. Les boutons sont ronds et moelleux, les cartes de niveaux sont en bas et un gros bouton vert lance le test.</p>
+      <div class="swatch"><b style="background:#c6e3ff"></b><b style="background:#ead8ff"></b><b style="background:#ffb547"></b><b style="background:#36d67e"></b> pastel + pâte à modeler</div></div>
+    <div><p class="label">Pour</p><ul><li>Très ludique, on a envie de jouer</li><li>Caméra fixe : simple à prendre en main</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Vue de plus loin : pour poser une pièce, il faut zoomer</li></ul></div>
+  </div>
+</section>
+
+<section class="board">
+  <div class="board-head"><span class="code">P3</span><h2>Simulation de nuit</h2></div>
+  <div class="frame"><div class="viewport">
+    <div class="m p3" data-scene="p3">
+      <div class="ab p3-brand"><span class="g" data-ghost="white"></span><b>labo ponts</b><em>simulation</em></div>
+      <nav class="ab dk p3-seg"><span>Ruisseau</span><span class="on">Rivière</span><span>Fleuve</span></nav>
+      <span class="ab dk p3-back"><svg class="i"><use href="#i-back"/></svg>tous les labos</span>
+      <nav class="ab dk p3-tools">
+        <span><svg class="i"><use href="#i-cursor"/></svg></span>
+        <span class="on"><svg class="i"><use href="#i-beam"/></svg></span>
+        <span><svg class="i"><use href="#i-cable"/></svg></span>
+        <span><svg class="i"><use href="#i-erase"/></svg></span>
+        <span class="sp"></span>
+        <span><svg class="i"><use href="#i-undo"/></svg></span>
+      </nav>
+      <aside class="ab dk p3-insp">
+        <p class="cap">Pièce sélectionnée</p>
+        <b class="tt">Diagonale D7</b>
+        <small class="sub">acier · 3,1 m</small>
+        <div class="big"><span class="num">92</span><span>%</span><em>contrainte</em></div>
+        <div class="heat"><u style="left:92%"></u></div>
+        <div class="kv"><span>Effort</span><b>18,4 kN</b></div>
+        <div class="kv"><span>Limite</span><b>20,0 kN</b></div>
+        <div class="ln"></div>
+        <p class="cap">Capteurs</p>
+        <div class="kv"><span>Flèche</span><b>18 mm</b></div>
+        <div class="kv"><span>Coût</span><b>96 / 120</b></div>
+        <div class="kv"><span>Charge</span><b>20 t</b></div>
+      </aside>
+      <div class="ab dk p3-run">
+        <span class="go"><svg class="i"><use href="#i-play"/></svg>Tester</span>
+        <span class="ib"><svg class="i"><use href="#i-reset"/></svg></span>
+        <div class="chart">
+          <div class="ch"><span class="cap">Contrainte max</span><span class="cap">rupture 100 %</span></div>
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none"><defs><linearGradient id="p3a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".35"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></linearGradient></defs><path d="M0 3H600" stroke="#ef4444" stroke-dasharray="6 6" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M0 38L40 37L80 35L120 32L160 28L200 24L240 19L280 15L320 12L360 9L400 7L427 6V40H0Z" fill="url(#p3a)"/><path d="M0 38L40 37L80 35L120 32L160 28L200 24L240 19L280 15L320 12L360 9L400 7L427 6" fill="none" stroke="#38bdf8" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="M427 0V40" stroke="#ffffff" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>
+        </div>
+        <div class="tm"><small>temps</small><b>3,2 s</b></div>
+      </div>
+      <div class="call hot" data-p="-0.625,2.03,1.75"><span>92 %</span><i></i></div>
+      <div class="call" data-p="0,2.75,0"><span>20 t</span><i></i></div>
+    </div>
+  </div></div>
+  <div class="notes">
+    <div><p class="pitch">Une ambiance de logiciel d'ingénieur : nuit bleue, terrain en fil de fer, et chaque pièce du pont s'allume du vert au rouge selon l'effort qu'elle subit. Une étiquette suit la pièce la plus chargée et la courbe d'effort défile en bas.</p>
+      <div class="swatch"><b style="background:#0a0f24"></b><b style="background:#38bdf8"></b><b style="background:#22c55e"></b><b style="background:#ef4444"></b> nuit + chaleur</div></div>
+    <div><p class="label">Pour</p><ul><li>On voit la physique en direct</li><li>Le plus « tech » des trois</li></ul></div>
+    <div><p class="label">Contre</p><ul><li>Plus sombre et plus dense que les deux autres</li></ul></div>
+  </div>
+</section>
+
+</div>
+<script src="core/ghost.js"></script>
+<script src="app-ponts/vendor/three.min.js"></script>
+<script>
+// Flask drawing (chimie mockups) + ghosts + scaling.
+(function () {
+  function flask(kind, n) {
+    const P = {
+      glass: { st: "#ffffff", a: .34, b: .1, top: "#46ea96", bot: "#0f9d56", men: "#a8f8cb", bub: "#eafff2", stand: "#0b2a17", sh: "#0b2a17", sho: .2, mk: "#ffffff", hl: .62, glow: "", drop: true },
+      neon: { st: "#c9ffdc", a: .1, b: .03, top: "#72ffad", bot: "#11b862", men: "#cbffe0", bub: "#effff5", stand: "#3e6250", sh: "#000000", sho: .4, mk: "#c9ffdc", hl: .3, glow: "drop-shadow(0 0 16px rgba(93,255,158,.6))", drop: false },
+      paper: { st: "#0c2416", a: .05, b: .015, top: "#52e49c", bot: "#17a95e", men: "#bdf6d5", bub: "#ffffff", stand: "#0c2416", sh: "#0c2416", sho: .1, mk: "#0c2416", hl: 0, glow: "", drop: false },
+    }[kind];
+    const id = "fk" + n, L = 252;
+    const body = "M172 40V172L74 350Q63 372 88 374H312Q337 372 326 350L228 172V40Z";
+    const edge = (y) => 228 + (98 * (y - 172)) / 178;
+    let marks = "", labels = "";
+    [[205, "400"], [262, "300"], [318, "200"]].forEach(([y, l]) => {
+      const e = edge(y);
+      marks += `M${(e - 26).toFixed(1)} ${y}H${(e - 12).toFixed(1)}`;
+      labels += `<text x="${(e - 31).toFixed(1)}" y="${y + 4}" text-anchor="end">${l}</text>`;
+    });
+    const bubs = [[150, 362, 4, -.3], [176, 350, 3, -1.1], [204, 366, 5, -1.9], [230, 356, 3.5, -.7], [252, 364, 4, -2.4], [190, 342, 2.5, -1.5], [220, 370, 3, -2.9]]
+      .map(([x, y, r, d]) => `<circle class="bub" cx="${x}" cy="${y}" r="${r}" style="animation-delay:${d}s;--rise:${-(y - L - 10)}px"/>`).join("");
+    return `<svg class="fk" viewBox="0 0 400 460" aria-hidden="true"><defs>` +
+      `<linearGradient id="${id}g" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="${P.a}"/><stop offset=".55" stop-color="#fff" stop-opacity="${P.b}"/><stop offset="1" stop-color="#fff" stop-opacity="${(P.a * .7).toFixed(2)}"/></linearGradient>` +
+      `<linearGradient id="${id}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.top}"/><stop offset="1" stop-color="${P.bot}"/></linearGradient>` +
+      `<radialGradient id="${id}f" cx=".5" cy=".82" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".28" stop-color="#c4e8ff"/><stop offset=".7" stop-color="#3b82f6"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/></radialGradient>` +
+      `<clipPath id="${id}c"><path d="${body}"/></clipPath></defs>` +
+      `<ellipse cx="200" cy="452" rx="165" ry="8" fill="${P.sh}" opacity="${P.sho}"/>` +
+      `<path d="M200 388V446" stroke="${P.stand}" stroke-width="5" stroke-linecap="round" opacity=".5"/>` +
+      `<g class="flame"><path d="M200 364C216 381 219 398 200 413C181 398 184 381 200 364Z" fill="url(#${id}f)"/></g>` +
+      `<rect x="183" y="412" width="34" height="36" rx="7" fill="${P.stand}"/><rect x="177" y="405" width="46" height="10" rx="5" fill="${P.stand}"/>` +
+      `<rect x="60" y="376" width="280" height="9" rx="4.5" fill="${P.stand}"/>` +
+      `<path d="M84 384L62 450M316 384L338 450" stroke="${P.stand}" stroke-width="6" stroke-linecap="round"/>` +
+      `<path d="${body}" fill="url(#${id}g)"/>` +
+      `<g style="filter:${P.glow || "none"}"><g clip-path="url(#${id}c)"><rect x="0" y="${L}" width="400" height="140" fill="url(#${id}l)"/>` +
+      `<ellipse cx="200" cy="${L}" rx="74" ry="6" fill="${P.men}" opacity=".9"/><g fill="${P.bub}" opacity=".85">${bubs}</g></g></g>` +
+      (P.drop ? `<g class="drop" style="animation-delay:-1s"><path d="M200 2C206 12 209 17 209 21A9 9 0 0 1 191 21C191 17 194 12 200 2Z" fill="#facc15"/></g>` +
+        `<ellipse class="rip" cx="200" cy="${L}" rx="9" ry="2.4" fill="none" stroke="#ffffff" stroke-width="1.2" vector-effect="non-scaling-stroke" style="animation-delay:-1s"/>` : "") +
+      `<path d="${body}" fill="none" stroke="${P.st}" stroke-width="4.5" stroke-linejoin="round"/>` +
+      `<ellipse cx="200" cy="40" rx="30" ry="5.5" fill="none" stroke="${P.st}" stroke-width="4.5"/>` +
+      (P.hl ? `<path d="M186 56V168L105 316" fill="none" stroke="#ffffff" stroke-opacity="${P.hl}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>` +
+        `<path d="M96 334L90 346" stroke="#ffffff" stroke-opacity="${(P.hl * .6).toFixed(2)}" stroke-width="4" stroke-linecap="round"/>` : "") +
+      `<path d="${marks}" stroke="${P.mk}" stroke-width="2" stroke-linecap="round" opacity=".75"/>` +
+      `<g fill="${P.mk}" opacity=".75" font-family="JetBrains Mono, monospace" font-size="11">${labels}</g>` +
+      `</svg>`;
+  }
+  document.querySelectorAll("[data-flask]").forEach((h, i) => { h.innerHTML = flask(h.dataset.flask, i); });
+  document.querySelectorAll(".m .g").forEach((h) => { if (window.AuraGhost) window.AuraGhost.mount(h, h.dataset.ghost || "white"); });
+  const fit = () => document.querySelectorAll(".viewport").forEach((v) => v.querySelector(".m").style.setProperty("--s", v.clientWidth / 1000));
+  addEventListener("resize", fit);
+  fit();
+})();
+
+// Real 3D for the ponts mockups (three.js, the same build as app-ponts).
+(function () {
+  const T = window.THREE;
+  if (!T) return;
+  const still = /still/.test(location.search);
+  const reduce = still || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (T.ColorManagement && "legacyMode" in T.ColorManagement) T.ColorManagement.legacyMode = false;
+  const W = 1000, H = 620, UP = new T.Vector3(0, 1, 0);
+  const V = (x, y, z) => new T.Vector3(x, y, z);
+  const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  const shade = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
+
+  function makeRenderer(host, o) {
+    const r = new T.WebGLRenderer({ antialias: true, alpha: !!o.alpha, preserveDrawingBuffer: still });
+    r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    r.setSize(W, H, false);
+    r.outputEncoding = T.sRGBEncoding;
+    r.toneMapping = o.tone ? T.ACESFilmicToneMapping : T.NoToneMapping;
+    r.toneMappingExposure = o.tone || 1;
+    r.shadowMap.enabled = true;
+    r.shadowMap.type = T.PCFSoftShadowMap;
+    if (o.alpha) r.setClearColor(0x000000, 0);
+    r.domElement.className = "gl";
+    host.insertBefore(r.domElement, host.firstChild);
+    return r;
+  }
+  // Moves the picture left by dx px (to keep the bridge clear of the side panels).
+  function shiftView(cam, dx) {
+    const fw = W + 2 * Math.abs(dx);
+    cam.aspect = fw / H;
+    cam.setViewOffset(fw, H, Math.abs(dx) + dx, 0, W, H);
+  }
+  function shadowSetup(light, s) {
+    light.castShadow = true;
+    light.shadow.mapSize.set(2048, 2048);
+    const c = light.shadow.camera;
+    c.left = -s; c.right = s; c.top = s; c.bottom = -s; c.near = 1; c.far = 170;
+    light.shadow.bias = -0.0004;
+    light.shadow.normalBias = 0.03;
+  }
+  function box(x0, x1, y0, y1, z0, z1, mat) {
+    const m = new T.Mesh(new T.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat);
+    m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    return shade(m);
+  }
+  function along(m, a, b) {
+    const d = new T.Vector3().subVectors(b, a);
+    m.position.copy(a).addScaledVector(d, 0.5);
+    m.quaternion.setFromUnitVectors(UP, d.normalize());
+    return m;
+  }
+  function rod(a, b, r, mat, seg) {
+    return shade(along(new T.Mesh(new T.CylinderGeometry(r, r, a.distanceTo(b), seg || 8, 1), mat), a, b));
+  }
+  function capsule(a, b, r, mat) {
+    return shade(along(new T.Mesh(new T.CapsuleGeometry(r, Math.max(0.001, a.distanceTo(b)), 6, 14), mat), a, b));
+  }
+  // The flask ghost of the logo, turned on a lathe: cap, neck, round body, eyes, cheeks, smile.
+  function makeGhost(body, dark, cheek) {
+    const prof = [[0, 0], [0.7, 0], [0.78, 0.08], [0.78, 0.45], [0.745, 0.716], [0.641, 0.94], [0.468, 1.116], [0.225, 1.25], [0.225, 1.6], [0.35, 1.6], [0.35, 1.75], [0, 1.75]]
+      .map((p) => new T.Vector2(p[0], p[1]));
+    const g = new T.Group();
+    g.add(shade(new T.Mesh(new T.LatheGeometry(prof, 48), body)));
+    const eyeG = new T.SphereGeometry(0.085, 16, 12), chG = new T.SphereGeometry(0.1, 16, 10);
+    [-1, 1].forEach((s) => {
+      const e = new T.Mesh(eyeG, dark); e.scale.set(1, 1.3, 0.55); e.position.set(s * 0.225, 0.62, 0.72); g.add(e);
+      const c = new T.Mesh(chG, cheek); c.scale.set(1.2, 0.55, 0.3); c.position.set(s * 0.46, 0.4, 0.62); g.add(c);
+    });
+    const sm = new T.Mesh(new T.TorusGeometry(0.065, 0.017, 8, 16, Math.PI), dark);
+    sm.rotation.z = Math.PI; sm.position.set(0, 0.45, 0.77); g.add(sm);
+    return g;
+  }
+  function skyDome(zenith, mid, horizon) {
+    const R = 420, g = new T.SphereGeometry(R, 32, 24);
+    const p = g.attributes.position, col = new Float32Array(p.count * 3);
+    const cz = new T.Color(zenith), cm = new T.Color(mid), ch = new T.Color(horizon), c = new T.Color();
+    for (let i = 0; i < p.count; i++) {
+      const t = p.getY(i) / R;
+      if (t <= 0) c.copy(ch);
+      else if (t < 0.12) c.copy(ch).lerp(cm, t / 0.12);
+      else c.copy(cm).lerp(cz, Math.min(1, (t - 0.12) / 0.5));
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    }
+    g.setAttribute("color", new T.BufferAttribute(col, 3));
+    return new T.Mesh(g, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false }));
+  }
+  // Low-poly valley: a river along z (bridge site at z = 0), flat banks and a road near the bridge, hills beyond.
+  function valley(o) {
+    const half = o.half;
+    const cx = (z) => 2.2 * Math.sin(z * 0.045);
+    const height = (x, z) => {
+      const d = Math.abs(x - cx(z));
+      const cut = -4.2 * (1 - sstep(half - 0.5, half + 2.5, d));
+      const keep = Math.max(sstep(3.5, 9, Math.abs(z)), sstep(o.road, o.road + 10, d));
+      const hills = sstep(half + 6, half + 34, d) * (5 + 3.2 * Math.sin(x * 0.085 + 1.3) + 2.4 * Math.cos(z * 0.11 + 0.7));
+      const back = sstep(-14, -70, z) * sstep(half + 3, half + 18, d) * 14;
+      const bumps = 0.4 * Math.sin(x * 1.27 + z * 0.31) * Math.cos(z * 1.13 - x * 0.2) * sstep(half + 2.5, half + 6, d);
+      return cut + (hills + back + bumps) * keep;
+    };
+    const g0 = new T.PlaneGeometry(180, 230, 150, 190);
+    g0.rotateX(-Math.PI / 2);
+    g0.translate(0, 0, -45);
+    const p0 = g0.attributes.position;
+    for (let i = 0; i < p0.count; i++) p0.setY(i, height(p0.getX(i), p0.getZ(i)));
+    const geo = g0.toNonIndexed();
+    const p = geo.attributes.position;
+    const col = new Float32Array(p.count * 3);
+    const rand = rng(o.seed || 7), c = new T.Color();
+    for (let i = 0; i < p.count; i += 3) {
+      const x = (p.getX(i) + p.getX(i + 1) + p.getX(i + 2)) / 3;
+      const y = (p.getY(i) + p.getY(i + 1) + p.getY(i + 2)) / 3;
+      const z = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
+      const d = Math.abs(x - cx(z));
+      let hex;
+      if (y < -2.4) hex = o.pal.bed;
+      else if (d < half + 2.6 && y < 0.3) hex = o.pal.sand;
+      else if (y > 7) hex = o.pal.rock;
+      else hex = o.pal.grass[(rand() * o.pal.grass.length) | 0];
+      c.set(hex).offsetHSL(0, 0, (rand() - 0.5) * (o.jitter || 0.03));
+      for (let k = 0; k < 3; k++) { col[(i + k) * 3] = c.r; col[(i + k) * 3 + 1] = c.g; col[(i + k) * 3 + 2] = c.b; }
+    }
+    geo.setAttribute("color", new T.BufferAttribute(col, 3));
+    geo.computeVertexNormals();
+    const mesh = new T.Mesh(geo, new T.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, metalness: 0, polygonOffset: !!o.poly, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }));
+    mesh.receiveShadow = true;
+    return { mesh, geo, height, cx };
+  }
+  function segDist(px, pz, ax, az, bx, bz) {
+    const vx = bx - ax, vz = bz - az;
+    const t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz)));
+    return Math.hypot(px - ax - t * vx, pz - az - t * vz);
+  }
+  function forest(scene, v, o) {
+    const rand = rng(o.seed);
+    const cone = new T.ConeGeometry(1, 1, 7); cone.translate(0, 0.5, 0);
+    const stem = new T.CylinderGeometry(0.13, 0.18, 1, 6); stem.translate(0, 0.5, 0);
+    const ball = new T.IcosahedronGeometry(1, 0);
+    const leaf = o.leaf.map((c) => new T.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.9 }));
+    const wood = new T.MeshStandardMaterial({ color: o.wood, flatShading: true, roughness: 1 });
+    for (let n = 0; n < o.count; n++) {
+      const x = (rand() - 0.5) * 170, z = -125 + rand() * 175;
+      const s = 0.75 + rand() * 0.9, round = rand() > 0.72, li = (rand() * leaf.length) | 0, rot = rand() * 6.283;
+      if (!o.ok(x, z)) continue;
+      const y = v.height(x, z);
+      if (y < -1) continue;
+      const g = new T.Group();
+      const st = new T.Mesh(stem, wood); st.scale.set(s, 0.9 * s, s); g.add(shade(st));
+      if (!round) { const k = new T.Mesh(cone, leaf[li]); k.scale.set(1.15 * s, 3 * s, 1.15 * s); k.position.y = 0.55 * s; g.add(shade(k)); }
+      else { const b = new T.Mesh(ball, leaf[li]); b.scale.setScalar(1.15 * s); b.position.y = 1.7 * s; g.add(shade(b)); }
+      g.position.set(x, y - 0.15, z); g.rotation.y = rot;
+      scene.add(g);
+    }
+  }
+  function puffs(scene, list, mat, geo) {
+    const out = [];
+    list.forEach(([x, y, z, s]) => {
+      const g = new T.Group();
+      [[0, 0, 0, 1.5], [1.6, -0.25, 0.2, 1.1], [-1.5, -0.35, -0.1, 1.05], [0.5, 0.6, -0.2, 1.05], [-0.4, 0.45, 0.5, 0.9]].forEach(([a, b, c, r]) => {
+        const m = new T.Mesh(geo, mat); m.position.set(a, b, c); m.scale.setScalar(r); g.add(m);
+      });
+      g.position.set(x, y, z); g.scale.setScalar(s); scene.add(g); out.push(g);
+    });
+    return out;
+  }
+  const heatStops = [[0, "#22c55e"], [0.5, "#facc15"], [0.75, "#fb923c"], [1, "#ef4444"]].map(([t, h]) => [t, new T.Color(h)]);
+  function heat(t) {
+    for (let i = 1; i < heatStops.length; i++) {
+      if (t <= heatStops[i][0]) { const a = heatStops[i - 1], b = heatStops[i]; return a[1].clone().lerp(b[1], (t - a[0]) / (b[0] - a[0])); }
+    }
+    return heatStops[heatStops.length - 1][1].clone();
+  }
+
+  // ---------- P1: golden hour, cable-stayed bridge ----------
+  function sceneP1(host) {
+    const renderer = makeRenderer(host, { tone: 1.05 });
+    const scene = new T.Scene();
+    const HZ = "#ffd6ad";
+    scene.add(skyDome("#6d9cf0", "#b8d2ff", HZ));
+    scene.fog = new T.Fog(HZ, 55, 185);
+    const camera = new T.PerspectiveCamera(38, W / H, 0.1, 1500);
+    camera.position.set(13, 9, 36);
+    camera.lookAt(0, 2.4, 0);
+    shiftView(camera, 50);
+    scene.add(new T.HemisphereLight("#d8e7ff", "#7d8f50", 0.85));
+    const sun = new T.DirectionalLight("#ffd09a", 1.8);
+    sun.position.set(-26, 20, 16);
+    shadowSetup(sun, 34);
+    scene.add(sun);
+    const half = 6;
+    const v = valley({ half, road: 30, seed: 11, jitter: 0.035, pal: { grass: ["#8fd063", "#86c95a", "#9ad66c", "#80c257"], sand: "#eedaa5", bed: "#c4c290", rock: "#c4b9a5" } });
+    scene.add(v.mesh);
+    const water = new T.Mesh(new T.PlaneGeometry(180, 230), new T.MeshStandardMaterial({ color: "#58b8ff", roughness: 0.14, metalness: 0.05, transparent: true, opacity: 0.9 }));
+    water.rotation.x = -Math.PI / 2; water.position.set(0, -2.2, -45); water.receiveShadow = true;
+    scene.add(water);
+    const roadM = new T.MeshStandardMaterial({ color: "#f0e6cf", roughness: 1 });
+    scene.add(box(-30, -half - 2, 0, 0.06, -1.6, 1.6, roadM), box(half + 2, 30, 0, 0.06, -1.6, 1.6, roadM));
+    const cam = camera.position;
+    forest(scene, v, {
+      seed: 21, count: 320, wood: "#8a5a3c", leaf: ["#3f9d4f", "#52b25a", "#2f8a46", "#67bd5c"],
+      ok: (x, z) => { const d = Math.abs(x - v.cx(z)); return d > half + 4.5 && !(Math.abs(z) < 6.5 && d < 34) && segDist(x, z, cam.x, cam.z, 0, 0) > 8 && Math.hypot(x - cam.x, z - cam.z) > 14; },
+    });
+    // Deck, rails, abutments, two H pylons and their fans of cables.
+    const L = half + 4, n = 10, seg = (2 * L) / n;
+    const deckA = new T.MeshStandardMaterial({ color: "#f3eee5", roughness: 0.7 }), deckB = new T.MeshStandardMaterial({ color: "#e7dfd1", roughness: 0.7 });
+    for (let i = 0; i < n; i++) { const x0 = -L + i * seg; scene.add(box(x0 + 0.04, x0 + seg - 0.04, 0.2, 0.7, -1.6, 1.6, i % 2 ? deckB : deckA)); }
+    const white = new T.MeshStandardMaterial({ color: "#ffffff", roughness: 0.5 });
+    [-1.55, 1.55].forEach((z) => {
+      scene.add(box(-L, L, 0.9, 1.02, z - 0.06, z + 0.06, white));
+      for (let x = -L; x <= L + 0.01; x += 2) scene.add(box(x - 0.05, x + 0.05, 0.7, 0.95, z - 0.05, z + 0.05, white));
+    });
+    const conc = new T.MeshStandardMaterial({ color: "#e4ddd0", roughness: 0.9 });
+    scene.add(box(-L - 0.5, -half - 1.5, -2.6, 0.2, -1.9, 1.9, conc), box(half + 1.5, L + 0.5, -2.6, 0.2, -1.9, 1.9, conc));
+    // Suspension: two white pylons, two ink main cables sagging over the river, thin vertical hangers.
+    const cable = new T.MeshStandardMaterial({ color: "#2a2340", roughness: 0.45 });
+    const hang = new T.MeshStandardMaterial({ color: "#5b5470", roughness: 0.6 });
+    const P = half + 3, top = 7.6, ZC = 2.0;
+    const yc = (x) => 1.5 + (top - 0.3 - 1.5) * (x / P) ** 2;
+    [-1, 1].forEach((s) => {
+      const x = s * P;
+      [-ZC, ZC].forEach((z) => scene.add(box(x - 0.25, x + 0.25, 0, top, z - 0.25, z + 0.25, white)));
+      scene.add(box(x - 0.25, x + 0.25, top - 0.45, top, -ZC - 0.25, ZC + 0.25, white));
+      [-ZC, ZC].forEach((z) => {
+        scene.add(rod(V(x, top - 0.3, z), V(s * (P + 5), 0.3, z), 0.06, cable));
+        scene.add(box(s * (P + 5) - 0.35, s * (P + 5) + 0.35, 0, 0.45, z - 0.35, z + 0.35, conc));
+      });
+    });
+    [-ZC, ZC].forEach((z) => {
+      for (let x = -P; x < P - 0.01; x += 1) scene.add(rod(V(x, yc(x), z), V(x + 1, yc(x + 1), z), 0.065, cable));
+      for (let x = -P + 1; x <= P - 1 + 0.01; x += 1) scene.add(rod(V(x, yc(x), z), V(x, 0.95, z * 0.8), 0.022, hang, 5));
+    });
+    const ghost = makeGhost(new T.MeshStandardMaterial({ color: "#fbf8ff", roughness: 0.38 }), new T.MeshStandardMaterial({ color: "#17141f", roughness: 0.3 }), new T.MeshStandardMaterial({ color: "#ff9a62", roughness: 0.6 }));
+    ghost.scale.setScalar(1.5);
+    scene.add(ghost);
+    return {
+      renderer, scene, camera,
+      update(t) {
+        ghost.position.set(-6 + 12 * (0.5 - 0.5 * Math.cos(t * 0.4 + 1.2)), 0.7 + 0.08 * Math.abs(Math.sin(t * 4.2)), 0);
+        ghost.lookAt(cam.x, ghost.position.y, cam.z);
+      },
+    };
+  }
+
+  // ---------- P2: floating island diorama ----------
+  function sceneP2(host) {
+    const renderer = makeRenderer(host, { alpha: true, tone: 0 });
+    const scene = new T.Scene();
+    const hh = 18.5, hw = (hh * W) / H;
+    const camera = new T.OrthographicCamera(-hw, hw, hh, -hh, -200, 400);
+    camera.position.set(30, 24, 30);
+    camera.lookAt(0, -1, 0);
+    scene.add(new T.HemisphereLight("#ffffff", "#c9b8ff", 0.95));
+    const key = new T.DirectionalLight("#fff3e2", 1.3);
+    key.position.set(10, 24, 16);
+    shadowSetup(key, 26);
+    scene.add(key);
+    const fill = new T.DirectionalLight("#c4d4ff", 0.45);
+    fill.position.set(-16, 8, -4);
+    scene.add(fill);
+    const clay = (c, o) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.62, metalness: 0 }, o || {}));
+    const M = {
+      grass: clay("#8fd46b"), soil: clay("#d69c63"), rock: clay("#a5abc6"), rock2: clay("#8f95b2"), sand: clay("#f1dca6"), road: clay("#f6e7c6"),
+      water: clay("#5fcdff", { transparent: true, opacity: 0.84, roughness: 0.15 }), fall: clay("#9fe5ff", { transparent: true, opacity: 0.8, roughness: 0.2 }), white: clay("#ffffff", { roughness: 0.9 }),
+    };
+    const R = 3.5, X = 14, Z = 10;
+    scene.add(box(-X + 1.2, X - 1.2, -6.4, -4.6, -Z + 1.2, Z - 1.2, M.rock2));
+    scene.add(box(-X, X, -4.6, -3.2, -Z, Z, M.rock));
+    scene.add(box(-X, X, -3.2, -2.6, -Z, Z, M.soil));
+    scene.add(box(-R, R, -2.6, -2.25, -Z, Z, M.sand));
+    [-1, 1].forEach((s) => {
+      const a = s < 0 ? -X : R, b = s < 0 ? -R : X;
+      scene.add(box(a, b, -2.6, -0.6, -Z, Z, M.soil));
+      scene.add(box(s < 0 ? a - 0.15 : a, s < 0 ? b : b + 0.15, -0.6, 0, -Z - 0.15, Z + 0.15, M.grass));
+      scene.add(box(s < 0 ? -X + 0.2 : R + 0.1, s < 0 ? -R - 0.1 : X - 0.2, 0, 0.06, -1.2, 1.2, M.road));
+    });
+    scene.add(box(-R, R, -2.25, -0.75, -Z, Z, M.water));
+    scene.add(box(-R + 0.2, R - 0.2, -7.4, -0.75, Z, Z + 0.3, M.fall));
+    const ball = new T.SphereGeometry(1, 24, 16);
+    [[-2.2, -7.4, 10.6, 0.9], [-0.6, -7.8, 10.8, 1.15], [1.1, -7.5, 10.6, 1], [2.5, -7.2, 10.5, 0.75], [0.2, -6.9, 11.2, 0.7]].forEach(([x, y, z, r]) => {
+      const m = new T.Mesh(ball, M.white); m.position.set(x, y, z); m.scale.setScalar(r); scene.add(m);
+    });
+    // River details: lily pads and stones.
+    const pad = clay("#6fd26a");
+    [[-1.6, -6], [1.5, -3.6], [-1.2, 6.6], [1.8, 7.8]].forEach(([x, z]) => { const m = new T.Mesh(new T.CylinderGeometry(0.5, 0.5, 0.06, 20), pad); m.position.set(x, -0.72, z); scene.add(m); });
+    const stone = clay("#b7bdd6");
+    [[2.5, -0.85, 5.2, 0.55], [-2.6, -0.85, -8, 0.6], [-11, 0.1, -1.9, 0.5], [8.6, 0.1, 2.1, 0.45]].forEach(([x, y, z, r]) => { const m = shade(new T.Mesh(ball, stone)); m.position.set(x, y, z); m.scale.set(r, r * 0.6, r); scene.add(m); });
+    // Trees: round clay trees and two-cone pines.
+    const trunk = clay("#b9835a");
+    const leafs = ["#5fcf7d", "#7fdc84", "#4ec27a", "#93e07a"].map((c) => clay(c, { roughness: 0.55 }));
+    const cone = new T.ConeGeometry(1, 1.3, 20);
+    [[-12, -7.5, 1, 0, 0], [-9.5, -8.3, 0.8, 1, 1], [-12.6, -3.4, 0.85, 0, 2], [-7.2, -6.8, 0.9, 0, 3], [-11.2, 6.8, 1.1, 0, 0], [-8.4, 8.2, 0.75, 1, 2], [-12.8, 8.8, 0.7, 1, 1], [-6.2, 4.8, 0.7, 0, 3],
+      [7.2, -7.6, 1, 0, 1], [10.4, -6, 0.85, 1, 0], [12.6, -8.6, 0.75, 0, 2], [12.2, 4.6, 1.05, 0, 3], [9.2, 7.6, 0.9, 1, 1], [6.4, 6.2, 0.7, 0, 0], [12.9, -3, 0.7, 1, 2]]
+      .forEach(([x, z, s, kind, li]) => {
+        const g = new T.Group();
+        g.add(capsule(V(0, 0, 0), V(0, 0.9 * s, 0), 0.16 * s, trunk));
+        if (kind === 0) { const b = shade(new T.Mesh(ball, leafs[li])); b.scale.setScalar(s); b.position.y = 1.6 * s; g.add(b); }
+        else [0, 1].forEach((k) => { const c = shade(new T.Mesh(cone, leafs[li])); c.scale.setScalar(s * (1 - k * 0.25)); c.position.y = (1.3 + k * 0.8) * s; g.add(c); });
+        g.position.set(x, 0, z); scene.add(g);
+      });
+    const flower = [clay("#ff8fb8"), clay("#ffd23f"), clay("#ffffff")];
+    const fr = rng(4);
+    for (let i = 0; i < 26; i++) {
+      const s = fr() < 0.5 ? -1 : 1, x = s * (4.4 + fr() * 9), z = (fr() - 0.5) * 19, f = flower[(fr() * 3) | 0];
+      if (Math.abs(z) < 1.8) continue;
+      const m = new T.Mesh(ball, f); m.scale.setScalar(0.13); m.position.set(x, 0.12, z); scene.add(m);
+    }
+    // Chunky clay bridge: planks, rails, posts and a red arch underneath.
+    const plankA = clay("#ffb547"), plankB = clay("#ffca72"), red = clay("#ff7a59");
+    const DL = 4.8;
+    for (let i = 0; i < 10; i++) { const x0 = -DL + i * 0.96; scene.add(box(x0 + 0.04, x0 + 0.92, 0.2, 0.55, -1.35, 1.35, i % 2 ? plankB : plankA)); }
+    [-1.3, 1.3].forEach((z) => {
+      scene.add(capsule(V(-DL, 1.18, z), V(DL, 1.18, z), 0.13, red));
+      for (let x = -4.5; x <= 4.6; x += 2.25) scene.add(capsule(V(x, 0.55, z), V(x, 1.18, z), 0.1, red));
+      let prev = null;
+      for (let k = 0; k <= 8; k++) {
+        const x = -R + (2 * R * k) / 8, p = V(x, -0.75 + 0.9 * (1 - (x / R) ** 2), z * 0.8);
+        if (prev) scene.add(capsule(prev, p, 0.17, red));
+        prev = p;
+      }
+    });
+    const ghost = makeGhost(clay("#ffffff", { roughness: 0.5 }), clay("#2b2350", { roughness: 0.4 }), clay("#ff9fb3"));
+    ghost.scale.setScalar(1.45);
+    scene.add(ghost);
+    const clouds = puffs(scene, [[-16.2, 4, 10, 0.95], [19.2, -6, -12.9, 0.9], [16, -12, -0.9, 0.8]], clay("#ffffff", { roughness: 0.95 }), ball);
+    return {
+      renderer, scene, camera,
+      update(t) {
+        ghost.position.set(-1.4, 0.55 + 0.08 * Math.abs(Math.sin(t * 3.2)), 0);
+        ghost.lookAt(camera.position.x, ghost.position.y, camera.position.z);
+        clouds.forEach((c, i) => { c.position.y += Math.sin(t * 0.6 + i * 2) * 0.004; });
+      },
+    };
+  }
+
+  // ---------- P3: night simulation, truss coloured by stress ----------
+  function sceneP3(host) {
+    const renderer = makeRenderer(host, { tone: 0 });
+    const scene = new T.Scene();
+    const HZ = "#131b42";
+    scene.add(skyDome("#02040b", "#080e28", HZ));
+    scene.fog = new T.Fog(HZ, 32, 130);
+    const camera = new T.PerspectiveCamera(40, W / H, 0.1, 1500);
+    camera.position.set(19, 8.5, 26);
+    camera.lookAt(0, 1.8, 0);
+    shiftView(camera, 70);
+    scene.add(new T.HemisphereLight("#4a64e0", "#03050c", 0.6));
+    const moon = new T.DirectionalLight("#aabdff", 0.8);
+    moon.position.set(18, 26, -12);
+    shadowSetup(moon, 30);
+    scene.add(moon);
+    const half = 7;
+    const v = valley({ half, road: 30, seed: 5, jitter: 0.02, poly: true, pal: { grass: ["#18214a", "#1b2552", "#151e44"], sand: "#1f2a58", bed: "#0b1130", rock: "#26316a" } });
+    scene.add(v.mesh);
+    scene.add(new T.Mesh(v.geo, new T.MeshBasicMaterial({ color: "#3b9dff", wireframe: true, transparent: true, opacity: 0.08 })));
+    const water = new T.Mesh(new T.PlaneGeometry(180, 230), new T.MeshStandardMaterial({ color: "#0b2a55", emissive: "#06183a", roughness: 0.12, metalness: 0.55, transparent: true, opacity: 0.95 }));
+    water.rotation.x = -Math.PI / 2; water.position.set(0, -2.2, -45); water.receiveShadow = true;
+    scene.add(water);
+    const sr = rng(99), sp = new Float32Array(700 * 3);
+    for (let i = 0; i < 700; i++) {
+      const th = sr() * 6.283, el = 0.04 + sr() * 1.3, Rr = 380;
+      sp[i * 3] = Rr * Math.cos(el) * Math.cos(th); sp[i * 3 + 1] = Rr * Math.sin(el); sp[i * 3 + 2] = Rr * Math.cos(el) * Math.sin(th);
+    }
+    const sg = new T.BufferGeometry(); sg.setAttribute("position", new T.BufferAttribute(sp, 3));
+    scene.add(new T.Points(sg, new T.PointsMaterial({ color: "#dfe8ff", size: 1.6, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.85 })));
+    const roadM = new T.MeshStandardMaterial({ color: "#1f2850", roughness: 0.9 });
+    const dash = new T.MeshStandardMaterial({ color: "#38bdf8", emissive: "#38bdf8", emissiveIntensity: 0.8 });
+    [-1, 1].forEach((s) => {
+      scene.add(box(s < 0 ? -30 : half + 2, s < 0 ? -half - 2 : 30, 0, 0.06, -1.6, 1.6, roadM));
+      for (let x = half + 4; x < 30; x += 2) scene.add(box(s * x - 0.4, s * x + 0.4, 0.06, 0.08, -0.05, 0.05, dash));
+    });
+    const cam = camera.position;
+    forest(scene, v, {
+      seed: 8, count: 260, wood: "#1b2236", leaf: ["#173548", "#1c3d52", "#14303f", "#21475c"],
+      ok: (x, z) => { const d = Math.abs(x - v.cx(z)); return d > half + 4.5 && !(Math.abs(z) < 6.5 && d < 34) && segDist(x, z, cam.x, cam.z, 0, 0) > 8 && Math.hypot(x - cam.x, z - cam.z) > 14; },
+    });
+    // Deck and abutments.
+    scene.add(box(-11, 11, 0.45, 0.75, -1.6, 1.6, new T.MeshStandardMaterial({ color: "#1a2240", roughness: 0.6, metalness: 0.3 })));
+    [-1.62, 1.62].forEach((z) => scene.add(box(-11, 11, 0.74, 0.8, z - 0.03, z + 0.03, dash)));
+    const abut = new T.MeshStandardMaterial({ color: "#232c52", roughness: 0.9 });
+    scene.add(box(-11.6, -8.4, -2.6, 0.45, -1.9, 1.9, abut), box(8.4, 11.6, -2.6, 0.45, -1.9, 1.9, abut));
+    // Warren truss: every member glows with its stress (green → red), hottest under the load.
+    const y0 = 0.78, y1 = 3.3;
+    const xs = Array.from({ length: 9 }, (_, i) => -10 + 2.5 * i), xt = Array.from({ length: 8 }, (_, i) => -8.75 + 2.5 * i);
+    const members = [];
+    [-1.75, 1.75].forEach((z) => {
+      for (let i = 0; i < 8; i++) members.push([V(xs[i], y0, z), V(xs[i + 1], y0, z)]);
+      for (let i = 0; i < 7; i++) members.push([V(xt[i], y1, z), V(xt[i + 1], y1, z)]);
+      for (let i = 0; i < 8; i++) { members.push([V(xs[i], y0, z), V(xt[i], y1, z)]); members.push([V(xt[i], y1, z), V(xs[i + 1], y0, z)]); }
+    });
+    for (let i = 0; i < 8; i++) members.push([V(xt[i], y1, -1.75), V(xt[i], y1, 1.75)]);
+    members.forEach(([a, b]) => {
+      const mx = (a.x + b.x) / 2, c = heat(0.12 + 0.82 * Math.exp(-(mx * mx) / 26));
+      scene.add(rod(a, b, 0.11, new T.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 0.8, roughness: 0.4, metalness: 0.2 })));
+      const glow = rod(a, b, 0.3, new T.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.14, blending: T.AdditiveBlending, depthWrite: false }));
+      glow.castShadow = false; glow.receiveShadow = false; scene.add(glow);
+    });
+    const node = new T.MeshStandardMaterial({ color: "#cfd8ff", emissive: "#4a5cff", emissiveIntensity: 0.35 }), nodeG = new T.SphereGeometry(0.17, 12, 10);
+    [-1.75, 1.75].forEach((z) => { xs.forEach((x) => { const m = new T.Mesh(nodeG, node); m.position.set(x, y0, z); scene.add(m); }); xt.forEach((x) => { const m = new T.Mesh(nodeG, node); m.position.set(x, y1, z); scene.add(m); }); });
+    const sel = rod(V(-1.25, y1, 1.75), V(0, y0, 1.75), 0.42, new T.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.22, blending: T.AdditiveBlending, depthWrite: false }));
+    sel.castShadow = false; scene.add(sel);
+    const warm = new T.PointLight("#ff5a3d", 2.2, 20, 2); warm.position.set(0, -1.3, 0); scene.add(warm);
+    const cool = new T.PointLight("#38bdf8", 0.9, 30, 2); cool.position.set(-9, 4, 5); scene.add(cool);
+    const ghost = makeGhost(new T.MeshStandardMaterial({ color: "#eef2ff", emissive: "#7288ff", emissiveIntensity: 0.22, roughness: 0.35 }), new T.MeshStandardMaterial({ color: "#0a0f24" }), new T.MeshStandardMaterial({ color: "#ff7a8a", emissive: "#ff7a8a", emissiveIntensity: 0.2 }));
+    ghost.scale.setScalar(1.05);
+    scene.add(ghost);
+    return {
+      renderer, scene, camera,
+      update(t) {
+        ghost.position.set(0, 0.8 + 0.05 * Math.abs(Math.sin(t * 3)), 0);
+        ghost.lookAt(cam.x, ghost.position.y, cam.z);
+        sel.material.opacity = 0.2 + 0.14 * Math.sin(t * 3);
+      },
+      after() {
+        host.querySelectorAll(".call").forEach((el) => {
+          const [x, y, z] = el.dataset.p.split(",").map(Number);
+          const p = V(x, y, z).project(camera);
+          el.style.left = (((p.x + 1) / 2) * W).toFixed(1) + "px";
+          el.style.top = (((1 - p.y) / 2) * H).toFixed(1) + "px";
+        });
+      },
+    };
+  }
+
+  const builders = { p1: sceneP1, p2: sceneP2, p3: sceneP3 };
+  const scenes = [];
+  document.querySelectorAll("[data-scene]").forEach((host) => {
+    try { const s = builders[host.dataset.scene](host); s.host = host; s.on = true; scenes.push(s); }
+    catch (e) { console.error(e); host.insertAdjacentHTML("afterbegin", '<p class="noweb">3D indisponible sur cet appareil</p>'); }
+  });
+  const draw = (t) => scenes.forEach((s) => { if (!s.on) return; if (s.update) s.update(t); s.renderer.render(s.scene, s.camera); });
+  draw(0);
+  scenes.forEach((s) => { if (s.after) s.after(); });
+  if (!reduce) {
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => { const s = scenes.find((x) => x.host === e.target); if (s) s.on = e.isIntersecting; }));
+      scenes.forEach((s) => io.observe(s.host));
+    }
+    const t0 = performance.now();
+    const loop = (now) => { draw((now - t0) / 1000); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>

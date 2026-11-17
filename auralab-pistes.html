@@ -1,0 +1,553 @@
+<title>Pistes visuelles AuraLab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@400;700&family=Manrope:wght@400;600;700&family=Martian+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;600;700&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: planche de présentation — intro courte, 4 maquettes de site en pleine largeur, grille de 6 logos, sélection fixée en bas. */
+:root{
+  --bg:#f4f5f8; --surface:#ffffff; --fg:#17151f; --muted:#5e5b6e; --line:#dddbe6; --accent:#5b3df5; --accent-soft:#ece8ff;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"Martian Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#111018; --surface:#1a1923; --fg:#ecebf3; --muted:#a09db2; --line:#2d2b3a; --accent:#a796ff; --accent-soft:#272143; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#111018; --surface:#1a1923; --fg:#ecebf3; --muted:#a09db2; --line:#2d2b3a; --accent:#a796ff; --accent-soft:#272143; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--fg); font:16px/1.55 var(--f-body); padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 120px}
+.wrap{max-width:1120px; margin:0 auto}
+h1,h2,h3,h4{text-wrap:balance; margin:0}
+p{margin:0}
+.label{font:600 11px/1.4 var(--f-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+
+/* Intro */
+.intro{padding-block:56px 40px; display:grid; grid-template-columns:1.3fr 1fr; gap:40px; align-items:end}
+.intro h1{font:800 clamp(38px,6vw,68px)/1 var(--f-display); letter-spacing:-.02em}
+.intro h1 span{color:var(--accent)}
+.intro .lede{color:var(--muted); max-width:58ch; margin-top:18px; font-size:17px}
+.brief{border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:18px 20px; display:grid; gap:10px; font-size:14px}
+.brief dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 14px}
+.brief dt{font:600 11px/1.9 var(--f-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.brief dd{margin:0}
+
+.section-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; border-top:2px solid var(--fg); padding-top:14px; margin-top:48px; margin-bottom:24px}
+.section-head h2{font:800 30px/1.1 var(--f-display)}
+.section-head p{color:var(--muted); max-width:60ch}
+
+/* Site cards */
+.site{display:grid; grid-template-columns:minmax(0,1.75fr) minmax(0,1fr); gap:28px; padding-block:28px; border-bottom:1px solid var(--line)}
+.site:last-of-type{border-bottom:0}
+.frame{border-radius:10px; overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 10px 30px -18px rgba(20,15,40,.35)}
+.chrome{display:flex; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid var(--line); font:400 11px var(--f-mono); color:var(--muted)}
+.chrome i{width:9px; height:9px; border-radius:50%; background:var(--line); display:block}
+.chrome span{margin-left:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.viewport{position:relative; aspect-ratio:960/580; overflow:hidden; max-width:100%}
+.mock{position:absolute; top:0; left:0; width:960px; height:580px; transform-origin:0 0; transform:scale(var(--s,.6))}
+.notes{display:grid; gap:14px; align-content:start; min-width:0}
+.notes .code{font:600 12px var(--f-mono); color:var(--accent)}
+.notes h3{font:800 28px/1.1 var(--f-display)}
+.notes .pitch{color:var(--muted)}
+.swatches{display:flex; gap:6px; flex-wrap:wrap}
+.sw{display:grid; gap:4px; font:400 10px var(--f-mono); color:var(--muted)}
+.sw b{display:block; width:44px; height:28px; border-radius:5px; border:1px solid var(--line)}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:14px}
+.kv dt{font:600 11px/1.9 var(--f-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.kv dd{margin:0}
+.pick{justify-self:start; font:600 14px var(--f-body); border:1.5px solid var(--fg); background:transparent; color:var(--fg); border-radius:999px; padding:8px 16px; cursor:pointer}
+.pick:hover{background:var(--accent-soft)}
+.pick[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.pick:focus-visible, .copy:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+/* Logos */
+.logos{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+.logo{background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:grid}
+.stages{display:grid; grid-template-columns:1fr 1fr}
+.stage{aspect-ratio:1; display:grid; place-items:center; padding:22%}
+.stage.light{background:#f3f2f7}
+.stage.dark{background:#14131b}
+.stage svg{width:100%; height:auto; display:block}
+.logo-body{padding:16px 18px 18px; display:grid; gap:10px}
+.logo-body .row{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.logo-body h4{font:800 20px var(--f-display)}
+.logo-body p{color:var(--muted); font-size:14px}
+.wordmark{display:flex; align-items:center; gap:10px; padding:12px 0; border-block:1px solid var(--line)}
+.wordmark .m{width:34px; flex:none}
+.wordmark .m svg{display:block; width:100%; height:auto}
+.wordmark .w{font-size:24px; line-height:1}
+.favs{display:flex; align-items:center; gap:10px}
+.favs span{display:block}
+.favs svg{display:block}
+.logo .pick{padding:6px 14px; font-size:13px}
+
+/* Reco */
+.reco{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+.reco article{border:1px solid var(--line); border-radius:10px; padding:20px; background:var(--surface); display:grid; gap:8px; align-content:start}
+.reco article.top{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+.reco h4{font:800 22px var(--f-display)}
+.reco p{color:var(--muted); font-size:15px}
+.tag{font:600 11px var(--f-mono); color:var(--accent); letter-spacing:.06em; text-transform:uppercase}
+
+/* Bottom bar */
+.bar{position:fixed; left:0; right:0; bottom:0; background:var(--fg); color:var(--bg); padding:12px max(16px, env(safe-area-inset-left, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; justify-content:center}
+.bar .in{max-width:1120px; width:100%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between}
+.bar output{font:600 14px var(--f-mono)}
+.copy{font:600 14px var(--f-body); background:var(--bg); color:var(--fg); border:0; border-radius:999px; padding:8px 16px; cursor:pointer}
+
+@media (max-width:860px){
+  .intro{grid-template-columns:1fr}
+  .site{grid-template-columns:1fr}
+  .logos, .reco{grid-template-columns:1fr}
+}
+@media (min-width:600px) and (max-width:860px){ .logos{grid-template-columns:1fr 1fr} }
+
+/* ================= Maquette S1 — Tableau noir ================= */
+.s1{background:#1e2a25; color:#ecebe2; font:15px/1.5 "Atkinson Hyperlegible", Verdana, sans-serif; border:14px solid #7b5236; box-shadow:inset 0 0 80px rgba(0,0,0,.45)}
+.s1 .nav{display:flex; justify-content:space-between; align-items:center; padding:16px 28px 0}
+.s1 .brand{display:flex; align-items:center; gap:10px; font:700 26px "Kalam", cursive}
+.s1 .brand span{width:34px; display:block}
+.s1 .links{display:flex; gap:24px; font-size:14px; color:#c9cbbf}
+.s1 .body{display:grid; grid-template-columns:1fr 1.15fr; gap:26px; padding:26px 28px 0}
+.s1 .eyebrow{font:700 12px "Atkinson Hyperlegible"; letter-spacing:.14em; text-transform:uppercase; color:#f2d675}
+.s1 h3{font:700 50px/1.02 "Kalam", cursive; margin:10px 0 14px; color:#f4f3ec}
+.s1 h3 u{text-decoration:none; background:linear-gradient(transparent 78%, rgba(242,214,117,.55) 78%, rgba(242,214,117,.55) 90%, transparent 90%)}
+.s1 .lede{color:#c9cbbf; max-width:34ch}
+.s1 .btns{display:flex; gap:12px; margin-top:20px}
+.s1 .b1{background:#f2d675; color:#1e2a25; font-weight:700; padding:10px 18px; border-radius:6px}
+.s1 .b2{border:2px dashed #c9cbbf; padding:8px 16px; border-radius:6px; color:#ecebe2}
+.s1 .lab{display:grid; grid-template-columns:1fr 170px; gap:14px}
+.s1 .glass{background:#15201b; border:2px solid rgba(236,235,226,.55); border-radius:10px; position:relative; height:280px; overflow:hidden}
+.s1 .glass canvas{position:absolute; inset:0; width:100%; height:100%}
+.s1 .glass .hud{position:absolute; left:10px; bottom:8px; font:400 12px "JetBrains Mono", monospace; color:#c9cbbf}
+.s1 .board{font:400 17px/1.3 "Kalam", cursive; color:#ecebe2; border-left:2px solid rgba(236,235,226,.3); padding-left:14px; display:grid; gap:12px; align-content:start}
+.s1 .board b{display:block; font:700 13px "Atkinson Hyperlegible"; letter-spacing:.1em; text-transform:uppercase; color:#e9a0a6}
+.s1 .sliders{grid-column:1/-1; display:grid; grid-template-columns:repeat(2,1fr); gap:12px 24px; font-size:13px; color:#c9cbbf}
+.s1 .sl{display:grid; gap:6px}
+.s1 .sl i{display:block; height:3px; background:rgba(236,235,226,.35); position:relative; border-radius:2px}
+.s1 .sl i::after{content:""; position:absolute; top:-6px; width:15px; height:15px; border-radius:50%; background:#ecebe2; left:var(--v)}
+.s1 .foot{position:absolute; left:28px; right:28px; bottom:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; border-top:2px dashed rgba(236,235,226,.25); padding-top:14px; font-size:13px; color:#c9cbbf}
+.s1 .foot b{display:block; font:700 19px "Kalam", cursive; color:#f4f3ec}
+
+/* ================= Maquette S2 — Papier millimétré ================= */
+.s2{background-color:#f7faf9; background-image:linear-gradient(#cfe3de 1px, transparent 1px), linear-gradient(90deg,#cfe3de 1px, transparent 1px), linear-gradient(#e7f0ee 1px, transparent 1px), linear-gradient(90deg,#e7f0ee 1px, transparent 1px); background-size:40px 40px,40px 40px,8px 8px,8px 8px; color:#16233a; font:14px/1.5 "Archivo", Arial, sans-serif}
+.s2 .top{display:flex; justify-content:space-between; align-items:stretch; border-bottom:2px solid #13315c; background:#f7faf9}
+.s2 .brand{display:flex; align-items:center; gap:10px; padding:12px 22px; font:800 22px "Archivo"; font-stretch:125%; letter-spacing:.02em; color:#13315c; border-right:2px solid #13315c}
+.s2 .brand span{width:30px; display:block}
+.s2 .meta{display:flex}
+.s2 .meta div{padding:8px 18px; border-left:1px solid #13315c; font:400 10px/1.5 "JetBrains Mono", monospace; color:#4a5a73; display:grid; align-content:center}
+.s2 .meta b{font:600 12px "JetBrains Mono", monospace; color:#13315c}
+.s2 .body{display:grid; grid-template-columns:1fr 1.1fr; gap:30px; padding:30px 22px 0}
+.s2 h3{font:800 56px/.95 "Archivo"; font-stretch:112%; color:#13315c; letter-spacing:-.01em}
+.s2 h3 em{font-style:normal; color:#ff6b1a}
+.s2 .lede{margin-top:16px; max-width:36ch; color:#34435c}
+.s2 .btns{display:flex; gap:10px; margin-top:20px}
+.s2 .b1{background:#13315c; color:#fff; padding:10px 18px; font-weight:700}
+.s2 .b2{border:2px solid #13315c; color:#13315c; padding:8px 16px; font-weight:700}
+.s2 .right{display:grid; gap:12px}
+.s2 .chamber{position:relative; height:200px; border:2px solid #13315c; background:rgba(255,255,255,.75); margin-left:26px; margin-top:16px}
+.s2 .chamber canvas{position:absolute; inset:0; width:100%; height:100%}
+.s2 .dim{position:absolute; font:400 10px "JetBrains Mono", monospace; color:#ff6b1a}
+.s2 .dim.w{top:-18px; left:0; right:0; text-align:center; border-top:1px solid #ff6b1a; padding-top:1px; height:0; line-height:0}
+.s2 .dim.w span{background:#f7faf9; padding:0 6px; position:relative; top:-1px}
+.s2 .dim.h{left:-24px; top:0; bottom:0; border-left:1px solid #ff6b1a; display:grid; place-items:center}
+.s2 .dim.h span{transform:rotate(-90deg); background:#f7faf9; padding:0 4px; white-space:nowrap}
+.s2 pre{margin:0 0 0 26px; background:#13315c; color:#d7e3f5; font:400 11.5px/1.55 "JetBrains Mono", monospace; padding:12px 14px}
+.s2 pre .k{color:#8fb6ff} .s2 pre .s{color:#ffb98a} .s2 pre .n{color:#ffd166}
+.s2 .cartouche{position:absolute; left:22px; right:22px; bottom:18px; display:grid; grid-template-columns:repeat(3,1fr); border:2px solid #13315c; background:#f7faf9}
+.s2 .cartouche div{padding:9px 14px; border-left:1px solid #13315c; font-size:12.5px; color:#34435c}
+.s2 .cartouche div:first-child{border-left:0}
+.s2 .cartouche b{display:block; font:600 10px "JetBrains Mono", monospace; letter-spacing:.1em; color:#ff6b1a}
+
+/* ================= Maquette S3 — Nocturne Kiroween ================= */
+.s3{background:radial-gradient(600px 380px at 74% 46%, rgba(124,92,255,.32), transparent 70%), #0e0b16; color:#ece6ff; font:14px/1.55 "Manrope", Arial, sans-serif}
+.s3 .nav{display:flex; justify-content:space-between; align-items:center; padding:20px 32px}
+.s3 .brand{display:flex; align-items:center; gap:10px; font:700 20px "Unbounded", sans-serif}
+.s3 .brand span{width:32px; display:block}
+.s3 .pill{font:600 11px "Martian Mono", monospace; color:#ffb27a; border:1px solid rgba(255,138,61,.5); border-radius:999px; padding:6px 12px}
+.s3 .body{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px 32px 0; align-items:center}
+.s3 h3{font:700 44px/1.08 "Unbounded", sans-serif; letter-spacing:-.01em}
+.s3 h3 em{font-style:normal; color:transparent; background:linear-gradient(90deg,#b8a6ff,#ff9a5c); -webkit-background-clip:text; background-clip:text}
+.s3 .lede{margin-top:16px; color:#a79fc4; max-width:38ch}
+.s3 .btns{display:flex; gap:12px; margin-top:22px}
+.s3 .b1{background:#ece6ff; color:#0e0b16; font-weight:700; padding:10px 20px; border-radius:999px}
+.s3 .b2{color:#ece6ff; padding:9px 18px; border-radius:999px; border:1px solid rgba(236,230,255,.3)}
+.s3 .orb{position:relative; height:330px}
+.s3 .orb canvas{position:absolute; inset:0; width:100%; height:100%}
+.s3 .tree{position:absolute; right:0; bottom:6px; background:rgba(20,16,32,.85); border:1px solid rgba(167,150,255,.3); border-radius:10px; padding:12px 16px; font:400 11px/1.75 "Martian Mono", monospace; color:#cfc6f0; white-space:pre}
+.s3 .tree b{color:#ffb27a; font-weight:400}
+.s3 .stats{position:absolute; left:32px; right:32px; bottom:24px; display:flex; gap:36px; border-top:1px solid rgba(236,230,255,.12); padding-top:16px}
+.s3 .stats div{font-size:12.5px; color:#a79fc4}
+.s3 .stats b{display:block; font:700 22px "Unbounded", sans-serif; color:#ece6ff}
+
+/* ================= Maquette S4 — Kit modulaire ================= */
+.s4{background:#e7eaee; color:#111318; font:14px/1.5 "Figtree", Arial, sans-serif}
+.s4 .nav{display:flex; justify-content:space-between; align-items:center; padding:18px 30px}
+.s4 .brand{display:flex; align-items:center; gap:10px; font:800 22px "Bricolage Grotesque", sans-serif}
+.s4 .brand span{width:30px; display:block}
+.s4 .links{display:flex; gap:22px; font-weight:600}
+.s4 .links .cta{background:#111318; color:#e7eaee; padding:6px 14px; border-radius:4px}
+.s4 .body{display:grid; grid-template-columns:1fr 1fr; gap:26px; padding:14px 30px 0}
+.s4 h3{font:800 70px/.9 "Bricolage Grotesque", sans-serif; letter-spacing:-.035em; font-variation-settings:"opsz" 96}
+.s4 .lede{margin-top:18px; font-size:15.5px; max-width:36ch; color:#3a3f4a}
+.s4 .stack{display:grid; gap:8px; justify-items:center}
+.s4 .blk{border-radius:6px; padding:12px 16px; color:#fff; display:grid; gap:2px; position:relative; overflow:hidden}
+.s4 .blk code{font:600 13px "JetBrains Mono", monospace}
+.s4 .blk small{font-size:12.5px; opacity:.92}
+.s4 .blk.app{background:#e5484d; width:60%; height:112px}
+.s4 .blk.app canvas{position:absolute; inset:0; width:100%; height:100%}
+.s4 .blk.app > *{position:relative}
+.s4 .blk.eng{background:#f2b705; color:#111318; width:80%}
+.s4 .blk.core{background:#1d3fbb; width:100%}
+.s4 .chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:4px}
+.s4 .chips i{font:normal 600 11px "JetBrains Mono", monospace; background:rgba(17,19,24,.12); border-radius:3px; padding:2px 6px}
+.s4 .who{position:absolute; left:30px; right:30px; bottom:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.s4 .who div{background:#fff; border-radius:6px; padding:12px 14px; font-size:13px; color:#3a3f4a}
+.s4 .who b{display:block; font:800 17px "Bricolage Grotesque", sans-serif; color:#111318}
+
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div>
+      <p class="label">AuraLab · planche de pistes · 7 nov. 2026</p>
+      <h1>Quatre sites, six logos, <span>une identité</span> à choisir.</h1>
+      <p class="lede">Chaque piste montre la page d'accueil et l'écran de labo, car le design retenu ira dans <code>core/</code> et habillera tous les labos. Retiens une ou plusieurs pistes avec les boutons, puis envoie-moi la sélection affichée en bas : j'en tirerai les prompts d'implémentation pour le kit.</p>
+    </div>
+    <aside class="brief">
+      <p class="label">Ce que le design doit porter</p>
+      <dl>
+        <dt>Produit</dt><dd>Kit de labos éducatifs : terrain libre + tableau noir non contraignant</dd>
+        <dt>Publics</dt><dd>Élèves (double-clic, hors-ligne), profs (JSON sans code), devs (template)</dd>
+        <dt>Contraintes</dt><dd>Zéro dépendance, fichiers autonomes, polices embarquables, lisible en classe</dd>
+        <dt>Contexte</dt><dd>Kiroween, catégorie Skeleton Crew</dd>
+      </dl>
+    </aside>
+  </header>
+
+  <div class="section-head">
+    <h2>Sites</h2>
+    <p>Les maquettes animent un vrai moteur de particules miniature : c'est le labo par défaut, celui qui « raconte une histoire ».</p>
+  </div>
+
+  <!-- S1 -->
+  <section class="site" id="s1">
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>auralab / labo-gaz-parfait.html</span></div>
+      <div class="viewport"><div class="mock s1">
+        <div class="nav"><div class="brand"><span data-logo="L3" data-v="dark"></span>AuraLab</div><div class="links"><span>Labos</span><span>Pour les profs</span><span>Créer un labo</span></div></div>
+        <div class="body">
+          <div>
+            <p class="eyebrow">Labos éducatifs virtuels</p>
+            <h3>Expérimente d'abord.<br><u>La théorie suit.</u></h3>
+            <p class="lede">Des terrains d'expérimentation libres, avec un tableau noir qui propose sans jamais imposer.</p>
+            <div class="btns"><span class="b1">Ouvrir un labo</span><span class="b2">Adapter pour ma classe</span></div>
+          </div>
+          <div class="lab">
+            <div class="glass"><canvas data-p="s1"></canvas><div class="hud">T 300 K · V 2,0 L · P 1,2 atm</div></div>
+            <div class="board"><div><b>Objectif</b>Chauffer le gaz sans dépasser 3 atm.</div><div><b>Piste</b>Et si tu doublais le volume&nbsp;?</div><div><b>Note</b>Observe la vitesse des particules.</div></div>
+            <div class="sliders"><div class="sl">Température<i style="--v:35%"></i></div><div class="sl">Volume<i style="--v:55%"></i></div></div>
+          </div>
+        </div>
+        <div class="foot"><div><b>Élèves</b>Double-clic, hors-ligne, jamais de code.</div><div><b>Profs</b>Un fichier JSON, validé par le navigateur.</div><div><b>Devs</b>Un config et quelques dizaines de lignes.</div></div>
+      </div></div>
+    </div>
+    <div class="notes">
+      <span class="code">S1</span>
+      <h3>Tableau noir</h3>
+      <p class="pitch">La salle de classe, prise au sérieux. Ardoise, craie et cadre en bois : le « tableau noir » du produit devient l'identité entière. Les élèves reconnaissent l'endroit, les profs s'y sentent chez eux.</p>
+      <div class="swatches"><div class="sw"><b style="background:#1e2a25"></b>ardoise</div><div class="sw"><b style="background:#ecebe2"></b>craie</div><div class="sw"><b style="background:#f2d675"></b>craie jaune</div><div class="sw"><b style="background:#e9a0a6"></b>craie rose</div><div class="sw"><b style="background:#7b5236"></b>cadre</div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Kalam (manuscrite)</dd><dt>Texte</dt><dd>Atkinson Hyperlegible, conçue pour la lisibilité</dd><dt>Atout</dt><dd>Le tableau est déjà dans l'interface du labo, rien à inventer</dd><dt>Risque</dt><dd>Peut faire « primaire » ; à doser pour le lycée</dd></dl>
+      <button class="pick" type="button" id="pick-s1" data-id="S1" aria-pressed="false">Retenir S1</button>
+    </div>
+  </section>
+
+  <!-- S2 -->
+  <section class="site" id="s2">
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>auralab / index.html</span></div>
+      <div class="viewport"><div class="mock s2">
+        <div class="top"><div class="brand"><span data-logo="L2" data-v="light"></span>AURALAB</div><div class="meta"><div>Feuille<b>01 / 03</b></div><div>Objet<b>Kit de labos</b></div><div>Dépendances<b>0</b></div></div></div>
+        <div class="body">
+          <div>
+            <h3>Un labo =<br>un config<br><em>+ 40 lignes.</em></h3>
+            <p class="lede">Une coquille commune, des moteurs interchangeables, et ton labo branché dessus. Les profs règlent le JSON, le navigateur vérifie.</p>
+            <div class="btns"><span class="b1">Voir les labos</span><span class="b2">Lire le gabarit</span></div>
+          </div>
+          <div class="right">
+            <div class="chamber"><canvas data-p="s2"></canvas><div class="dim w"><span>L = 24 cm</span></div><div class="dim h"><span>h = 10 cm</span></div></div>
+<pre>{
+  <span class="k">"labo"</span>: <span class="s">"gaz-parfait"</span>,
+  <span class="k">"moteur"</span>: <span class="s">"particules"</span>,
+  <span class="k">"particules"</span>: <span class="n">240</span>,
+  <span class="k">"temperature"</span>: { <span class="k">"min"</span>: <span class="n">100</span>, <span class="k">"max"</span>: <span class="n">900</span>, <span class="k">"defaut"</span>: <span class="n">300</span> },
+  <span class="k">"tableau"</span>: { <span class="k">"objectif"</span>: <span class="s">"Atteindre 3 atm"</span> }
+}</pre>
+          </div>
+        </div>
+        <div class="cartouche"><div><b>ÉLÈVES</b>Fichier autonome, hors-ligne</div><div><b>PROFS</b>Adapter sans coder ni installer</div><div><b>DEVS</b>core/ · engines/ · app-*/</div></div>
+      </div></div>
+    </div>
+    <div class="notes">
+      <span class="code">S2</span>
+      <h3>Papier millimétré</h3>
+      <p class="pitch">La paillasse et le cahier de TP. Quadrillage, cotes, cartouche de dessin technique : chaque chiffre a son unité. Sobre, très lisible, et le JSON est montré comme une pièce du dessin plutôt que caché.</p>
+      <div class="swatches"><div class="sw"><b style="background:#f7faf9"></b>papier</div><div class="sw"><b style="background:#cfe3de"></b>quadrillage</div><div class="sw"><b style="background:#13315c"></b>encre</div><div class="sw"><b style="background:#ff6b1a"></b>cote</div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Archivo élargie</dd><dt>Données</dt><dd>JetBrains Mono</dd><dt>Atout</dt><dd>La plus crédible pour les profs ; vieillit bien</dd><dt>Risque</dt><dd>Moins de « waouh » pour un jury de hackathon</dd></dl>
+      <button class="pick" type="button" id="pick-s2" data-id="S2" aria-pressed="false">Retenir S2</button>
+    </div>
+  </section>
+
+  <!-- S3 -->
+  <section class="site" id="s3">
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>auralab / kiroween</span></div>
+      <div class="viewport"><div class="mock s3">
+        <div class="nav"><div class="brand"><span data-logo="L1" data-v="dark"></span>AuraLab</div><span class="pill">Kiroween · Skeleton Crew</span></div>
+        <div class="body">
+          <div>
+            <h3>Le squelette d'un labo.<br><em>À toi de lui donner vie.</em></h3>
+            <p class="lede">Un template sans science dedans. Branche un moteur, écris un config, et ton expérience prend son aura.</p>
+            <div class="btns"><span class="b1">Lancer la démo</span><span class="b2">Forker le squelette</span></div>
+          </div>
+          <div class="orb"><canvas data-p="s3"></canvas>
+<div class="tree">auralab/
+├─ <b>core/</b>      coquille, zéro science
+├─ <b>engines/</b>   particules · équations
+└─ <b>app-gaz/</b>   config + liaison</div></div>
+        </div>
+        <div class="stats"><div><b>0</b>dépendance</div><div><b>0</b>crédit Kiro à l'exécution</div><div><b>0</b>valeur qui fait planter</div><div><b>1</b>config par labo</div></div>
+      </div></div>
+    </div>
+    <div class="notes">
+      <span class="code">S3</span>
+      <h3>Nocturne</h3>
+      <p class="pitch">Le nom pris au mot : une aura violette qui pulse autour des particules, une touche citrouille pour Kiroween. Le discours « squelette » colle exactement à la catégorie Skeleton Crew.</p>
+      <div class="swatches"><div class="sw"><b style="background:#0e0b16"></b>nuit</div><div class="sw"><b style="background:#7c5cff"></b>aura</div><div class="sw"><b style="background:#ff8a3d"></b>citrouille</div><div class="sw"><b style="background:#ece6ff"></b>lueur</div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Unbounded</dd><dt>Texte</dt><dd>Manrope · Martian Mono</dd><dt>Atout</dt><dd>La plus forte pour le jury et la démo vidéo</dd><dt>Risque</dt><dd>Thème sombre fatigant au vidéoprojecteur ; mieux en « skin » optionnel</dd></dl>
+      <button class="pick" type="button" id="pick-s3" data-id="S3" aria-pressed="false">Retenir S3</button>
+    </div>
+  </section>
+
+  <!-- S4 -->
+  <section class="site" id="s4">
+    <div class="frame">
+      <div class="chrome"><i></i><i></i><i></i><span>auralab / kit</span></div>
+      <div class="viewport"><div class="mock s4">
+        <div class="nav"><div class="brand"><span data-logo="L4" data-v="light"></span>AuraLab</div><div class="links"><span>Labos</span><span>Moteurs</span><span>Docs</span><span class="cta">Créer un labo</span></div></div>
+        <div class="body">
+          <div>
+            <h3>Monte ton labo bloc par bloc.</h3>
+            <p class="lede">Trois couches qui s'emboîtent. Tu changes de moteur sans toucher à la coquille, tu changes de labo sans toucher au moteur.</p>
+          </div>
+          <div class="stack">
+            <div class="blk app"><canvas data-p="s4"></canvas><code>app-gaz-parfait/</code><small>config + liaison</small></div>
+            <div class="blk eng"><code>engines/</code><small>moteurs interchangeables</small><div class="chips"><i>particules</i><i>équations</i><i>optique</i></div></div>
+            <div class="blk core"><code>core/</code><small>layout · contrôles · HUD · courbes · boucle — sans science</small></div>
+          </div>
+        </div>
+        <div class="who"><div><b>Élèves</b>On ouvre, on manipule.</div><div><b>Profs</b>On règle le JSON.</div><div><b>Devs</b>On empile un nouveau bloc.</div></div>
+      </div></div>
+    </div>
+    <div class="notes">
+      <span class="code">S4</span>
+      <h3>Kit modulaire</h3>
+      <p class="pitch">L'architecture devient l'identité : trois blocs de couleur primaire pour core, engines et app. Ça explique le produit en un coup d'œil et ça se décline à l'infini (un labo = une couleur de bloc).</p>
+      <div class="swatches"><div class="sw"><b style="background:#e7eaee"></b>socle</div><div class="sw"><b style="background:#1d3fbb"></b>core</div><div class="sw"><b style="background:#f2b705"></b>engines</div><div class="sw"><b style="background:#e5484d"></b>app</div><div class="sw"><b style="background:#111318"></b>encre</div></div>
+      <dl class="kv"><dt>Titres</dt><dd>Bricolage Grotesque</dd><dt>Texte</dt><dd>Figtree</dd><dt>Atout</dt><dd>Le meilleur pour vendre « kit » et « template » aux devs</dd><dt>Risque</dt><dd>Parle plus d'architecture que de science</dd></dl>
+      <button class="pick" type="button" id="pick-s4" data-id="S4" aria-pressed="false">Retenir S4</button>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <h2>Logos</h2>
+    <p>Chaque logo est montré sur fond clair, sur fond sombre et en favicon (16 et 32 px), la taille d'un onglet d'élève.</p>
+  </div>
+
+  <div class="logos">
+    <article class="logo" data-l="L1">
+      <div class="stages"><div class="stage light" data-logo="L1" data-v="light"></div><div class="stage dark" data-logo="L1" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L1 · Halo</h4><button class="pick" type="button" id="pick-l1" data-id="L1" aria-pressed="false">Retenir</button></div>
+        <p>Un A dans une orbite, avec une particule en mouvement. L'« aura » et le labo dans un seul signe.</p>
+        <div class="wordmark"><span class="m" data-logo="L1" data-v="light-ui"></span><span class="w" style="font-family:'Unbounded',sans-serif;font-weight:700">AuraLab</span></div>
+        <div class="favs" data-fav="L1"></div>
+      </div>
+    </article>
+    <article class="logo" data-l="L2">
+      <div class="stages"><div class="stage light" data-logo="L2" data-v="light"></div><div class="stage dark" data-logo="L2" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L2 · Fiole</h4><button class="pick" type="button" id="pick-l2" data-id="L2" aria-pressed="false">Retenir</button></div>
+        <p>Un erlenmeyer où flottent des particules. Lisible tout de suite, même par un élève de 6e.</p>
+        <div class="wordmark"><span class="m" data-logo="L2" data-v="light-ui"></span><span class="w" style="font-family:'Archivo',sans-serif;font-weight:800;font-stretch:125%">AURALAB</span></div>
+        <div class="favs" data-fav="L2"></div>
+      </div>
+    </article>
+    <article class="logo" data-l="L3">
+      <div class="stages"><div class="stage light" data-logo="L3" data-v="light"></div><div class="stage dark" data-logo="L3" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L3 · Craie</h4><button class="pick" type="button" id="pick-l3" data-id="L3" aria-pressed="false">Retenir</button></div>
+        <p>Un A tracé à la craie sur une ardoise, souligné en jaune. Le tableau noir en icône d'app.</p>
+        <div class="wordmark"><span class="m" data-logo="L3" data-v="light-ui"></span><span class="w" style="font-family:'Kalam',cursive;font-weight:700">AuraLab</span></div>
+        <div class="favs" data-fav="L3"></div>
+      </div>
+    </article>
+    <article class="logo" data-l="L4">
+      <div class="stages"><div class="stage light" data-logo="L4" data-v="light"></div><div class="stage dark" data-logo="L4" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L4 · Strates</h4><button class="pick" type="button" id="pick-l4" data-id="L4" aria-pressed="false">Retenir</button></div>
+        <p>Quatre blocs qui dessinent un A : app en haut, engines au milieu, core en socle.</p>
+        <div class="wordmark"><span class="m" data-logo="L4" data-v="light-ui"></span><span class="w" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800">AuraLab</span></div>
+        <div class="favs" data-fav="L4"></div>
+      </div>
+    </article>
+    <article class="logo" data-l="L5">
+      <div class="stages"><div class="stage light" data-logo="L5" data-v="light"></div><div class="stage dark" data-logo="L5" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L5 · Fiole-fantôme</h4><button class="pick" type="button" id="pick-l5" data-id="L5" aria-pressed="false">Retenir</button></div>
+        <p>Une fiole dont le bas ondule comme un drap de fantôme. Mascotte Kiroween, sympathique pour les élèves.</p>
+        <div class="wordmark"><span class="m" data-logo="L5" data-v="light-ui"></span><span class="w" style="font-family:'Unbounded',sans-serif;font-weight:500">auralab</span></div>
+        <div class="favs" data-fav="L5"></div>
+      </div>
+    </article>
+    <article class="logo" data-l="L6">
+      <div class="stages"><div class="stage light" data-logo="L6" data-v="light"></div><div class="stage dark" data-logo="L6" data-v="dark"></div></div>
+      <div class="logo-body">
+        <div class="row"><h4>L6 · Orbite</h4><button class="pick" type="button" id="pick-l6" data-id="L6" aria-pressed="false">Retenir</button></div>
+        <p>Un « a » minuscule traversé par une trajectoire. Le plus discret, il se marie avec toutes les pistes.</p>
+        <div class="wordmark"><span class="m" data-logo="L6" data-v="light-ui"></span><span class="w" style="font-family:'Figtree',sans-serif;font-weight:700">auralab</span></div>
+        <div class="favs" data-fav="L6"></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="section-head">
+    <h2>Combinaisons qui tiennent</h2>
+    <p>Comme le design passera par des variables CSS dans <code>core/</code>, on peut garder un thème par défaut et un second en option.</p>
+  </div>
+  <div class="reco">
+    <article class="top"><span class="tag">Ma recommandation</span><h4>S1 + L1, et S3 en thème</h4><p>Le tableau noir pour l'usage en classe, le Halo comme signe commun, et la nocturne activable pour la démo Kiroween. Un seul jeu de tokens, deux ambiances.</p></article>
+    <article><span class="tag">La plus sûre</span><h4>S2 + L2</h4><p>Cahier de TP et fiole : immédiatement compris par les profs, très lisible au vidéoprojecteur, facile à tenir dans le temps.</p></article>
+    <article><span class="tag">La plus « kit »</span><h4>S4 + L4</h4><p>Le logo et le site racontent tous les deux l'architecture en trois couches. Idéal si le public visé est surtout les devs du hackathon.</p></article>
+  </div>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <div class="in"><output id="sel" for="pick-s1">Sélection : rien pour l'instant</output><button class="copy" type="button" id="copy">Copier la sélection</button></div>
+</div>
+
+<script>
+(function(){
+  // ---------- Logos ----------
+  var uid = 0;
+  var P = {
+    L1:{light:{fg:'#1a1530',ac:'#6d4aff'}, dark:{fg:'#f3efff',ac:'#a08cff'}},
+    L2:{light:{fg:'#13315c',ac:'#ff6b1a',bg:'#f3f2f7'}, dark:{fg:'#e6eefb',ac:'#ff8a4a',bg:'#14131b'}},
+    L3:{light:{slate:'#22322c',rim:'#22322c',ch:'#efeee6',y:'#f2d675'}, dark:{slate:'#22322c',rim:'#4a5f56',ch:'#efeee6',y:'#f2d675'}},
+    L4:{light:{r:'#e5484d',y:'#f2b705',b:'#1d3fbb'}, dark:{r:'#f0646a',y:'#f7c531',b:'#5576f0'}},
+    L5:{light:{body:'#6d4aff',eye:'#ffffff',ac:'#ff8a3d'}, dark:{body:'#efeaff',eye:'#14131b',ac:'#ff8a3d'}},
+    L6:{light:{fg:'#121620',ac:'#0d9488'}, dark:{fg:'#f2f4f8',ac:'#2dd4bf'}}
+  };
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var themeAttr = document.documentElement.getAttribute('data-theme');
+  var uiDark = themeAttr ? themeAttr === 'dark' : dark;
+
+  var draw = {
+    L1:function(c,id){return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="g'+id+'"><stop offset="0.5" stop-color="'+c.ac+'" stop-opacity=".35"/><stop offset="1" stop-color="'+c.ac+'" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="49" fill="url(#g'+id+')"/><circle cx="50" cy="50" r="33" fill="none" stroke="'+c.ac+'" stroke-width="3.5"/><path d="M37 65 L50 33 L63 65 M41.5 55 H58.5" fill="none" stroke="'+c.fg+'" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="78.6" cy="33.5" r="5.5" fill="'+c.ac+'"/><circle cx="21.4" cy="66.5" r="3" fill="'+c.ac+'" opacity=".7"/></svg>';},
+    L2:function(c){return '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M32.5 62 Q41 57 50 62 T67.5 62 L74 77 Q76 82 70 82 H30 Q24 82 26 77 Z" fill="'+c.ac+'"/><path d="M39 13 H61" stroke="'+c.fg+'" stroke-width="5" stroke-linecap="round"/><path d="M44 14 V40 L23 79 Q20 86 28 86 H72 Q80 86 77 79 L56 40 V14" fill="none" stroke="'+c.fg+'" stroke-width="5" stroke-linejoin="round"/><circle cx="41" cy="72" r="3.4" fill="'+c.bg+'"/><circle cx="54" cy="68.5" r="2.5" fill="'+c.bg+'"/><circle cx="61" cy="75" r="2.9" fill="'+c.bg+'"/><circle cx="47" cy="49" r="2.4" fill="'+c.ac+'"/><circle cx="52" cy="33" r="1.8" fill="'+c.ac+'" opacity=".7"/></svg>';},
+    L3:function(c,id){return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><filter id="r'+id+'" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter></defs><rect x="4" y="4" width="92" height="92" rx="20" fill="'+c.slate+'" stroke="'+c.rim+'" stroke-width="2"/><g filter="url(#r'+id+')" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M29 74 L49.5 25 L71 74" stroke="'+c.ch+'" stroke-width="7"/><path d="M38 57 Q50 54.5 62 57.5" stroke="'+c.ch+'" stroke-width="6"/><path d="M27 84 Q50 80.5 73 84.5" stroke="'+c.y+'" stroke-width="3.4"/></g></svg>';},
+    L4:function(c){return '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="39" y="12" width="22" height="18" rx="3" fill="'+c.r+'"/><rect x="27" y="36" width="46" height="18" rx="3" fill="'+c.y+'"/><rect x="15" y="60" width="29" height="27" rx="3" fill="'+c.b+'"/><rect x="56" y="60" width="29" height="27" rx="3" fill="'+c.b+'"/></svg>';},
+    L5:function(c){return '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="67" cy="16" r="3.6" fill="'+c.ac+'"/><circle cx="74" cy="6.5" r="2.2" fill="'+c.ac+'" opacity=".75"/><rect x="36" y="18" width="28" height="6" rx="3" fill="'+c.body+'"/><path d="M41 22 H59 V36 Q81 45 81 68 V86 Q75.8 80 70.7 86 Q65.5 92 60.3 86 Q55.2 80 50 86 Q44.8 92 39.7 86 Q34.5 80 29.3 86 Q24.2 92 19 86 V68 Q19 45 41 36 Z" fill="'+c.body+'"/><ellipse cx="41" cy="62" rx="4.6" ry="6.2" fill="'+c.eye+'"/><ellipse cx="59" cy="62" rx="4.6" ry="6.2" fill="'+c.eye+'"/></svg>';},
+    L6:function(c){return '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="45" cy="57" r="17" fill="none" stroke="'+c.fg+'" stroke-width="9"/><path d="M62 38 V75" stroke="'+c.fg+'" stroke-width="9" stroke-linecap="round"/><ellipse cx="50" cy="56" rx="43" ry="14" transform="rotate(-24 50 56)" fill="none" stroke="'+c.ac+'" stroke-width="2.6"/><circle cx="89.3" cy="38.5" r="5.2" fill="'+c.ac+'"/></svg>';}
+  };
+  function svg(key, v){
+    var variant = v === 'light-ui' ? (uiDark ? 'dark' : 'light') : v;
+    return draw[key](P[key][variant], ++uid);
+  }
+  document.querySelectorAll('[data-logo]').forEach(function(el){ el.innerHTML = svg(el.dataset.logo, el.dataset.v); });
+  document.querySelectorAll('[data-fav]').forEach(function(el){
+    var k = el.dataset.fav;
+    el.innerHTML = '<span class="label">Favicon</span>' +
+      '<span style="width:32px;height:32px">'+svg(k, 'light-ui').replace('<svg','<svg width="32" height="32"')+'</span>' +
+      '<span style="width:16px;height:16px">'+svg(k, 'light-ui').replace('<svg','<svg width="16" height="16"')+'</span>';
+  });
+
+  // ---------- Mise à l'échelle des maquettes ----------
+  var vps = document.querySelectorAll('.viewport');
+  function fit(vp){ vp.firstElementChild.style.setProperty('--s', vp.clientWidth / 960); }
+  vps.forEach(fit);
+  if ('ResizeObserver' in window){ var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target); }); }); vps.forEach(function(v){ ro.observe(v); }); }
+  else window.addEventListener('resize', function(){ vps.forEach(fit); });
+
+  // ---------- Moteur de particules miniature ----------
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cfg = {
+    s1:{n:70, r:[2.5,4], cols:['#ecebe2','#f2d675','#e9a0a6'], speed:1.1, glow:0},
+    s2:{n:60, r:[3,3.5], cols:['#13315c','#13315c','#ff6b1a'], speed:.9, glow:0, ring:true},
+    s3:{n:90, r:[1.5,3.5], cols:['#b8a6ff','#ece6ff','#ff9a5c'], speed:.7, glow:14, orbit:true},
+    s4:{n:34, r:[2,3.5], cols:['#ffffff','#ffd4d5'], speed:1, glow:0}
+  };
+  var sims = [];
+  document.querySelectorAll('canvas[data-p]').forEach(function(cv){
+    var c = cfg[cv.dataset.p], ctx = cv.getContext('2d');
+    var w = cv.offsetWidth || 300, h = cv.offsetHeight || 200, dpr = Math.min(window.devicePixelRatio || 1, 2) * 1.5;
+    cv.width = w * dpr; cv.height = h * dpr; ctx.scale(dpr, dpr);
+    var ps = [], seed = 7;
+    function rnd(){ seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    for (var i = 0; i < c.n; i++){
+      var a = rnd() * Math.PI * 2, sp = c.speed * (0.4 + rnd());
+      ps.push({x: rnd() * w, y: rnd() * h, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: c.r[0] + rnd() * (c.r[1] - c.r[0]), col: c.cols[i % c.cols.length], t: rnd() * 6.28, R: 40 + rnd() * Math.min(w, h) * .42, w: (.004 + rnd() * .01) * (rnd() < .5 ? -1 : 1)});
+    }
+    sims.push({cv:cv, ctx:ctx, c:c, ps:ps, w:w, h:h});
+  });
+  function step(s){
+    var ctx = s.ctx, c = s.c, w = s.w, h = s.h;
+    ctx.clearRect(0, 0, w, h);
+    if (c.orbit){
+      var cx = w * .5, cy = h * .46;
+      ctx.strokeStyle = 'rgba(184,166,255,.18)'; ctx.lineWidth = 1;
+      [70, 110, 150].forEach(function(r){ ctx.beginPath(); ctx.ellipse(cx, cy, r, r * .55, -.35, 0, 6.29); ctx.stroke(); });
+    }
+    s.ps.forEach(function(p){
+      if (c.orbit){
+        p.t += p.w * 1.6; var cx2 = w * .5, cy2 = h * .46;
+        p.x = cx2 + Math.cos(p.t) * p.R; p.y = cy2 + Math.sin(p.t) * p.R * .55;
+      } else {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < p.r || p.x > w - p.r){ p.vx *= -1; p.x = Math.max(p.r, Math.min(w - p.r, p.x)); }
+        if (p.y < p.r || p.y > h - p.r){ p.vy *= -1; p.y = Math.max(p.r, Math.min(h - p.r, p.y)); }
+      }
+      ctx.shadowBlur = c.glow; ctx.shadowColor = p.col; ctx.fillStyle = p.col;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.29);
+      if (c.ring){ ctx.lineWidth = 1.4; ctx.strokeStyle = p.col; ctx.stroke(); } else ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+  }
+  function loop(){ sims.forEach(step); if (!reduce) requestAnimationFrame(loop); }
+  if (reduce){ for (var k = 0; k < 40; k++) sims.forEach(function(s){ s.ps.forEach(function(p){ p.x += p.vx; p.y += p.vy; }); }); }
+  loop();
+
+  // ---------- Sélection ----------
+  var picks = document.querySelectorAll('.pick'), bar = document.getElementById('bar'), out = document.getElementById('sel');
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem('auralab-sel') || '[]'); } catch(e){}
+  function text(){ var ids = []; picks.forEach(function(b){ if (b.getAttribute('aria-pressed') === 'true') ids.push(b.dataset.id); }); return ids; }
+  function render(){
+    var ids = text();
+    bar.hidden = ids.length === 0;
+    out.textContent = 'Sélection AuraLab : ' + ids.join(' + ');
+    try { localStorage.setItem('auralab-sel', JSON.stringify(ids)); } catch(e){}
+  }
+  picks.forEach(function(b){
+    if (saved.indexOf(b.dataset.id) > -1) b.setAttribute('aria-pressed', 'true');
+    b.addEventListener('click', function(){ b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); render(); });
+  });
+  render();
+  document.getElementById('copy').addEventListener('click', function(){
+    var btn = this, t = out.textContent;
+    function done(){ btn.textContent = 'Copié'; setTimeout(function(){ btn.textContent = 'Copier la sélection'; }, 1600); }
+    try { navigator.clipboard.writeText(t).then(done, function(){ selectOut(); }); } catch(e){ selectOut(); }
+    function selectOut(){ var r = document.createRange(); r.selectNodeContents(out); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Texte sélectionné'; }
+  });
+})();
+</script>
